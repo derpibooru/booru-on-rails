@@ -1,0 +1,136 @@
+- if duplicate_reports.any?
+  .grid.grid--dupe-report-list
+    p Source image
+    p Target image
+    p Diff
+    p Status/options
+    - can_manage_dr = can?(:manage, DuplicateReport)
+    - duplicate_reports.each do |report|
+      ruby:
+        background_class =
+          case report.state
+          when 'rejected'.freeze
+            'background-danger'.freeze
+          when 'accepted'.freeze
+            'background-success'.freeze
+          when 'claimed'.freeze
+            'background-warning'.freeze
+          else
+            ''.freeze
+          end
+
+      == render partial: 'duplicate_reports/image_cell', locals: { image: report.image, source: true, report: report, can_manage_dr: can_manage_dr }
+      == render partial: 'duplicate_reports/image_cell', locals: { image: report.duplicate_of_image, source: false, report: report, can_manage_dr: can_manage_dr }
+      .grid--dupe-report-list__cell.dr__diff.border-vertical
+        table.table
+          tr
+            - if report.same_aspect_ratio?
+              td.success
+                a href=duplicate_report_path(report)
+                  ' Visual diff
+                | (Same aspect ratio)
+            - else
+              td.warning Different aspect ratio
+          tr
+            - if report.both_are_edits?
+              td.warning Both are edits
+            - elsif report.target_is_edit?
+              td.danger Target is an edit
+            - elsif report.source_is_edit?
+              td.danger Source is an edit
+            - else
+              td.success Neither is an edit
+          tr
+            - if report.both_are_alternate_versions?
+              td.warning Both are alternate versions
+            - elsif report.target_is_alternate_version?
+              td.danger Target is an alternate version
+            - elsif report.source_is_alternate_version?
+              td.danger Source is an alternate version
+            - else
+              td.success Neither is an alternate version
+          tr
+            - if report.same_res?
+              td.success Same resolution
+            - else
+              td.warning
+                - if report.higher_res?
+                  | Target resolution better
+                - else
+                  | Source resolution better
+          tr
+            - file_types = capture do
+              | (
+              = report.image.file_type
+              ' ,
+              = report.duplicate_of_image.file_type
+              | )
+            - if report.same_format?
+              td.success
+                ' Same format
+                = file_types
+            - else
+              td.warning
+                - if report.better_format?
+                  ' Target format better
+                - else
+                  ' Source format better
+                = file_types
+          tr
+            - if report.same_artist_tags?
+              td.success Same artist tags
+            - elsif report.more_artist_tags_on_target?
+              td.warning More artist tags on target
+            - elsif report.more_artist_tags_on_source?
+              td.warning More artist tags on source
+            - else
+              td.danger Different artist tags
+          tr
+            - if report.neither_have_source?
+              td.warning Neither have sources
+            - elsif report.same_source?
+              td.success Same sources
+            - elsif report.similar_source?
+              td.warning Same hostname
+            - elsif report.source_on_target?
+              td.warning Target has a source
+            - elsif report.source_on_source?
+              td.warning Source has a source
+            - else
+              td.danger Different sources
+          tr
+            - if report.same_rating_tags?
+              td.success Same rating tags
+            - else
+              td.danger Different rating tags
+          tr
+            - if report.forward_merge?
+              td.warning Target newer
+            - else
+              td.success Target older
+      .flex.flex--column.grid--dupe-report-list__cell.border-vertical id="report_options_#{report.id}"
+        .dr__status-options[class="#{background_class}"]
+          = report.state.capitalize
+          - if can_manage_dr && report.modifier.present?
+            '  by
+            = report.modifier.name
+          - if can_manage_dr
+            div
+              - if report.state == 'open'
+                a href=duplicate_report_claim_path(report, target: "report_options_#{report.id}") data-method="post"
+                  button.button.button--separate-right
+                    i.fa.fa-clipboard>
+                    | Claim
+              - if report.state != 'rejected'
+                a href=duplicate_report_reject_path(report) data-method="post"
+                  button.button
+                    i.fa.fa-times>
+                    | Reject
+        .dr__status-options
+          div
+            ' Reported
+            => friendly_time report.created_at
+            ' by
+            - if report.user.present?
+              =< link_to report.user.name, profile_path(report.user)
+          = report.reason.presence

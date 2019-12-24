@@ -1,0 +1,16 @@
+= form_for [@user, @award], url: @award.new_record? ? :profile_badge_awards : :profile_badge_award do |f|
+  - if @award.new_record?
+    .field
+      = label_tag :badge_id, 'Badge to award'
+      = select_tag :badge_id, options_for_select(Badge.order(title: :asc).where(disable_award: false).map { |b| [b.title, b.id, { 'data-set-value': b.description }] }), class: 'input', 'data-change-selectvalue': '#badge_award_label'
+  .field
+    = f.label :label, 'Label (Public)'
+    = f.text_field :label, class: 'input input--wide'
+  .field
+    = f.label :reason, 'Reason (Private)'
+    = f.text_field :reason, class: 'input input--wide'
+  .field
+    = f.label :badge_name, 'Badge Name (Overrides default name if set, leave blank for default badge name)'
+    = f.text_field :badge_name, class: 'input input--wide'
+  .field
+    = f.submit 'Award', class: 'button', data: { disable_with: raw('Saving&hellip;') }

@@ -1,0 +1,19 @@
+en:
+  booru:
+    name: "Derpibooru"
+    site: "derpibooru"
+    advert_message: "Derpibooru costs over $25 a day to operate -"
+    meta_description: "Derpibooru is a linear imagebooru which lets you share, find and discover new art and media surrounding the show My Little Pony: Friendship is Magic"
+    anonymous_user: "Background Pony"
+    errors:
+      access_denied: "Sorry, I'm afraid I can't let you do that, %{user}. You probably need to be logged in; if you're logged in and seeing this, you might've hit a bug."
+      record_not_found: "Sorry, we don't have the record you've requested yet—or anymore."
+      account_required: "Sorry, you need to sign in to view this page."
+      site_locked: "Sorry, the site is locked temporarily. Please try again later."
+      user_banned: "Sorry, you've been banned from using the site until %{until}. Reason given: %{reason} (Ban ID: %{ban_id}). If you feel this has been done in error, contact an administrator."
+      ip_high_risk: "%{reason}"
+      missing_fingerprint: "Sorry, you must accept cookies and enable JavaScript to post content"
+      comment_flooding: "Sorry, but you must wait %{seconds} seconds between posting comments on images."
+      post_flooding: "Sorry, but you must wait %{seconds} seconds between posting replies."
+      upload_flooding: "Sorry, but you must wait %{seconds} seconds between uploads."
+      metadata_flooding: "Sorry, but you must wait %{seconds} seconds between tags/source updates."

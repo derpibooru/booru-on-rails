@@ -1,0 +1,66 @@
+:categories:
+  - character
+  - content-fanmade
+  - content-official
+  - error
+  - oc
+  - origin
+  - rating
+  - species
+  - spoiler
+
+:category_labels:
+  character: Character
+  content-fanmade: Fan-Made Content
+  content-official: Official Content
+  error: Incomplete Metadata
+  oc: Original Character
+  origin: Creator or Origin
+  rating: Rating
+  species: Species
+  spoiler: Spoiler
+
+:category_namespaces:
+  artist: origin
+  art pack: content-fanmade
+  colorist: origin
+  comic: content-fanmade
+  editor: origin
+  fanfic: content-fanmade
+  oc: oc
+  photographer: origin
+  series: content-fanmade
+  species: species
+  spoiler: spoiler
+  video: content-fanmade
+
+:namespaces:
+  - artist
+  - art pack
+  - ask
+  - blog
+  - colorist
+  - comic
+  - editor
+  - fanfic
+  - oc
+  - parent
+  - parents
+  - photographer
+  - series
+  - species
+  - spoiler
+  - video
+
+:rating_tags:
+  - safe
+  - suggestive
+  - questionable
+  - explicit
+  - semi-grimdark
+  - grimdark
+  - grotesque
+
+:nsfw_ratings:
+  - questionable
+  - explicit

@@ -1,0 +1,221 @@
+require: rubocop-rails
+inherit_from: .rubocop_todo.yml
+
+# REQUIRED STUFF FOR SETUP
+AllCops:
+  Exclude:
+    - db/migrate/*.rb
+    - db/schema.rb
+    # The most poorly written thing I've ever seen in Ruby.
+    - lib/simpletextile.rb
+    - lib/retard_filter.rb
+    - vendor/**/*
+    - public/**/*
+    - tmp/**/*
+  #Include:
+    #- "**/*.eye"
+  TargetRubyVersion: 2.6
+
+Rails:
+  Enabled: true
+
+Rails/UnknownEnv:
+  Environments:
+    - production
+    - staging
+    - development
+    - test
+
+# This is already safe.
+Rails/OutputSafety:
+  Enabled: false
+
+Rails/DynamicFindBy:
+  Whitelist:
+    - find_by_slug_or_id
+    - find_by_sql
+
+# "Fixing" this would make our code slower and more complex.
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+# This is utterly retarded.
+Bundler/OrderedGems:
+  Enabled: false
+
+# We need these.
+Style/GlobalVars:
+  AllowedVariables:
+    - "$flipper"
+    - "$redis"
+    - "$themes"
+# End required stuff for our setup
+
+# STYLE DECISIONS
+# Let us line things up
+Layout/ArgumentAlignment:
+  # TODO: EnforcedStyle: with_fixed_indentation
+  Enabled: false
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+# We really don't care about this.
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+# Try to avoid excessive indentation.
+Layout/EndAlignment:
+  AutoCorrect: true
+  EnforcedStyleAlignWith: variable
+
+# YAEIA
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+# We do not care about potential inheritance issues with these
+Style/ClassVars:
+  Enabled: false
+
+# Consistency is better than brevity.
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+# More excessive indentation avoided.
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+  Exclude:
+    - 'test/lib/search_parser_test.rb'
+
+# Even more.
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+  Exclude:
+    - 'test/lib/search_parser_test.rb'
+
+# We should be able to comment things out, dammit
+Layout/CommentIndentation:
+  Enabled: false
+
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+# Lambda styles are bizarrely inconsistent. Let's just make them all stabby.
+Style/Lambda:
+  EnforcedStyle: literal
+
+# `extend self` is slightly more readable
+Style/ModuleFunction:
+  EnforcedStyle: extend_self
+
+# `unless` just muddies the logic; only ever use it in modifier form.
+Style/NegatedIf:
+  Enabled: false
+
+# This is both faster and clearer.
+Style/NumericPredicate:
+  AutoCorrect: true
+  EnforcedStyle: comparison
+
+# has_blah? is okay.
+Naming/PredicateName:
+  AllowedMethods:
+    - has_array_field
+    - has_tag_proxy
+    - has_thumbnails?
+
+# e's aren't good
+Naming/RescuedExceptionsVariableName:
+  PreferredName: ex
+
+# Screw %r.
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
+  EnforcedStyle: slashes
+
+# `rescue` as a modifier is an ugly kludge, but it's better than the block form in 90% of cases.
+Style/RescueModifier:
+  Enabled: false
+
+# &. should only be used where needed
+Style/SafeNavigation:
+  Enabled: false
+
+# Sometimes code is clearer with multiple expressions on one line.
+Style/Semicolon:
+  Enabled: false
+
+# This is just silly.
+Naming/VariableNumber:
+  Enabled: false
+
+# Doesn't really help things
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+# We use one for modules and one for classes, Rubocop treats them the same
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# This does not matter and it's useful to show example Unicode in comments
+Style/AsciiComments:
+  Enabled: false
+# End style decisions
+
+# RANDOM CRAP
+# Single quotes are required here.
+Lint/PercentStringArray:
+  Exclude:
+    - config/initializers/secure_headers.rb
+
+# Loosen metrics
+Metrics/ClassLength:
+  Max: 700
+
+Metrics/BlockLength:
+  Max: 400
+
+Metrics/LineLength:
+  Exclude:
+    - app/helpers/oc_avatar_helper.rb
+  Max: 300
+
+Metrics/ModuleLength:
+  Max: 250
+
+Metrics/ParameterLists:
+  Max: 7
+
+# fp
+Naming/MethodParameterName:
+  AllowedNames: io, id, to, by, on, in, at, ip, db, fp
+
+# This incorrectly flags some has_many relationships
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+# Pointless
+Rails/HelperInstanceVariable:
+  Enabled: false
+
+Rails/Output:
+  Exclude:
+    - db/seeds.rb
+    - db/seeds_development.rb
+
+# Broken in rubocop 0.73
+Layout/EmptyLinesAroundAccessModifier:
+  Enabled: false
+
+Lint/UselessAccessModifier:
+  Enabled: false
+
+# TODO: This is HORRID and only here because fixing it is a huge task that should not be done in normal Rubocop stuff
+Style/MethodMissingSuper:
+  Exclude:
+    - 'lib/has_array_field.rb'
+
+Style/MissingRespondToMissing:
+  Exclude:
+    - 'lib/has_array_field.rb'

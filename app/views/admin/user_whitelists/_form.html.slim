@@ -1,0 +1,12 @@
+= form_for [:admin, @user_whitelist] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @user_whitelist.errors }
+  .field
+    - if @username
+      = f.hidden_field :username, value: @username
+    - else
+      => f.label :username, 'Username:'
+      = f.text_field :username, class: 'input input--wide', required: true
+  .field
+    => f.label :reason, 'Reason:'
+    = f.text_field :reason, class: 'input input--wide', required: true
+  = f.submit 'Save', class: 'button'

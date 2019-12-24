@@ -1,0 +1,67 @@
+.flex.flex--centered.header--secondary__admin-links.stretched-mobile-links.js-staff-action
+  - if %w[assistant moderator admin].include? current_user.role
+    .dropdown.hide-mobile
+      a.header__link title=t('header.staff.admin_title')
+        span.js-dropdown-icon
+          =<> t('header.staff.admin')
+          i.fa.fa-caret-down
+      .dropdown__content.js-burger-links
+        - if can? :manage, Flipper
+          = icon_link t('header.staff.flags'), 'fa fa-fw fa-toggle-on', '/admin/flipper', class: 'header__link'
+        - if can? :manage, ActiveJob
+          = icon_link t('header.staff.bg_jobs'), 'fa fa-fw fa-server', '/admin/sidekiq', class: 'header__link'
+        - if can? :manage, SiteNotice
+          = icon_link t('header.staff.site_notices'), 'fa fa-fw fa-info-circle', '/admin/site_notices', class: 'header__link'
+        - if can? :manage, Tag
+          = icon_link t('header.staff.tags'), 'fa fa-fw fa-tags', admin_tags_path, class: 'header__link'
+        - if can? :mod_read, User
+          = icon_link t('header.staff.users'), 'fa fa-fw fa-users', admin_users_path, class: 'header__link'
+        - if can? :mod_read, Comment
+          = icon_link t('header.staff.comments'), 'fa fa-fw fa-comments', comments_path, class: 'header__link'
+        - if can? :mod_read, Forum
+          = icon_link t('header.staff.forums'), 'fa fa-fw fa-paragraph', admin_forums_path, class: 'header__link'
+        - if can? :manage, Advert
+          = icon_link t('header.staff.ads'), 'fa fa-fw fa-shopping-bag', admin_adverts_path, class: 'header__link'
+        - if can? :award, Badge
+          = icon_link t('header.staff.badges'), 'fa fa-fw fa-trophy', admin_badges_path, class: 'header__link'
+        - if can? :manage, ModNote
+          = icon_link t('header.staff.mod_notes'), 'fa fa-fw fa-sticky-note', admin_mod_notes_path, class: 'header__link'
+        - if can? :manage, StaticPages
+          = icon_link t('header.staff.pages'), 'fa fa-fw fa-file-alt', static_pages_path, class: 'header__link'
+  - if can? :manage, DuplicateReport
+    = link_to duplicate_reports_path,
+            title: t('header.staff.duplicates_title'), class: 'header__link' do
+      = t('header.staff.duplicates')
+      span.header__counter__admin
+        =< DuplicateReport.where(state: %w[open closed]).count.to_s
+  - if can? :manage, Report
+    = link_to admin_reports_path,
+            title: t('header.staff.reports_title'), class: 'header__link' do
+      = t('header.staff.reports')
+      span.header__counter__admin
+        =< Report.where(open: true).count.to_s
+  - if can? :manage, UserLink
+    = link_to '/admin/user_links/',
+            title: t('header.staff.links_title'), class: 'header__link' do
+      = t('header.staff.links')
+      span.header__counter__admin
+        =< UserLink.where(aasm_state: %w[unverified link_verified contacted]).count.to_s
+  - if can? :manage, DnpEntry
+    = link_to '/admin/dnp_entries',
+            title: t('header.staff.dnp_title'), class: 'header__link' do
+      = t('header.staff.dnp')
+      span.header__counter__admin
+        =< DnpEntry.where(aasm_state: %w[requested claimed rescinded acknowledged]).count.to_s
+  - if can?(:mod_read, UserBan) || can?(:mod_read, SubnetBan) || can?(:mod_read, FingerprintBan)
+    .dropdown.hide-mobile
+      a.header__link title='Bans'
+        span.js-dropdown-icon
+          =<> 'B'
+          i.fa.fa-caret-down
+      .dropdown__content.dropdown__content-right.js-burger-links
+        - if can? :mod_read, UserBan
+          = icon_link 'User Bans', 'fa fa-fw fa-user', admin_user_bans_path, class: 'header__link'
+        - if can? :mod_read, SubnetBan
+          = icon_link 'IP Bans', 'fab fa-fw fa-internet-explorer', admin_subnet_bans_path, class: 'header__link'
+        - if can? :mod_read, FingerprintBan
+          = icon_link 'FP Bans', 'fa fa-fw fa-desktop', admin_fingerprint_bans_path, class: 'header__link'

@@ -1,0 +1,50 @@
+- page_layout :wide
+- pagination = paginate @reports if @reports.present?
+h1
+  = t '.title'
+- if @my_reports.present?
+  .block
+    .block__header
+      span.block__header__title Your Reports
+    .block__content
+      table.table
+        thead
+          tr
+            th Thing
+            th Reason
+            th User
+            th.hide-mobile Opened
+            th State
+            th Options
+        tbody
+          - @my_reports.each do |r|
+            = render partial: 'report', locals: { report: r }
+.block
+  .block__header
+    span.block__header__title All Reports
+    = pagination.presence
+  .block__content
+    - if @reports.blank?
+      p We couldn't find any reports for you, sorry!
+    - else
+      table.table
+        thead
+          tr
+            th Thing
+            th Reason
+            th User
+            th.hide-mobile Opened
+            th State
+            th Options
+        tbody
+          - @reports.each do |r|
+            = render partial: 'report', locals: { report: r }
+  - if pagination.present?
+    .block__header.block__header--light
+      = pagination
+- info = capture do
+  label[for='rq']
+    | Searchable fields: id, created_at, reason, state, open, user, user_id, admin, admin_id, ip, fingerprint, reportable_type, reportable_id, image_id
+    br
+    | Report reason is used if you don't specify a field.
+= render partial: 'layouts/search', locals: { info: info, path: admin_reports_path, q: :rq, text: 'Search reports' }

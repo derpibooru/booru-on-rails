@@ -1,0 +1,27 @@
+- list = capture do
+  table.table
+    thead
+      tr
+        th Title
+        th Start
+        th Finish
+        th Live?
+        th Options
+    tbody
+      - now = Time.zone.now
+      - @site_notices.each do |site_notice|
+        tr
+          td
+            em
+              = site_notice.title
+          td[class=(site_notice.start_date < now ? 'danger' : 'success')]
+            = friendly_time site_notice.start_date
+          td[class=(site_notice.finish_date < now ? 'danger' : 'success')]
+            = friendly_time site_notice.finish_date
+          td
+            = site_notice.live? ? 'Yes' : 'No'
+          td
+            => link_to t('edit'), edit_admin_site_notice_path(site_notice)
+            ' &bull;
+            = link_to t('destroy'), admin_site_notice_path(site_notice), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { item_class: SiteNotice, items: @site_notices, new_item_path: new_admin_site_notice_path, rendered_list: list }

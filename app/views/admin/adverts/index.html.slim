@@ -1,0 +1,54 @@
+- page_layout :wide
+- list = capture do
+  table.table
+    thead
+      tr
+        th.table--adverts__image Image
+        th Ad Information
+        th Start
+        th Finish
+        th Enabled
+        th Restriction
+        th Statistics
+        th Options
+    tbody
+      - now = Time.zone.now
+      - @adverts.each do |advert|
+        tr
+          td
+            = image_tag advert.uploaded_image.url
+          td
+            strong
+              ' URL:
+            = link_to advert.link, advert.link
+            br
+            strong
+              ' Title:
+            em
+              = advert.title
+            - if advert.notes.present?
+              br
+              strong
+                ' Notes:
+              = advert.notes
+          td[class=(advert.start_date > now ? 'danger' : 'success')]
+            = friendly_time advert.start_date
+          td[class=(advert.finish_date < now ? 'danger' : 'success')]
+            = friendly_time advert.finish_date
+          td
+            = advert.live? ? 'Yes' : 'No'
+          td
+            = advert.restrictions
+          td
+            ' Impressions:
+            = advert.impressions
+            br
+            ' Clicks:
+            = advert.clicks
+          td
+            => link_to 'Show', admin_advert_path(advert)
+            ' &bull;
+            => link_to t('edit'), edit_admin_advert_path(advert)
+            ' &bull;
+            = link_to t('destroy'), admin_advert_path(advert), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { item_class: Advert, items: @adverts, new_item_path: new_admin_advert_path, rendered_list: list }

@@ -1,0 +1,13 @@
+= form_for [:admin, @ban] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @ban.errors }
+  .field
+    => f.label :username, 'Username:'
+    - if @user
+      = @user.name
+      = f.hidden_field :user_id, value: @user.id
+    - else
+      = f.text_field :username, class: 'input', placeholder: 'Username', required: true
+  .field
+    => f.check_box :override_ip_ban, class: 'checkbox'
+    = f.label :override_ip_ban, 'Override IP ban?'
+  = render partial: 'admin/bans/form', locals: { f: f }

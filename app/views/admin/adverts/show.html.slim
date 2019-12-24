@@ -1,0 +1,20 @@
+h1 Advert Changes
+= image_tag @advert.image.url
+p
+  | (Not yet implemented!)
+/ TODO: @advert.versions is not yet implemented
+/table.table
+  thead
+    tr
+      th User
+      th Timestamp
+      th Changes
+  tbody
+    - @advert.versions.each do |version|
+      tr
+        td
+          = User.find_by(id: version.whodunnit).try :name
+        td
+          = friendly_time version.created_at
+        td
+          = friendly_changes version.changeset

@@ -1,0 +1,11 @@
+- comment = comment_activitypage
+.block__content.flex.alternating-color data-user-id=(comment.user_id if comment.user_visible?)
+  .flex__shrink.spacing-right
+    = render partial: 'images/image_container', locals: { image: comment.image, size: :thumb_tiny }
+  .flex__grow
+    => link_to "##{comment.image.id}", short_image_path(comment.image, anchor: "comment_#{comment.id}")
+    | by
+    span.hyphenate-breaks
+      =< link_to_author(comment, false)
+    br
+    = friendly_time(comment.created_at)

@@ -1,0 +1,16 @@
+en:
+  duplicate_reports:
+    accept_success: "Duplicate report accepted successfully"
+    accept_reverse_success: "Duplicate report reverse accepted successfully"
+    claim_success: "Duplicate report claimed successfully"
+    reject_success: "Duplicate report rejected successfully"
+    processing_error: "Error encountered while processing duplicate report."
+    errors:
+      image_nil: "Provided image does not exist"
+      target_image_nil: "Merge target does not exist."
+      target_image_hidden: "Can't merge into a deleted image."
+      identical_images: "Can't report an image as a dupe of itself!"
+      animated_and_still_image: "Can't report if only one image is an animation"
+      webm_and_other: "Can't report WebM and non-WebM (we want to keep both versions)"
+      ratings_differ: "Can't merge unless ratings are identical"
+      target_already_reported: "Report for the target image has already been received."

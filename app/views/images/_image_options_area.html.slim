@@ -1,0 +1,143 @@
+- display_mod_tools = can?(:hide, @image) && (cookies['hidestaff'] != 'true'.freeze)
+#image_options_area
+  .block__header.block__header--js-tabbed
+    a href="#" data-click-tab="reporting" data-load-tab=image_reporting_path(image)
+      i.fa.fa-exclamation-triangle>
+      | Report
+    a href="#" data-click-tab="sharing"
+      i.fa.fa-share>
+      | Share
+    a href="#" data-click-tab="favoriters" data-load-tab=image_favorites_path(image)
+      i.fa.fa-star>
+      | List favoriters
+    - if display_mod_tools
+      a href="#" data-click-tab="replace"
+        i.fa.fa-upload>
+        | Replace
+      a href="#" data-click-tab="administration"
+        i.fa.fa-toolbox>
+        | Administrate
+        - if @image.scratchpad.present?
+          i.fa.fa-sticky-note.fa--important<
+          i.fa.fa-exclamation.fa--important
+  .block__tab.hidden data-tab="favoriters"
+    p Loading...
+  .block__tab.hidden data-tab="reporting"
+    p Loading...
+  .block__tab.hidden data-tab="sharing"
+    - tumblr_desc = "Shared from #{@image.source_url.presence || 'an unknown source'}"
+    a href="//www.tumblr.com/share/photo?source=https:#{@image.image.url(:medium)}&amp;caption=#{u(tumblr_desc)}&amp;click_thru=#{u(short_image_url(@image))}"
+      button.button.button--link
+        i.fa.fa-share>
+        | Share on Tumblr
+    #embed_options
+      - source_link = @image.source_url.blank? ? ' (Original source unknown at time of posting)' : " - [url=#{@image.source_url}]Original source[/url]"
+      h5 = t('booru.name')
+      p
+        strong> Small thumbnail
+        input.input#embed_small_thumbnail_tag type="text" value=">>#{@image.id}s" cols="10" readonly="readonly"
+        a< href="#" data-click-copy="#embed_small_thumbnail_tag"
+          i.fa.fa-clipboard>
+          | Copy
+      p
+        strong> Thumbnail
+        input.input#embed_thumbnail_tag type="text" value=">>#{@image.id}t" cols="10" readonly="readonly"
+        a< href="#" data-click-copy="#embed_thumbnail_tag"
+          i.fa.fa-clipboard>
+          | Copy
+      p
+        strong> Preview
+        input.input#embed_preview_tag type="text" value=">>#{@image.id}p" cols="10" readonly="readonly"
+        a< href="#" data-click-copy="#embed_preview_tag"
+          i.fa.fa-clipboard>
+          | Copy
+      h5 BBCode
+      p
+        strong> Full size BBcode
+        a href="#" data-click-copy="#bbcode_embed_full_tag"
+          i.fa.fa-clipboard>
+          | Copy
+        br
+        textarea.input.input--wide.input--separate-top#bbcode_embed_full_tag rows="2" cols="100" readonly="readonly"
+          = "[img]https:#{@image.image.url(:full)}[/img]\n[url=#{short_image_url(@image)}]View on #{t('booru.name')}[/url]#{source_link}"
+      p
+        strong> Thumbnailed BBcode
+        a href="#" data-click-copy="#bbcode_embed_thumbnail_tag"
+          i.fa.fa-clipboard>
+          | Copy
+        br
+        textarea.input.input--wide.input--separate-top#bbcode_embed_thumbnail_tag rows="2" cols="100" readonly="readonly"
+          = "[img]https:#{@image.image.url(:medium)}[/img]\n[url=#{short_image_url(@image)}]View on #{t('booru.name')}[/url]#{source_link}"
+  - if display_mod_tools
+    .block__tab.hidden data-tab="replace"
+      = form_tag image_file_path(@image), method: :put, multipart: true do
+        = render partial: 'layouts/image_upload', locals: { form: nil, field: :image }
+        = submit_tag 'Save changes', class: 'button', autocomplete: 'off', data: { disable_with: 'Replacing...' }
+  - if display_mod_tools
+    .block__tab.hidden data-tab="administration"
+      .block.block--danger
+        a.button.button--link> href=edit_image_scratchpad_path(@image)
+          i.far.fa-edit
+        - if @image.scratchpad.present?
+          strong> Mod notes:
+          = render_textile @image.scratchpad.to_s
+        - else
+          em No mod notes present
+      - if can? :hide, image
+        - if !image.hidden_from_users
+          = form_tag image_hide_path(@image), method: :post do
+            = label_tag :deletion_reason, 'Deletion reason (cannot be empty)'
+            .field.field--inline
+              = text_field_tag :deletion_reason, '', class: 'input input--wide', placeholder: 'Rule violation', required: true
+              = submit_tag 'Delete', class: 'button button--state-danger button--separate-left'
+        - else
+          = form_tag image_hide_path(@image), method: :put do
+            = label_tag :deletion_reason, 'Deletion reason (cannot be empty)'
+            .field.field--inline
+              = text_field_tag :deletion_reason, '', class: 'input input--wide', placeholder: 'New reason', required: true
+              = submit_tag 'Change deletion reason', class: 'button button--state-warning button--separate-left'
+      .flex.flex--spaced-out.flex--wrap
+        - if !image.hidden_from_users
+          - if can? :feature, image
+            = form_tag image_feature_path(@image), method: :post do
+              .field
+                p Automatically tags 'featured image'
+                = submit_tag 'Feature', data: { confirm: t('are_you_sure') }, class: 'button button--state-success'
+        - elsif !@image.destroyed_content
+          - if can? :destroy, image
+            = form_tag image_path(@image), method: :delete do
+              .field
+                p
+                  ' ONLY if
+                  strong> ILLEGAL TO STORE (CP);
+                p ping byte[] about backups
+                = submit_tag 'Hard-delete', data: { confirm: t('are_you_sure_destroy_image') }, class: 'button button--state-danger'
+          - if can? :undelete, image
+            = form_tag image_hide_path(@image), method: :delete do
+              .field
+                = submit_tag 'Restore', class: 'button button--state-success'
+        - if !@image.destroyed_content && can?(:repair, image)
+          = form_tag image_repair_path(@image), method: :post do
+            .field
+              = submit_tag 'Repair', class: 'button button--state-success'
+        = form_tag image_hash_path(@image), method: :delete do
+          .field
+            p Allows reuploading
+            .flex.flex--end-bunched
+              = submit_tag 'Clear hash', data: { confirm: t('are_you_sure') }, class: 'button button--state-danger'
+      br
+      .flex.flex--spaced-out
+          - if @image.commenting_allowed
+            = button_to 'Lock comment editing', image_comment_lock_path(@image), method: :post, class: 'button'
+          - else
+            = button_to 'Unlock comment editing', image_comment_lock_path(@image), method: :delete, class: 'button'
+
+          - if @image.description_editing_allowed
+            = button_to 'Lock description editing', image_description_lock_path(@image), method: :post, class: 'button'
+          - else
+            = button_to 'Unlock description editing', image_description_lock_path(@image), method: :delete, class: 'button'
+
+          - if @image.tag_editing_allowed
+            = button_to 'Lock tag editing', image_tag_lock_path(@image), method: :post, class: 'button'
+          - else
+            = button_to 'Unlock tag editing', image_tag_lock_path(@image), method: :delete, class: 'button'

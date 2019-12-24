@@ -1,0 +1,18 @@
+h1
+  ' Users with
+  => @badge.title
+  | badge
+  - if @badge.image.present?
+    =< image_tag @badge.uploaded_image.url, size: '32'
+- pagination = paginate @users
+= pagination
+table.table
+  thead
+    tr
+      th User
+  tbody
+    - @users.each do |user|
+      tr
+        td
+          = link_to user.name, profile_path(user)
+= pagination

@@ -1,0 +1,121 @@
+---
+rules:
+  at-rule-empty-line-before: [always, {
+    ignore: [after-comment],
+    ignoreAtRules: [import, include, extend]
+  }]
+  at-rule-name-case: lower
+  at-rule-name-space-after: always
+  at-rule-no-vendor-prefix: true
+  at-rule-semicolon-newline-after: always
+  block-closing-brace-newline-after: always
+  block-closing-brace-newline-before: always-multi-line
+  block-closing-brace-space-before: always-single-line
+  block-no-empty: true
+  #block-no-single-line: true
+  block-opening-brace-space-after: always-single-line
+  block-opening-brace-space-before: always-multi-line
+  color-hex-case: lower
+  color-hex-length: long
+  color-no-invalid-hex: true
+  custom-property-no-outside-root: true
+  declaration-bang-space-after: never
+  declaration-bang-space-before: always
+  declaration-block-no-duplicate-properties: true
+  declaration-block-no-ignored-properties: true
+  declaration-block-no-shorthand-property-overrides: true
+  declaration-block-semicolon-newline-after: always-multi-line
+  declaration-block-semicolon-newline-before: never-multi-line
+  declaration-block-semicolon-space-after: always-single-line
+  declaration-block-semicolon-space-before: never
+  declaration-block-single-line-max-declarations: 1
+  declaration-block-trailing-semicolon: always
+  declaration-colon-space-after: always
+  declaration-colon-space-before: never
+  font-family-name-quotes: always-where-recommended
+  font-weight-notation: named-where-possible
+  function-calc-no-unspaced-operator: true
+  function-comma-newline-after: never-multi-line
+  function-comma-newline-before: never-multi-line
+  function-comma-space-after: always
+  function-comma-space-before: never
+  function-linear-gradient-no-nonstandard-direction: true
+  function-max-empty-lines: 0
+  function-name-case: lower
+  function-parentheses-newline-inside: never-multi-line
+  function-parentheses-space-inside: never
+  #TODO: function-url-data-uris: never
+  function-url-quotes: always
+  function-whitespace-after: always
+  indentation: 2
+  max-empty-lines: 1
+  max-nesting-depth: 2
+  media-feature-colon-space-after: always
+  media-feature-colon-space-before: never
+  media-feature-name-no-vendor-prefix: true
+  media-feature-no-missing-punctuation: true
+  media-feature-range-operator-space-after: always
+  media-feature-range-operator-space-before: always
+  media-feature-parentheses-space-inside: never
+  media-query-list-comma-newline-after: never-multi-line
+  media-query-list-comma-newline-before: never-multi-line
+  media-query-list-comma-space-after: always
+  media-query-list-comma-space-before: never
+  # This may increase readability, but you'll need to reorder all stylesheets to follow the specificity order
+  #no-descending-specificity: true
+  no-duplicate-selectors: true
+  no-eol-whitespace: true
+  no-extra-semicolons: true
+  no-indistinguishable-colors: true
+  no-missing-end-of-source-newline: true
+  no-unknown-animations: true
+  number-leading-zero: always
+  number-max-precision: 2
+  number-no-trailing-zeros: true
+  length-zero-no-unit: true
+  property-case: lower
+  property-no-vendor-prefix: true
+  root-no-standard-properties: true
+  rule-non-nested-empty-line-before: [always, {
+    ignore: [after-comment]
+  }]
+  selector-attribute-brackets-space-inside: never
+  selector-attribute-operator-space-after: never
+  selector-attribute-operator-space-before: never
+  selector-combinator-space-after: always
+  selector-combinator-space-before: always
+  selector-list-comma-newline-before: never-multi-line
+  selector-list-comma-space-after: always-single-line
+  selector-list-comma-space-before: never
+  selector-max-empty-lines: 0
+  selector-max-compound-selectors: 3
+  #TODO: selector-max-specificity: string
+  #TODO: selector-no-id: true
+  # Disallow qualifying type for id selector
+  selector-no-qualifying-type: [true, {
+    ignore: ["attribute", "class"]
+  }]
+  selector-no-universal: true
+  selector-no-vendor-prefix: true
+  selector-pseudo-class-case: lower
+  selector-pseudo-class-no-unknown: true
+  selector-pseudo-class-parentheses-space-inside: never
+  selector-pseudo-element-case: lower
+  selector-pseudo-element-colon-notation: double
+  selector-pseudo-element-no-unknown: true
+  selector-root-no-composition: true
+  selector-type-case: lower
+  selector-type-no-unknown: true
+  shorthand-property-no-redundant-values: true
+  string-no-newline: true
+  string-quotes: double
+  stylelint-disable-reason: always-after
+  time-no-imperceptible: true
+  unit-case: lower
+  unit-no-unknown: true
+  value-keyword-case: lower
+  value-list-comma-newline-after: never-multi-line
+  value-list-comma-newline-before: never-multi-line
+  value-list-comma-space-after: always
+  value-list-comma-space-before: never
+  value-no-vendor-prefix: true

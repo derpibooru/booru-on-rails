@@ -1,0 +1,47 @@
+= form_for [:admin, @dnp_entry] do
+  = render partial: 'layouts/errors', locals: { errors: @dnp_entry.errors }
+  .block
+    .block__header
+      span.block__header__title DNP Request Form
+    .block__content
+      / Artist Tag
+      strong Artist Tag
+      p Please select the artist tag you would like to request a DNP entry for
+      .field
+        = select_tag :tag_id, options_for_select(@selectable_tags.map { |tag| [tag.name, tag.id] }, @dnp_entry.tag_id), class: 'input'
+      hr
+      / DNP Type
+      strong Restrictions
+      p Please select the type of restriction you would like on your artist tag. If you do not wish for any of your art to be posted, please select "Artist Upload Only".
+      .field
+        = select_tag :dnp_type, options_for_select(DnpEntry::DNPTYPES.keys, @dnp_entry.dnp_type), class: 'input'
+      hr
+      / Conditions
+      strong Conditions
+      p If you selected 'Other', or have other conditions applicable to your request, please enter them here. If someone always has permission to upload your artwork, enter their name here. (Optional)
+      .field
+        = text_area_tag :conditions, @dnp_entry.conditions, class: 'input input--wide', placeholder: 'Conditions'
+      hr
+      / Reason
+      strong Reason For Request
+      p Please indicate the reason why you would like your artwork to be removed. (Required)
+      .field
+        = text_area_tag :reason, @dnp_entry.reason, class: 'input input--wide', placeholder: 'Reason'
+      .field
+        => check_box_tag :hide_reason, nil, @dnp_entry.hide_reason, class: 'checkbox'
+        = label_tag :hide_reason, 'Hide request reason'
+      p Only select this box if your request contains sensitive or private information that you do not wish to be publicly available. Reasons that do not contain such information will not be hidden.
+      hr
+      / Instructions
+      strong Instructions
+      p If you would like existing artwork to be removed under this request, please provide instructions, such as "Remove all art with my artist tag that contain the 'edit' tag." (Optional)
+      .field
+        = text_area_tag :instructions, @dnp_entry.instructions, class: 'input input--wide', placeholder: 'Instructions'
+      hr
+      / Feedback
+      strong Feedback
+      p If you have any additional feedback for the site staff, you may enter it here. (Optional)
+      .field
+        = text_area_tag :feedback, @dnp_entry.feedback, class: 'input input--wide', placeholder: 'Feedback'
+      hr
+      = submit_tag 'Submit Request', class: 'button'

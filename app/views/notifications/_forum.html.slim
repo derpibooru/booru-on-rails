@@ -1,0 +1,15 @@
+- topic = notification.actor_child
+strong
+  - if topic
+    = link_to_author topic
+  // TODO remove these extra else clauses when old notifications are gone
+  - elsif notification.user
+    = link_to notification.user.name, profile_path(notification.user)
+  - else
+    | Somebody
+=<> notification.action
+- if topic
+  | titled
+  strong =<> link_to topic.title, short_topic_path(topic.forum, topic)
+| in
+=<> link_to notification.actor.name, forum_path(notification.actor)

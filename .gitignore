@@ -1,0 +1,52 @@
+# Nano? In my repo?
+*.save
+
+# Vim? In my repo?
+*.swp
+
+# Emacs? In my repo?
+\#*#
+
+# Idea and RubyMine
+.idea/
+
+# Rubinius
+.rbx/
+
+# Bundler config
+/.bundle/
+
+# Documentation is for winners, not git repos
+/.yardoc/
+/doc/
+
+# Logfiles and tempfiles
+/log/
+/tmp/
+
+# Byebug
+.byebug_history
+
+# Vagrant
+.vagrant/
+
+*.local.conf
+*.local.yml
+/app/assets/stylesheets/scaffolds.scss
+/config/deploy/my_staging.rb
+/config/booru/avatar.yml
+/config/booru/settings.yml
+/config/booru/footer.yml
+/config/booru/reports.yml
+/config/booru/captcha.yml
+/config/booru/ratings.yml
+/config/elastic_apm.yml
+/public/assets/
+/public/images/
+/public/system/
+/public/uploads/
+/public/test/
+/rails_best_practices_output.html
+/vendor/
+.rake_tasks
+.rake_tasks~

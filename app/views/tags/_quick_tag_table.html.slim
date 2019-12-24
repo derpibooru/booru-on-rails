@@ -1,0 +1,17 @@
+.block.js-tagtable data-target=target
+  / see config/booru/quick_tag_table.yml
+  / it is important that the table is cached for at least an hour as rebuilding it is an expensive operation
+  - cache('quick-tag-table-v4', expires_in: 2.hours) do
+    - tabs = Booru::CONFIG.quick_tag_table['tabs']
+    - tab_modes = Booru::CONFIG.quick_tag_table['tab_modes']
+
+    .block__header--sub.block__header--js-tabbed
+      - tabs.each_with_index do |name, i|
+        = link_to name, '#', class: i == 0 ? 'selected' : nil, data: { click_tab: name }
+
+    - tabs.each_with_index do |name, i|
+      - data = Booru::CONFIG.quick_tag_table[name]
+      - mode = tab_modes[name]
+
+      .block__tab.quick-tag-table__tab class=(i != 0 ? 'hidden' : nil) data-tab=name
+        = render partial: "tags/quick_tag_table_#{mode}", locals: { data: data }

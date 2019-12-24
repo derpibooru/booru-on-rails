@@ -1,0 +1,191 @@
+h1 Tags
+= form_tag tags_path, method: :get, class: 'hform', enforce_utf8: false do
+  .field
+    = text_field_tag :tq, params[:tq].presence || '*', class: 'input hform__text', placeholder: 'Search tags', autocapitalize: 'none'
+    = submit_tag 'Search', class: 'hform__button button', data: { disable_with: false }, name: nil
+  .fieldlabel
+    ' For more information, see the
+    = link_to 'search syntax documentation', search_syntax_path
+    ' . Wildcards are supported in all literal fields.
+    ' Search results are sorted by image count, then by name alphabetically.
+- if @error
+  h2 Resu- uhh...
+  p
+    strong> Okay, hold up.
+    ' We couldn't make heads or tails of whatever it is you just searched for.
+  p
+    ' You searched for
+    code = params[:tq]
+    ' , which is all well and good but perhaps it doesn't make total sense to
+    ' our search engine. A classic problem is imbalanced parentheses. That is,
+    ' have you provided a
+    code> )
+    ' for every
+    code = '('
+    ' ? Did you try surrounding terms in quotes?
+  p
+    ' Twilight Meditation:
+    strong
+      code = @error
+- elsif params[:tq].present?
+  h2 Search Results
+  = render partial: 'tag_list', locals: { tags: @tags }
+- else
+  h2 Popular Tags
+  = render partial: 'tag_list', locals: { tags: @tags }
+- if !@error
+  .block
+    .block__header.block__header--light.flex
+      = paginate @tags
+      span.block__header__title = pagination_info @tags
+
+h3 Default search
+p
+  ' If you do not specify a field to search over, the search engine will
+  ' search for tags with a name that is similar to the query's
+  em word stems
+  ' . For example,
+  code winged humanization
+  ' ,
+  code wings
+  ' , and
+  code> spread wings
+  ' would all be matched by a search for
+  code wing
+  ' , but
+  code> sewing
+  ' would not be.
+
+h3 Allowed fields
+table.table
+  thead
+    tr
+      th Field Selector
+      th Type
+      th Description
+      th Example
+  tbody
+    tr
+      td
+        code alias_of
+      td Literal
+      td Matches the name of the target tag, if this tag is aliased.
+      td
+        code = link_to 'alias_of:twilight sparkle', tags_path(tq: 'alias_of:twilight sparkle')
+    tr
+      td
+        code aliased
+      td Boolean
+      td Matches when this tag is aliased.
+      td
+        code = link_to 'aliased:true', tags_path(tq: 'aliased:true')
+    tr
+      td
+        code aliases
+      td Literal
+      td Matches the name of any of this tag's aliases.
+      td
+        code = link_to 'aliases:ts', tags_path(tq: 'aliases:ts')
+    tr
+      td
+        code analyzed_name
+      td Full Text
+      td Matches the name of this tag. This is the default field.
+      td
+        code = link_to 'analyzed_name:wing', tags_path(tq: 'analyzed_name:wing')
+    tr
+      td
+        code category
+      td Literal
+      td Matches the category this tag belongs to.
+      td
+        code = link_to 'category:origin', tags_path(tq: 'category:origin')
+    tr
+      td
+        code description
+      td Full Text
+      td Matches the text of the full description for this tag.
+      td
+        code = link_to 'description:species', tags_path(tq: 'description:species')
+    tr
+      td
+        code id
+      td Numeric Range
+      td Matches the numeric surrogate key for this tag.
+      td
+        code = link_to 'id:40482', tags_path(tq: 'id:40482')
+    tr
+      td
+        code images
+      td Numeric Range
+      td Matches tags with the specified image count.
+      td
+        code = link_to 'images.lte:1000', tags_path(tq: 'images.lte:1000')
+    tr
+      td
+        code implied_by
+      td Literal
+      td Matches this tag if it is implied by the given tag.
+      td
+        code = link_to 'implied_by:transparent background', tags_path(tq: 'implied_by:transparent background')
+    tr
+      td
+        code implies
+      td Literal
+      td Matches this tag if it implies the given tag.
+      td
+        code = link_to 'implies:shipping', tags_path(tq: 'implies:shipping')
+    tr
+      td
+        code name
+      td Literal
+      td Matches the exact name of this tag.
+      td
+        code = link_to 'name:safe', tags_path(tq: 'name:safe')
+    tr
+      td
+        code name_in_namespace
+      td Literal
+      td Matches the name of this tag with any namespace component removed.
+      td
+        code = link_to 'name_in_namespace:johnjoseco', tags_path(tq: 'name_in_namespace:johnjoseco')
+    tr
+      td
+        code namespace
+      td Literal
+      td Matches tags with the given namespace.
+      td
+        code = link_to 'namespace:artist', tags_path(tq: 'namespace:artist')
+    tr
+      td
+        code short_description
+      td Full Text
+      td Matches the text of the short description for this tag.
+      td
+        code = link_to 'short_description:gender', tags_path(tq: 'short_description:gender')
+    tr
+      td
+        code slug
+      td Literal
+      td Matches the slug of this tag.
+      td
+        code = link_to 'slug:-fwslash-mlp-fwslash-', tags_path(tq: 'slug:-fwslash-mlp-fwslash-')
+
+h3 Tag Categories
+table.table
+  thead
+    tr
+      th Category Name
+      th Definition
+  tbody
+    - Tag.category_labels.each do |cat, label|
+      tr
+        td
+          code = cat
+        td = label
+
+h3 Other pages
+p
+  => link_to 'View aliased tags', '/tags/aliases'
+  ' &#149;
+  => link_to 'View rating tags', '/tags/ratings'

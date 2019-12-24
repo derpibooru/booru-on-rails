@@ -1,0 +1,31 @@
+= form_for(@gallery, url: { id: @gallery.id, user: current_user, action: (@gallery.new_record? ? :create : :update) }) do |f|
+  - if @gallery.errors.any?
+    #error_explanation
+      h2 = "#{pluralize(@gallery.errors.count, 'error')} prevented this from being posted:"
+      ul
+      - @gallery.errors.full_messages.each do |msg|
+        li = msg
+  - if @gallery.new_record?
+    .block.block--fixed.block--primary
+      | You can edit this information later.
+  .field
+    = f.label :title, 'Choose a title displayed in gallery preview'
+    = f.text_field :title, class: 'input input--wide', placeholder: 'Title'
+  .field
+    = f.label :spoiler_warning, 'If you are going to have NSFW images in the gallery, leave a warning for users who may not want to see it'
+    = f.text_field :spoiler_warning, class: 'input input--wide', placeholder: 'Spoiler warning'
+  .field
+    = f.label :description, 'Describe the gallery in a few words'
+    = f.text_area :description, class: 'input input--wide', placeholder: 'Description'
+  .field
+    = f.label :thumbnail_id, 'Set an existing image as the gallery cover'
+    br
+    = f.text_field :thumbnail_id, class: 'input', placeholder: 'Image ID (e.g. 100)', value: @gallery.thumbnail_id || params[:with_image]
+  .field
+    = f.label :order_position_asc, 'Reverse gallery order (images will be inserted at the end of the gallery)'
+    = f.check_box :order_position_asc, class: 'checkbox'
+  .field
+  = f.hidden_field :with_image, value: params[:with_image] if params[:with_image].present?
+  = f.submit 'Save Gallery', class: 'button'
+  - unless @gallery.new_record?
+    = link_to 'Destroy Gallery', gallery_path(@gallery), class: 'button button--state-danger button--separate-left', data: { confirm: t('are_you_sure') }, method: :delete

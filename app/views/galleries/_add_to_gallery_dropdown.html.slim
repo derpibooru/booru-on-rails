@@ -1,0 +1,32 @@
+.dropdown.block__header__dropdown-tab
+  a href="#"
+    i.fa.fa-images>
+    span.hide-limited-desktop.hide-mobile Galleries
+    span data-click-preventdefault="true"
+      i.fa.fa-caret-down<
+  .dropdown__content.dropdown__content-right
+    .block
+      .block__content.add-to-gallery-list
+        .block__list
+          a.block__list__link.primary href="/galleries?include_image=#{image.id}"
+            i.fa.fa-table>
+            span.hide-mobile Featured in
+        - if current_user && current_user.galleries.exists?
+          ul.block__list.js-gallery-list
+            - image_gallery_ids = image.galleries.map(&:id)
+            - current_user.galleries.each do |g|
+              li id="gallery_#{g.id}"
+                - contains_image = g.id.in? image_gallery_ids
+                a.block__list__link.js-gallery-add class=('hidden' if contains_image) data-fetchcomplete-hide="#gallery_#{g.id} .js-gallery-add" data-fetchcomplete-show="#gallery_#{g.id} .js-gallery-remove" data-method='post' data-remote=true href=gallery_images_path(g, id: image.id)
+                  =g.title
+                a.block__list__link.active.js-gallery-remove class=('hidden' if !contains_image) data-fetchcomplete-hide="#gallery_#{g.id} .js-gallery-remove" data-fetchcomplete-show="#gallery_#{g.id} .js-gallery-add" data-method='delete' data-remote=true href=gallery_image_path(g, id: image.id)
+                  =g.title
+        .block__list
+          - if current_user
+            a.block__list__link.primary href=new_gallery_path(with_image: image.id)
+              i.fa.fa-plus
+              span.hide-limited-desktop.hide-mobile< Create a gallery
+          - else
+            a.block__list__link.primary href=new_user_registration_path
+              i.fa.fa-user-plus
+              span.hide-limited-desktop.hide-mobile< Register to create a gallery

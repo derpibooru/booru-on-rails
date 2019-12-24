@@ -1,0 +1,28 @@
+- page_layout :wide
+h1 Your Reports
+- if current_user && @reports && @reports.first
+  .block
+    .block__header
+      span.block__header__title Recent Reports
+      = paginate @reports
+    .block__content
+      table.table
+        thead
+          tr
+            th State
+            th Reported Thing
+            th Reason
+            th Opened
+        tbody
+          - @reports.each do |r|
+            tr
+              td class=(case r.state when 'closed' then 'success' when 'in_progress' then 'warning' else 'danger' end)
+                = r.state.humanize.capitalize
+              td = link_to_reported_thing(r.reportable)
+              td = r.reason
+              td = friendly_time(r.created_at)
+- elsif current_user
+  p You've not made any reports yet.
+  p You can find report buttons on various things around the site if you need to report something.
+- else
+  p You need to be logged in to keep track of reports you've made.

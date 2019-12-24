@@ -1,0 +1,35 @@
+h1 = "#{@fingerprint}'s fingerprint profile"
+ul
+  li = link_to 'View images this fingerprint has uploaded', search_path(q: "fingerprint:#{@fingerprint}", del: 1)
+  li = link_to 'View comments this fingerprint has posted', comments_path(cq: "fingerprint:#{@fingerprint}", del: 1)
+  li = link_to 'View posts this fingerprint has made', posts_path(fingerprint: @fingerprint, del: 1)
+= render partial: 'bans/ban_list', locals: { bans: @bans }
+
+h2 Administration Options
+ul
+  li = link_to 'View tag changes', "/fingerprint_profiles/#{@fingerprint}/tag_changes"
+  li = link_to 'View source changes', "/fingerprint_profiles/#{@fingerprint}/source_changes"
+  li = link_to 'View fingerprint ban history', admin_fingerprint_bans_path(q: @fingerprint)
+  li = link_to 'View reports this fingerprint has made', admin_reports_path(rq: "fingerprint:#{@fingerprint}")
+  li = link_to 'Ban this sucker', new_admin_fingerprint_ban_path(fingerprint: @fingerprint)
+
+h4 Observed users
+table.table
+  thead
+    tr
+      th Username
+      th Account Used
+      th Last Seen
+      th Created At
+  tbody
+    - @user_fingerprints.each do |ufp|
+      tr
+        td
+          =<> link_to ufp.user.name, profile_path(ufp.user)
+        td
+          =<> ufp.uses
+          | times
+        td
+          =<> friendly_time ufp.updated_at
+        td
+          =<>friendly_time ufp.user.created_at

@@ -1,0 +1,82 @@
+/ requires: +html_id+ (post_1, comment_2, etc.), +communication+ object, and
+/ +avatar_type+, set to either :user (displays user avatar) or :communication_image (displays image attached to communication)
+article.block.communication id=html_id
+  .block__content.flex.flex--no-wrap
+    .flex__fixed.spacing-right
+      - if avatar_type == :communication_image
+        .post-image-container
+          = render partial: 'images/image_container', locals: { image: communication.image, size: :thumb_tiny }
+      - else
+        =<> user_avatar((communication.user if communication.user_visible?), 'avatar--100px', communication.author)
+        - if communication.class == Post && communication.user_visible? && communication.user.forum_posts_count > 0
+          span.communication__sender__stats.center
+            ' Posts:
+            = communication.user.forum_posts_count
+    .flex__grow.communication__body
+      span.communication__body__sender-name =<> link_to_author(communication, can?(:manage, communication.class))
+      - if communication.user_visible?
+        =<> render partial: 'profiles/user_badges', locals: { user: communication.user }
+        br
+        - if [Post, Comment].include?(communication.class) && communication.name_at_post_time != communication.user.name
+          p.small-text
+            ' (Previously known as
+            = communication.name_at_post_time
+            ' )
+        - elsif communication.user.last_renamed_at > 14.days.ago
+          p.small-text
+            ' (Previously known as
+            = communication.user.previous_usernames.last
+            ' )
+        = user_label communication.user, small: true
+      .communication__body__text
+        - if defined?(post_text) && post_text
+          =<> post_text
+        - else
+          - if communication.try(:hidden_from_users)
+            strong.comment_deleted
+              | Deletion reason:
+              =<> communication.deletion_reason
+              -if can?(:read, communication)
+                | (
+                = communication.deleted_by.try(:name) || 'Orbital Friendship Cannon'
+                | )
+              br
+              - if communication.destroyed_content
+                | This #{communication.class.to_s.downcase}'s contents have been destroyed.
+                br
+          - if (communication.class == Message && can?(:read, communication.conversation)) || can?(:read, communication)
+            =<> render_post communication
+
+  .block__content.communication__options
+    .flex.flex--wrap.flex--spaced-out
+      - if defined?(communication_options) && communication_options
+        = communication_options
+      - else
+        include app/views/communications/_communication_options.html.slim
+    - if show_advanced_options
+      - if can? :hide, communication.class
+        .js-staff-action
+          - restore_path = "#{path}/restore"
+          - if !(communication.hidden_from_users || communication.destroyed_content)
+            =<> link_to '#', class: 'communication__interaction togglable-delete-form-link', 'data-click-toggle': "#inline-del-form-post-#{communication.id}" do
+              i.fa.fa-times
+              =<> 'Delete'
+          - elsif can?(:restore, communication.class) && communication.hidden_from_users && !communication.destroyed_content
+            =<> link_to restore_path, data: { confirm: t('are_you_sure') }, method: :put, class: 'communication__interaction' do
+              i.fa.fa-check
+              =<> 'Restore'
+            - if can? :manage, communication.class
+              =<> link_to "#{path}?deletion_reason=#{CGI.escape(communication.deletion_reason)}&hard=true", method: :delete, data: { confirm: t('are_you_sure') }, class: 'communication__interaction' do
+                i.fa.fa-times
+                =<> 'Delete Contents'
+          - if can? :manage, communication.class
+            .communication__info
+              =<> link_to_ip(communication.ip)
+            .communication__info
+              =<> link_to_fingerprint(communication.fingerprint, communication.user_agent)
+        = form_tag path, method: :delete, class: 'togglable-delete-form hidden flex', id: "inline-del-form-post-#{communication.id}"
+          = text_field_tag :deletion_reason, nil, class: 'input input--wide', placeholder: 'Deletion Reason', id: "inline-del-reason-post-#{communication.id}", required: true
+          - if can? :manage, communication.class
+            = check_box_tag :hard, '1', false, id: "inline-post-del-hard-checkbox-#{communication.id}", class: 'checkbox'
+            = label_tag "inline-post-del-hard-checkbox-#{communication.id}", 'Delete Contents', class: 'checkbox-label-of-doom'
+          = submit_tag 'Delete', class: 'button'

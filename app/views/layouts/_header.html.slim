@@ -1,0 +1,131 @@
+header.header
+  .flex.flex--centered.flex--start-bunched.flex--maybe-wrap
+    .flex.flex--centered
+      #js-burger-toggle.hide-desktop
+        a.header__link href='#'
+          i.fa.fa-bars
+      a.header__link href='/'
+        i.fa.fw.favicon-home
+        span.fa__text.hide-limited-desktop.hide-mobile = t('booru.name')
+      a.header__link.hide-mobile href=new_image_path title='Upload'
+        i.fa.fa-upload
+
+    = form_tag '/search'.freeze, method: :get, class: 'header__search flex flex--no-wrap flex--centered'.freeze, enforce_utf8: false do
+      input.input.header__input.header__input--search#q[
+        name='q'
+        title="For terms all required, separate with ',' or 'AND'; also supports 'OR' for optional terms and '-' or 'NOT' for negation. Search with a blank query for more options or click the ? for syntax help."
+        value=(@search_query || @tag&.name || ''.freeze)
+        placeholder='Search'
+        autocapitalize='none'
+        autocorrect='off'
+        spellcheck='false'
+      ]
+
+      - if user_signed_in? && can?(:undelete, Image) && (cookies['hidestaff'] != 'true'.freeze)
+        = deleted_images_dropdown 'header__input'.freeze
+      - if params[:sf] && params[:sf] != 'created_at'.freeze
+        = hidden_field_tag :sf, params[:sf]
+      - if params[:sd] && params[:sd] != 'desc'.freeze
+        = hidden_field_tag :sd, params[:sd]
+
+      button.header__search__button type="submit" title='Search'
+        i.fa-embedded--search
+      a.header__search__button href=search_reverse_path title="Search using an image"
+        i.fa-embedded--camera
+      a.header__search__button href=search_syntax_path title="Search syntax help"
+        i.fa-embedded--help
+
+    .flex.flex--centered.flex--no-wrap.header__force-right
+      - if user_signed_in?
+        - notification_count = current_user.unread_notifications.count
+        a.header__link href='/notifications' title='Notifications'
+          i.fa-embedded--notification>
+          span.js-notification-ticker.fa__text.header__counter data-notification-count=notification_count = notification_count
+
+        - conversation_count = (@unread ? @unread.size : 0)
+        - if conversation_count == 1
+          - page = (@unread.first.messages.count / 25.0).ceil
+          a.header__link href=conversation_path(@unread.first, page: page > 1 ? page : nil) title='Messages'
+            i.fa-embedded--unread-message>
+            span.fa-embedded__text.header__counter = conversation_count
+        - elsif conversation_count > 0
+          a.header__link href=conversations_path title='Conversations'
+            i.fa-embedded--unread-message>
+            span.fa-embedded__text.header__counter = conversation_count
+        - else
+          a.header__link href=conversations_path title='Conversations'
+            i.fa-embedded--message>
+            span.fa-embedded__text.header__counter.hidden = conversation_count
+
+        a.header__link.hide-mobile href=filters_path title='Filters'
+          i.fa.fa-filter
+          span.hide-limited-desktop< Filters
+        = form_tag filters_current_path, method: :patch, class: 'header__filter-form'.freeze, id: 'filter-quick-form'.freeze do
+          = select_tag :id, grouped_options_for_select(Filter.for_menu(current_user), [@current_filter.name, @current_filter.id.to_s]),
+                id: 'filter-quick-menu'.freeze, class: 'input header__input'.freeze, data: { change_submit: '#filter-quick-form'.freeze }
+        = form_tag spoiler_type_path, method: :put, class: 'header__filter-form hide-mobile hide-limited-desktop'.freeze, id: 'spoiler-quick-form'.freeze do
+          = select_tag :id, grouped_options_for_select([['Spoilers', %w[static click hover off]]], current_user.spoiler_type),
+                id: 'spoiler-quick-menu'.freeze, class: 'input header__input'.freeze, data: { change_submit: '#spoiler-quick-form'.freeze }
+        .dropdown.header__dropdown
+          - user_profile_path = profile_path(current_user)
+          a.header__link.header__link-user href=user_profile_path
+            = user_avatar current_user, 'avatar--28px'.freeze, current_user.name
+            span.header__link-user__dropdown-arrow.hide-mobile data-click-preventdefault="true"
+          nav.dropdown__content.dropdown__content-right.hide-mobile.js-burger-links
+            a.header__link href=user_profile_path
+              = current_user.name
+            a.header__link href='/search?q=my:watched'
+              i.fa.fa-fw.fa-eye>
+              | Watched
+            a.header__link href='/search?q=my:faves'
+              i.fa.fa-fw.fa-star>
+              | Faves
+            a.header__link href='/search?q=my:upvotes'
+              i.fa.fa-fw.fa-arrow-up>
+              | Upvotes
+            a.header__link href=galleries_path(user: current_user.name)
+              i.fa.fa-fw.fa-image>
+              | Galleries
+            a.header__link href='/search?q=my:uploads'
+              i.fa.fa-fw.fa-upload>
+              | Uploads
+            a.header__link href='/lists/my_comments'
+              i.fa.fa-fw.fa-comments>
+              | Comments
+            a.header__link href=posts_posted_path
+              i.fas.fa-fw.fa-pen-square>
+              | Posts
+            a.header__link href='/user_links'
+              i.fa.fa-fw.fa-link>
+              | Links
+            a.header__link href='/settings/edit'
+              i.fa.fa-fw.fa-cogs>
+              | Settings
+            a.header__link href=conversations_path
+              i.fa.fa-fw.fa-envelope>
+              | Messages
+            a.header__link href=edit_user_registration_path
+              i.fa.fa-fw.fa-user>
+              | Account
+            a.header__link href=destroy_user_session_path data-method='delete'
+              i.fas.fa-fw.fa-sign-out-alt>
+              | Logout
+      - else
+        a.header__link.hide-mobile href=filters_path
+          | Filters (
+          = @current_filter.name
+          | )
+        span.js-burger-links.hide-mobile
+          a.header__link href='/settings/edit'
+            i.fa.fa-fw.fa-cogs.hide-desktop>
+            | Settings
+        a.header__link href=new_user_registration_path
+          | Register
+        a.header__link href=new_user_session_path
+          | Login
+
+nav.header.header--secondary
+  .flex.flex--centered.flex--spaced-out.flex--wrap
+    include _header_navigation.html
+    - if current_user.try(:staff?)
+      include _header_staff_links.html

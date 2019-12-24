@@ -1,0 +1,47 @@
+- if !@user.potential_aliases.empty?
+  h2 Potential Aliases
+  p
+  | Remember that aliases, especially fingerprints, aren't infallible by a
+  em<> long
+  | margin. Use this data only in supplement to other evidence when considering bans.
+  br
+  br
+  table.table
+    thead
+      tr
+        td User
+        td Method
+        td Creation Date
+        td Ban Status
+    tbody
+      - @user.potential_aliases.each do |method, u|
+        tr
+          td
+            =link_to u.name, profile_path(u)
+          td
+            =< " #{method.to_s.upcase.gsub('_', ' ')}"
+          /Account Creation Date
+          -if u.created_at > 7.days.ago
+            td.danger
+              =< friendly_time u.created_at
+          -elsif u.created_at > 14.days.ago
+            td.warning
+              =< friendly_time u.created_at
+          -else
+            td.success
+              =< friendly_time u.created_at
+          /Account Ban Status
+          -if u.deleted_at
+            td.danger
+              | Account Disabled
+          -elsif u.currently_banned?
+            td.danger
+              | Currently Banned
+          -elsif u.previously_banned?
+            td.warning
+              | Previously Banned
+          -else
+            td.success
+              | Never Banned
+- else
+  h2 No potential aliases found

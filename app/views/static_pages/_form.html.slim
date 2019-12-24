@@ -1,0 +1,16 @@
+= form_for @static_page do |f|
+  = render partial: 'layouts/errors', locals: { errors: @static_page.errors }
+
+  .field
+    = f.label :title
+    = f.text_field :title, class: 'input input--wide'
+
+  .field
+    = f.label :slug
+    = f.text_field :slug, class: 'input input--wide'
+
+  .field
+    = f.label :body
+    = f.text_area :body, class: 'input input--wide'
+
+  .actions = f.submit class: 'button'

@@ -1,0 +1,37 @@
+- page_layout :wide
+- list = capture do
+  table.table
+    thead
+      tr
+        th Fingerprint
+        th Created
+        th Expires
+        th Reason/Note
+        th Ban ID
+        th Options
+    tbody
+      - @bans.each do |ban|
+        tr
+          td
+            = link_to_fingerprint ban.fingerprint
+          td
+            => friendly_time ban.created_at
+            = user_abbrv ban.banning_user
+          td[class=(ban.active? ? 'success' : 'danger')]
+            = friendly_time ban.valid_until
+          td
+            = ban.reason
+            - if ban.note.present?
+              p.block.block--fixed
+                em
+                  ' Note:
+                  = ban.note
+          td
+            = ban.generated_ban_id
+          td
+            - if can? :edit, FingerprintBan
+              = link_to t('edit'), edit_admin_fingerprint_ban_path(ban)
+              - if can? :destroy, ban
+                '  &bull;
+                = link_to t('destroy'), admin_fingerprint_ban_path(ban), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { form_path: admin_fingerprint_bans_path, item_class: FingerprintBan, items: @bans, new_item_path: new_admin_fingerprint_ban_path, rendered_list: list }

@@ -1,0 +1,21 @@
+- cache('site-notices-v1'.freeze, expires_in: 3.minutes) do
+  - SiteNotice.current.each do |site_notice|
+    .flash.flash--site-notice
+      strong = site_notice.title
+      =< site_notice.text
+      - if site_notice.link.present?
+        a<> href=site_notice.link
+          = site_notice.link_text
+noscript.flash.flash--warning
+  strong You don't appear to have Javascript enabled
+  ' If you're using an add-on like NoScript, please allow
+  => Booru::CONFIG.settings[:cdn_host]
+  ' for the site to work properly.
+- if flash[:notice]
+  .flash.flash--success = flash[:notice]
+- if flash[:alert]
+  .flash.flash--warning = flash[:alert]
+- if flash[:error]
+  .flash.flash--warning = flash[:error]
+- if flash[:warning]
+  .flash.flash--warning = flash[:warning]

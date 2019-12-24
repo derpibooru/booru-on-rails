@@ -1,0 +1,24 @@
+h4
+  ' Mod Notes for
+  = link_to_noted_thing(notable)
+table.table
+  thead
+    tr
+      th Moderator
+      th Note
+      th Time
+      th.center Actions
+  tbody
+    - notable.mod_notes.where(deleted: false).order(id: :desc).each do |note|
+      tr
+        td
+          = link_to note.moderator.name, profile_path(note.moderator)
+        td
+          = render_textile note.body
+        td
+          = friendly_time note.created_at
+        td.center
+          => link_to 'Edit', edit_admin_mod_note_path(note)
+          ' &bull;
+          => link_to 'Delete', admin_mod_note_path(note), data: { confirm: t('are_you_sure') }, method: :delete
+p = link_to 'Add New Note', new_admin_mod_note_path(notable_class: notable.class, notable_id: notable.id)

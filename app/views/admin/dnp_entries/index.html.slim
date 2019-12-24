@@ -1,0 +1,80 @@
+- page_layout :wide
+- pagination = paginate @dnp_requests
+h2 Do-Not-Post Requests
+=render partial: 'layouts/search', locals: { path: admin_dnp_entries_path }
+.block
+  .block__header
+    = pagination
+    span.block__header__title Display Only:
+    => link_to 'All Open', admin_dnp_entries_path(states: 'requested,claimed,rescinded,acknowledged')
+    => link_to 'Listed', admin_dnp_entries_path(states: 'listed')
+    => link_to 'Rescinded', admin_dnp_entries_path(states: 'rescinded,acknowledged')
+    => link_to 'Closed', admin_dnp_entries_path(states: 'closed')
+  .block__content
+    - if @dnp_requests.blank?
+      | No results found
+    - else
+      table.table
+        thead
+          tr
+            td Tag
+            td Requesting User
+            td Type
+            td Conditions
+            td Status
+            td Created
+            td Modified
+            td Options
+        tbody
+          - @dnp_requests.each do |request|
+            tr
+              td
+                = render partial: 'tags/tag', locals: { tag: request.tag }
+              td
+                = link_to request.requesting_user.name, profile_path(request.requesting_user)
+              td = request.dnp_type
+              td = render_textile(request.conditions)
+              ruby:
+                td_class =
+                  case request.aasm_state
+                  when 'closed'
+                    'success'
+                  when 'listed'
+                    'success'
+                  when 'claimed'
+                    'warning'
+                  when 'acknowledged'
+                    'warning'
+                  else
+                    'danger'
+                  end
+
+              td[class=td_class]
+                - state_text = request.aasm_state == 'acknowledged' ? 'Claimed (Rescinded)' : request.aasm_state
+                => state_text.capitalize
+                - if request.modifying_user.present?
+                  ' by
+                  = link_to request.modifying_user.name, profile_path(request.modifying_user)
+              td = friendly_time(request.created_at)
+              td = friendly_time(request.updated_at)
+              td
+                => link_to 'Show', admin_dnp_entry_path(request)
+                ' &bull;
+                => link_to 'Send PM', new_conversation_path(recipient: request.requesting_user.name)
+                - if %w[requested claimed].include? request.aasm_state
+                  ' &bull;
+                  => link_to 'Claim', admin_dnp_entry_transition_path(request, do: 'claim'), method: :post, data: { confirm: t('dnp.confirm') }
+                  ' &bull;
+                  => link_to 'Approve', admin_dnp_entry_transition_path(request, do: 'list'), method: :post, data: { confirm: t('dnp.confirm') }
+                  ' &bull;
+                  = link_to 'Close', admin_dnp_entry_transition_path(request, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }
+                - elsif %w[listed].include? request.aasm_state
+                  ' &bull;
+                  => link_to 'Rescind', admin_dnp_entry_transition_path(request, do: 'rescind'), method: :post, data: { confirm: t('dnp.confirm') }
+                  ' &bull;
+                  = link_to 'Close', admin_dnp_entry_transition_path(request, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }
+                - elsif %w[rescinded acknowledged].include? request.aasm_state
+                  ' &bull;
+                  => link_to 'Claim', admin_dnp_entry_transition_path(request, do: 'acknowledge'), method: :post, data: { confirm: t('dnp.confirm') }
+                  ' &bull;
+                  = link_to 'Close', admin_dnp_entry_transition_path(request, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }

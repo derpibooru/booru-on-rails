@@ -1,0 +1,16 @@
+= form_for [:admin, @link] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @link.errors }
+  .field
+    - user = User.find_by id: @link.user_id || params[:user_id]
+    = f.label :user_id, link_to(user.name, profile_path(user))
+    = f.hidden_field :user_id, value: user.id
+  .field
+    => f.label :uri, 'Insert the URL to associate here (e.g. http://me.deviantart.com/, http://myblog.tumblr.com/, or http://twitter.com/me):'
+    = f.text_field :uri, class: 'input input--wide'
+  .field
+    => f.label :tag_name, '"artist:" tag that is associated with this link (e.g. artist:me):'
+    = f.text_field :tag_name, class: 'input', autocomplete: 'off', placeholder: 'artist:me', data: { ac: 'true', ac_min_length: '3', ac_source: '/tags/autocomplete.json?term=' }
+  .field
+    => f.check_box :public, checked: (@link.new_record? ? true : @link.public), class: 'checkbox'
+    = f.label :public, raw("Public &ndash; checking this box will, once the link is verified, display it on associated tag pages, as well as a link to the associated #{t('booru.name')} account")
+  = f.submit 'Save Link', class: 'button'

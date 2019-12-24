@@ -1,0 +1,49 @@
+- can_rearrange = @gallery.creator == current_user
+- info_row = capture do
+  .block__header.block__header--light.block__header--sub
+    span.block__header__title A gallery by
+    =>link_to @gallery.creator.name, profile_path(@gallery.creator)
+    | with
+    =<> pluralize(@gallery.image_count, 'image')
+    | and
+    =< pluralize(@gallery.watcher_count, 'subscriber')
+    | , last updated
+    =<> "#{time_ago_in_words(@gallery.updated_at)} ago"
+  .block__content.flex.js-imagelist-info
+    .flex__fixed.thumb-tiny-container.spacing-right
+      = render partial: 'images/image_container', locals: { image: @gallery.thumbnail, size: :thumb_tiny }
+    .flex__grow
+      - if @gallery.spoiler_warning.present?
+        strong Warning:
+        =<@gallery.spoiler_warning
+      - if @gallery.description.present?
+        p = @gallery.description
+  .block__content.hidden#gallery-rearrange-info
+    .block.block--fixed.block--primary
+      | Click the image and drag.
+      br
+      strong Note that you may have to wait a couple of seconds before the order is applied.
+- header_links = capture do
+  a href=new_report_path(reportable_class: 'Gallery', reportable_id: @gallery.id)
+    i.fa.fa-exclamation-triangle>
+    span.hide-mobile Report
+  - if can? :edit, @gallery
+    a href=edit_gallery_path(@gallery)
+      i.fas.fa-pen-square>
+      span.hide-mobile Edit
+  - if can_rearrange
+    a.rearrange-button.js-rearrange href='#' data-click-hide='.js-rearrange' data-click-show='.js-save,#gallery-rearrange-info'
+      i.fa.fa-sort>
+      ' Rearrange
+    a.rearrange-button.js-save.hidden href='#' data-click-hide='.js-save,#gallery-rearrange-info' data-click-show='.js-rearrange' data-reorder-path=gallery_order_path(@gallery)
+      i.fa.fa-check>
+      ' Save
+  - elsif current_user
+    = subscription_link(@gallery, current_user)
+- title = capture do
+  | Viewing
+  strong<> = @gallery.title
+
+/ Ugly as hell, but it works for now. FIXME.
+- classes = [('js-sortable-has-prev' if @gallery_prev), ('js-sortable-has-next' if @gallery_next)].compact.join(' ')
+#sortable class=classes = render partial: 'images/imagelist', locals: { images: @images, header: title, info_row: info_row, header_links: header_links, render_images: 'galleries/imagelist_hack', random_image_href: random_image_href }

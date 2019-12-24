@@ -1,0 +1,17 @@
+.post-search-results
+  - avatar_type = :user
+  - @posts.each do |post|
+    .post-entry-wrapper
+      h3
+        - post_forum = (forum || Forum.find_by(id: post.topic.forum_id))
+        =<> link_to post_forum.name, forum_path(post_forum)
+        | &raquo;
+        =<> link_to post.topic.title, forum_topic_path(post_forum, post.topic)
+        - post_link = short_topic_post_path(post_forum, post.topic, post, anchor: "post_#{post.id}")
+        | &raquo;
+        - if (post.topic_position == 0) || !post.topic_position
+          =<> link_to 'Topic Opener', post_link
+        - else
+          =<> link_to "Post #{post.topic_position + 1}", post_link
+      = render partial: 'topics/posts/post', locals: { post: post }
+  .js-editable-posts data-editable=editable_communications(@posts).to_json

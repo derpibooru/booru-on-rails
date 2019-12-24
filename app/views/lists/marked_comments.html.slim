@@ -1,0 +1,7 @@
+h1 = @title
+.block
+  .block__header
+    span.block__header__title Marked Comments
+    = paginate @marked_comments
+
+= render partial: 'comment_list', locals: { comments: @marked_comments }

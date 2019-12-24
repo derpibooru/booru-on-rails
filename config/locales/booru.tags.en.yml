@@ -1,0 +1,15 @@
+en:
+  tags:
+    errors:
+      aliasing:
+        base_rating_tag: "Alias cannot be specified on a rating tag."
+        base_has_aliases: "Alias cannot be specified because this tag is aliased with the following: %{aliases}. Please redirect all aliases first or update the target to point to this tag."
+        target_does_not_exist: "does not exist. To confirm intentions, please create this tag first."
+        target_is_a_rating_tag: "cannot be a rating tag."
+        target_identical_to_source: "cannot be the same as or an alias of this tag."
+      destruction:
+        rating_tag: "is a rating tag."
+        alias_target: "is the target of at least one alias; unalias those first!"
+        implied_by_others: "is implied by other tags, and would just come back via them."
+        in_system_filter: "is included in a system filter."
+        namespace_spoiler: "is a spoiler tag, and must be destroyed via console."

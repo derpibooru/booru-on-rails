@@ -1,0 +1,11 @@
+h1
+  | Viewing last 10 versions of
+  =<> communication.class.to_s.downcase
+  | by
+  =<> link_to_author(communication, can?(:manage, communication.class))
+  | on
+  =< link_to communication.parent_title, communication.link_to_route
+- communication_versions = communication.versions.where.not(created_at: nil).reorder(created_at: :desc).limit(10).to_a
+= render partial: 'communications/communication_versions', collection: communication_versions, locals: { communication: communication }
+br
+=< link_to 'Back', communication.link_to_route

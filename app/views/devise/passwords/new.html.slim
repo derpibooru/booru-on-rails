@@ -1,0 +1,9 @@
+h1 Forgot your password?
+p Give us the email address you signed up with and we'll fire you an email explaining how to get your password reset.
+
+= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+  =<> devise_error_messages!
+  .field
+    => f.label :email
+    => f.email_field :email, class: 'input', required: true
+  = f.submit 'Send me reset password instructions', class: 'button'

@@ -1,0 +1,12 @@
+.block
+  .block__header
+    span.block__header__title Recent Forum Posts
+    = link_to 'View all', posts_posted_path(user_id: @user.id)
+  .block__content
+    .block
+      - @recent_posts.each do |post|
+        .block__content.alternating-color
+          | Post
+          =<> link_to friendly_time(post.created_at), short_topic_post_path(post.topic.forum, post.topic, post, anchor: "post_#{post.id}")
+          | in topic
+          =<> link_to post.topic.title, short_topic_path(post.topic.forum, post.topic)

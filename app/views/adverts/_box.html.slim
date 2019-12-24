@@ -1,0 +1,19 @@
+- if !current_user || (current_user && current_user.show_advertisements?)
+  - advert = AdvertSelector.for(@image)
+
+  .block#imagespns
+    .spnstxt
+      ' Interested in advertising on
+      = t('booru.name')
+      ' ?
+      => link_to 'Click here', '/pages/advertising'
+      | for information!
+    - if advert
+      a href=advert_path(advert) rel='nofollow' title=advert.title
+        img src=advert.uploaded_image.url alt=advert.title width='700' height='80'
+      - advert.increment!(:impressions)
+    p
+      strong
+        => t('booru.advert_message')
+        = link_to 'help support us financially', '/pages/donations'
+        | !

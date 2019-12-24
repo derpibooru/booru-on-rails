@@ -1,0 +1,53 @@
+h2 Submit a report
+strong = link_to_reported_thing(@report.reportable)
+.image-other
+  .dnp-warning
+    h3 Reporting Tips
+    ul
+      li
+        | Make sure to report for the correct
+        =< link_to 'rule.', '/pages/rules'
+      li One report per problem (mention all things affected, please).
+      li
+        strong Do not report someone just because they disagree with you. Abusing the report system is a bannable offense.
+  - if @report && @report.reportable_type.to_s.downcase == 'image'
+    br
+    .dnp-warning
+      h3 Takedown Policy
+      p
+        strong> Only an owner of an image's rights (normally the artist) can request a takedown.
+        - has_artist_link = false
+        - user_links = UserLink.where(user: current_user)
+        - if user_links
+          - has_artist_link = Tag.where(id: user_links.select(:tag_id)).where(namespace: 'artist').exists?
+        - if !has_artist_link
+          ' If you're the artist, you'll
+          strong> need
+          ' a verified
+          - if current_user
+            = link_to 'user link', '/user_links'
+          - else
+            | user link
+          | .
+      p
+        | For more information, please read the
+        =< link_to 'takedown policy', '/pages/takedowns'
+        | .
+  - if @report.reportable_type.to_s.downcase == 'conversation'
+    .dnp-warning
+      h3 Privacy note
+      p
+        | The whole conversation will be readable by site staff.
+  br
+  = form_for Report.new do |f|
+    = hidden_field_tag :reportable_id, params[:reportable_id]
+    = hidden_field_tag :reportable_class, params[:reportable_class]
+    .field
+      = select_tag :category, options_for_select(Booru::CONFIG.reports[:categories].invert.to_a), class: 'input'
+    .field
+      => f.text_area :reason, class: 'input input--wide', placeholder: 'Provide anything else we should know here.'
+    - if !current_user && $flipper[:captcha].enabled?
+      => captcha_tags
+      p
+        | This helps stop bot spam; log in if you don't want to deal with captchas.
+    = f.submit 'Send Report', class: 'button', id: 'report_send_button'

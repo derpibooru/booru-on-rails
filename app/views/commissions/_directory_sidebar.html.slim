@@ -1,0 +1,22 @@
+.block
+  .block__header
+    span.block__header__title Search
+  .block__content
+    = form_tag commissions_path, class: 'hform', method: :get, enforce_utf8: false
+      .field = label_tag :categories, 'Art Categories:'
+      - Commission::CATEGORIES.sort_by(&:downcase).each do |cat|
+        - name = "category_#{cat.downcase.tr(' ', '_')}"
+        .field
+          => check_box_tag 'category[]', cat, (params[:category].include?(cat) if params[:category].present?), class: 'checkbox spacing-right', id: name
+          =< label_tag name, cat
+      br
+      .field = label_tag :item_type, 'Commission Type:'
+      .field = select_tag :item_type, options_for_select(CommissionItem::ITEM_TYPES, params[:item_type]), class: 'input', include_blank: '(Any)'
+      br
+      .field = label_tag :price, 'Price:'
+      .field = number_field_tag :price_min, params[:price_min], class: 'input input--short', placeholder: 'At Least', step: 'any', min: 0
+      .field = number_field_tag :price_max, params[:price_max], class: 'input input--short', placeholder: 'At Most', step: 'any', min: 0
+      br
+      .field = label_tag :keywords, 'Search:'
+      .field = text_field_tag :keywords, params[:keywords], class: 'input input--short', placeholder: 'Keywords'
+      = submit_tag 'Search', class: 'button'

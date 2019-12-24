@@ -1,0 +1,74 @@
+ruby:
+  args = if defined?(as_admin) && as_admin
+    [[:admin, @filter]]
+  else
+    [@filter]
+  end
+
+.form
+  = form_for(*args) do |f|
+    - if @filter.errors.any?
+      #error_explanation
+        h2 = "#{pluralize(@filter.errors.count, 'error')} prevented this from being posted:"
+        ul
+        - @filter.errors.full_messages.each do |msg|
+          li = msg
+    .field
+      = f.text_field :name, class: 'input input--wide', placeholder: 'Name'
+    .fieldlabel
+      ' This is a friendly name for this filter - it should be short and descriptive.
+      strong If you are making a public filter, this must be accurate.
+    .field
+      = f.text_area :description, class: 'input input--wide', placeholder: :description
+    .fieldlabel
+      | Here you can describe your filter in a bit more detail.
+    .field
+      = f.label :spoilered_tag_list, 'Spoilered Tags'
+      br
+      = render partial: 'tags/tag_editor', locals: { f: f, name: :spoilered_tag_list, type: :edit }
+    .fieldlabel
+      | These tags will spoiler the images they're associated with.
+    .field
+      = f.label :spoilered_complex_str, 'Complex Spoiler Filter'
+      br
+      = f.text_area :spoilered_complex_str, class: 'input input--wide', autocapitalize: 'none'
+    .fieldlabel
+      p
+        ' Use the search syntax here to specify an additional filter.
+        ' For multiple filters, separate with a newline (or use the OR operator). Search fields excepting
+        code<> faved_by
+        ' are supported. See the
+        =<>link_to 'Search Syntax Guide', search_syntax_path
+        ' for more information.
+      p
+        strong> WARNING:
+        ' This filter is applied along with your tag filters. Tag filters may spoiler images that you mean to filter more precisely here. Double-check to make sure they don't interfere.
+    .field
+      = f.label :hidden_tag_list, 'Hidden Tags'
+      br
+      = render partial: 'tags/tag_editor', locals: { f: f, name: :hidden_tag_list, type: :edit }
+    .fieldlabel
+      | These tags will hide images entirely from the site; if you go directly to an image, it will spoiler it.
+    .field
+      = f.label :hidden_complex_str, 'Complex Hide Filter'
+      br
+      = f.text_area :hidden_complex_str, class: 'input input--wide', autocapitalize: 'none'
+    .fieldlabel
+      p
+        ' Use the search syntax here to specify an additional filter. See the
+        =<> link_to 'Search Syntax Guide', search_syntax_path
+        ' for more information.
+      p
+        strong> WARNING:
+        ' This filter is applied along with your tag filters. Tag filters may hide images that you mean to filter more precisely here. Double-check to make sure they don't interfere.
+    - if @filter.new_record?
+      .field
+        = f.check_box :public, class: 'checkbox'
+        = f.label :public, for: :filter_public
+      .fieldlabel
+        strong You probably do not want to check this unless you know what you are doing - it cannot be changed later
+        | . Public filters can be shared with other users and used by them; if you make changes to a filter it will update all users of that filter.
+    - elsif @filter.public?
+      .fieldlabel
+        strong Changes made to this filter will affect anyone else using this filter! Check your changes, and make sure your changes don't change the filter's intent.
+    = f.submit 'Save Filter', class: 'button'

@@ -1,0 +1,26 @@
+- if !@links.empty?
+  - @links.each do |link|
+    .block__content.alternating-color.break-word
+      .center
+        - if link.tag
+          .tag-list = render partial: 'tags/tag', locals: { tag: link.tag }
+        = link_to link.uri, link.uri
+        - if @user == current_user && link.tag
+          br
+          | Watched by
+          =<> User.where('watched_tag_ids @> ARRAY[?]', link.tag.id).count
+          | users
+        - if can? :manage, link
+          br
+          = link.public ? 'Public - ' : 'Hidden - '
+          = link_to 'Details', link
+          - if can? :manage, UserLink
+            =< link_to 'Admin', admin_user_link_path(link)
+
+- if @user == current_user
+  .block__content.alternating-color.break-word
+    .center
+      - if !@links.empty?
+        p Content creator? Make a link!
+      a.button href=new_user_link_path
+        | Create new user link

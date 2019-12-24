@@ -1,0 +1,8 @@
+h1 Editing Moderation Scratchpad
+
+= form_tag profile_scratchpad_path(@user), method: :put do
+  - edit_area = capture do
+    = render partial: 'layouts/textile_toolbar'
+    = text_area_tag :notes, @user.scratchpad || '', class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: 'Mod notes'
+  - actions = submit_tag 'Update', class: 'button', autocomplete: 'off', data: { disable_with: 'Updating...' }
+  = render partial: 'communications/communication_edit', locals: { title: 'Moderation Scratchpad', edit_area: edit_area, actions: actions }

@@ -1,0 +1,17 @@
+- content_for(:robots, true)
+h2 = link_to 'Top Scoring', search_path(q: 'first_seen_at.gt:3 days ago', sf: 'score', sd: 'desc')
+= render partial: 'images/display_images', locals: { images: @top_scoring_images, image_count: @top_scoring_images.count }
+h2 = link_to 'All Time Top Scoring', search_path(q: '*', sf: 'score', sd: 'desc')
+= render partial: 'images/display_images', locals: { images: @all_time_top_scoring_images, image_count: @all_time_top_scoring_images.count }
+h2 = link_to 'Top Commented', search_path(q: 'first_seen_at.gt:3 days ago', sf: 'comments', sd: 'desc')
+= render partial: 'images/display_images', locals: { images: @top_commented_images, image_count: @top_commented_images.count }
+
+p
+  | Showing results for the last
+  =< distance_of_time_in_words(Time.zone.now, @time_period)
+p
+  =<> link_to 'Last month', url_for(last: '4w')
+  | &#149;
+  =<> link_to 'Last 3 days', url_for(last: '3d')
+  | &#149;
+  =<> link_to 'Last 24 hours', url_for(last: '24h')

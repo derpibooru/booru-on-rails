@@ -1,0 +1,10 @@
+- if @username
+  h1
+    ' Editing
+    = @username
+    | 's Ban
+- else
+  h1 Editing User Ban
+= render partial: 'form'
+br
+= link_to 'Back', admin_user_bans_path, class: 'button button--link'

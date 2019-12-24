@@ -1,0 +1,10 @@
+h1 Staff
+.staff-block
+  - cache('site-staff-v6', expires_in: 45.minutes) do
+    - @staff.categories.each do |category, users|
+      - if users.any?
+        h4 = category
+        - users.each do |user|
+          a.profile-block href=profile_path(user)
+            => user_avatar(user, 'avatar--125px', user.name)
+            b => user.name

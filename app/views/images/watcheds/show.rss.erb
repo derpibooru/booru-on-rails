@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<rss version="2.0">
+  <channel>
+    <title><%= t('booru.name') %> Watchlist</title>
+    <description>Your watched tags feed from <%= t('booru.name') %></description>
+    <link><%= images_watched_url %></link>
+    <lastBuildDate><%= Time.zone.now.to_s(:rfc822) %></lastBuildDate>
+    <% if @images and @images.size > 0 %>
+      <% for image in @images %>
+        <% next unless image %>
+        <item>
+          <title><%= "##{image.id} - #{image.tag_list}" %></title>
+          <description>
+            <![CDATA[
+              <% mouseovertext = "Size: " + (image.image_width.to_s + "x" + image.image_height.to_s) + " | Tagged: "+(image.tag_ids.size > 0 ? image.tag_list : "Not tagged yet!") %>
+              <%= link_to image_tag("https:#{spoilered_preview(image, @current_filter)}"), short_image_url(image), alt: mouseovertext, title: mouseovertext %>
+            ]]>
+          </description>
+          <pubDate><%= image.created_at.to_s(:rfc822) %></pubDate>
+          <link><%= short_image_url(image) %></link>
+          <guid><%= short_image_url(image) %></guid>
+        </item>
+      <% end %>
+    <% end %>
+  </channel>
+</rss>

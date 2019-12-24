@@ -1,0 +1,89 @@
+/ General information block
+.block
+  .block__header
+    span.block__header__title General information
+  .block__content.commission__block_body
+    strong> Profile:
+    = link_to @user.name, profile_path(@user)
+    br
+    strong> Status:
+    = @user.commission.open ? 'Open' : 'Closed'
+    br
+    strong> Price Range:
+    = format '$%.2f - $%.2f USD', @user.commission.minimum_price, @user.commission.maximum_price
+    br
+    br
+    = render_textile(@user.commission.information)
+
+/ Contact information block
+.block
+  .block__header
+    span.block__header__title Contact information
+  .block__content.commission__block_body
+    = render_textile(@user.commission.contact)
+
+/ Categories block
+.block
+  .block__header
+    span.block__header__title Art Categories
+  .block__content
+    - @user.commission.categories.sort_by(&:downcase).each do |cat|
+      span.commission__category
+        = link_to cat, commissions_path(category: cat)
+
+/ Will create block
+- if @user.commission.will_create.present?
+  .block
+    .block__header
+      span.block__header__title Will draw/create
+    .block__content.commission__block_body
+      = render_textile(@user.commission.will_create)
+
+/ Will not create block
+- if @user.commission.will_not_create.present?
+  .block
+    .block__header
+      span.block__header__title Will not draw/create
+    .block__content.commission__block_body
+      = render_textile(@user.commission.will_not_create)
+
+/ User link block
+.block
+  .block__header: span.block__header__title User Links
+  - is_current = (current_user && current_user.id == @user.id)
+  - if @links.present? || is_current
+    = render partial: 'profiles/user_link_area'
+
+/ Options block
+.block
+  .block__header
+    span.block__header__title Options
+  .block__content
+    - if can? :edit, @user.commission
+      = link_to 'Edit this listing', edit_commission_path(@user.commission)
+      br
+      = link_to 'Delete this listing', commission_path(@user.commission), data: { confirm: t('commissions.confirm_delete_listing') }, method: :delete
+      br
+    = link_to 'Report this listing', new_report_path(reportable_class: 'commission', reportable_id: @user.commission.id)
+
+/ Share block
+.block
+  .block__header
+    span.block__header__title Share this listing
+  .block__content
+    - url = commission_url(@user.commission)
+
+    .field
+      label> for='commission_url' URL
+      = icon_link 'Copy', 'fa fa-clipboard', '#', data: { 'click_copy': '#commission_url' }
+      = text_field_tag 'commission_url', url, class: 'input input--wide input--separate-top', readonly: true
+
+    .field
+      label> for='commission_textile' Textile
+      = icon_link 'Copy', 'fa fa-clipboard', '#', data: { 'click_copy': '#commission_textile' }
+      = text_field_tag 'commission_textile', "\"#{@listing_name}\":#{url}", class: 'input input--wide input--separate-top', readonly: true
+
+    .field
+      label> for='commission_bbcode' BBCode
+      = icon_link 'Copy', 'fa fa-clipboard', '#', data: { 'click_copy': '#commission_bbcode' }
+      = text_field_tag 'commission_bbcode', "[url=#{url}]#{@listing_name}[/url]", class: 'input input--wide input--separate-top', readonly: true

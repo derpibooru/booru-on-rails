@@ -1,0 +1,10 @@
+.field
+  => f.label :reason, "Reason (shown to the banned user, and to staff on the user's profile page):"
+  = f.text_field :reason, class: 'input input--wide', placeholder: 'Reason', required: true
+.field
+  => f.label :note, 'Admin-only note:'
+  = f.text_field :note, class: 'input input--wide', placeholder: 'Note'
+.field
+  => f.label :until, 'End time relative to now, in simple English (e.g. "1 week from now", "next Tuesday"):'
+  = f.text_field :until, class: 'input input--wide', placeholder: 'Until', required: true
+= f.submit 'Save Ban', class: 'button'

@@ -1,0 +1,25 @@
+.grid--dupe-report-list__cell.flex.flex--column.flex--spaced-out.flex--centered.flex--no-wrap.center.dr__image-cell.border-vertical
+  p
+    - if image.blank?
+      | (Image now hard-deleted)
+    - else
+      | #
+      = image.id
+  = render partial: 'images/image_container', locals: { image: image, size: :thumb_small }
+  p
+    = image.image_width
+    | x
+    = image.image_height
+  p
+    = link_to_author image, can?(:manage, Image)
+  - if report.valid? && can_manage_dr
+    - if source
+      a href=duplicate_report_accept_reverse_path(report) data-method="post"
+        button.button
+          ' Keep Source
+          i.fa.fa-arrow-left
+    - else
+      a href=duplicate_report_accept_path(report) data-method="post"
+        button.button
+          i.fa.fa-arrow-right>
+          | Keep Target

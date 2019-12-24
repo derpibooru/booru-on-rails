@@ -1,0 +1,17 @@
+footer#footer
+  #footer_content
+    - Booru::CONFIG.footer[:cols].each do |col|
+      .footercol
+        h5 = col
+        - Booru::CONFIG.footer[col].each do |row|
+          - if row[:bold]
+            strong: a href=row[:url] = row[:title]
+          - else
+            a href=row[:url] = row[:title]
+          br
+  #serving_info
+    ' Powered by the booru-on-rails project - version
+    = Booru::VERSION_STRING
+    br
+    ' Served by #{Socket.gethostname}
+    = render_time

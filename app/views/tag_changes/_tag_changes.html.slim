@@ -1,0 +1,81 @@
+.block
+  .block__header
+    span.block__header_title
+      | Display only:
+    = link_to 'Removed', params.permit!.merge(added: 0, page: nil)
+    = link_to 'Added', params.permit!.merge(added: 1, page: nil)
+    = link_to 'All', params.permit!.merge(added: nil, page: nil)
+
+  - pagination = paginate @tag_changes
+  .block__header = pagination
+
+  .block__content
+    - can_manage = can? :manage, TagChange
+    - if @tag_changes.any?
+      = form_tag(mass_revert_tag_changes_path, method: :delete) do
+        table.table
+          thead
+            tr
+              - if can_manage
+                th.js-staff-action &#x2713;
+              - if !local_assigns[:hide_thumbnails]
+                th colspan=2 Image
+              th Tag
+              th Action
+              th Timestamp
+              th User
+              - if can_manage
+                th.js-staff-action Moderation
+
+          tbody
+            - @tag_changes.order(created_at: :desc).each do |tc|
+              tr
+                - if can_manage
+                  td.js-staff-action = check_box_tag 'ids[]', tc.id, false, class: 'checkbox'
+                - if !local_assigns[:hide_thumbnails]
+                  - if tc.image && tc.image.visible_to?(current_user)
+                    td.center
+                      => link_to tc.image_id, short_image_path(tc.image_id)
+                      - if tc.image.duplicate_id
+                        | (merged)
+                      - elsif tc.image.hidden_from_users
+                        | (deleted)
+                    td.center = render partial: 'images/image_container', locals: { image: tc.image, size: :thumb_tiny }
+                  - else
+                    td.center N/A
+                    td.center Image Merged/Deleted
+                - if tc.tag.nil?
+                  td = tc.tag_name.presence || 'Unknown tag'
+                - else
+                  td = render partial: 'tags/tag', locals: { tag: tc.tag }
+                td[class=(tc.added ? 'success' : 'danger')] = tc.added ? 'Added' : 'Removed'
+                td = friendly_time(tc.created_at)
+
+                - signify_staff = tc.user_visible? && tc.user.staff?
+                td[class=(signify_staff ? 'success' : 'blank')]
+                  =<> link_to_author tc, can_manage
+                  - if can_manage
+                    => link_to_ip tc.ip
+                    => link_to_fingerprint tc.fingerprint
+                  - if tc.image && tc.image.uploader_is?(tc.user, tc.ip)
+                    br
+                    - if tc.user_visible?
+                      | (Image Uploader)
+                    - else
+                      | (Anonymous Uploader)
+                  - if signify_staff
+                    br
+                    small
+                      strong> Stop!
+                      | This user is a staff member.
+                      br
+                      | Ask them before reverting their changes.
+                - if can_manage
+                  td.js-staff-action = link_to 'Delete tag change from history', tag_change_path(tc), method: :delete
+        - if can_manage
+          br
+          = submit_tag 'Revert Selected', class: 'button', data: { disable_with: 'Reverting...', confirm: t('are_you_sure') }
+    - else
+      | No tag changes!
+
+  .block__header = pagination

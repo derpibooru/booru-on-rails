@@ -1,0 +1,6 @@
+- if filters.present?
+  - filters.each do |filter|
+    - if filter
+      = render partial: 'filter', locals: { filter: filter }
+- else
+  p Couldn't find any filters, sorry!

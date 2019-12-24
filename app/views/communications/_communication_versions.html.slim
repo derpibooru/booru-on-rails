@@ -1,0 +1,23 @@
+ruby:
+  Differ.format = :html
+  track = communication_versions
+  old_model = track.reify || communication
+  new_model = old_model.paper_trail.next_version || communication
+- options = capture do
+  div
+    - if new_model.edit_reason.present?
+      | Reason:
+      =< h(new_model.edit_reason)
+    - else
+      | No reason given
+  .flex__right
+    | Edited
+    =<> friendly_time(track.created_at)
+    | by
+    - user = User.find_by(id: track.whodunnit)
+    - if user && user != communication.user
+      =<> link_to user.name, profile_path(user)
+    - else
+      =<> link_to_author(communication, can?(:manage, communication.class))
+
+= render partial: 'communications/communication', locals: { avatar_type: :user, communication: communication, communication_options: options, html_id: nil, post_text: Differ.diff_by_word(h(new_model.body), h(old_model.body)).to_s.gsub(/\r?\n/, '<br>').html_safe }

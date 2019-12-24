@@ -1,0 +1,80 @@
+:query: >
+  case
+    when images.hidden_from_users = 'f' then
+      json_build_object(
+        'id', images.id,
+        'created_at', to_char(images.created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'updated_at', to_char(images.updated_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'first_seen_at', to_char(images.first_seen_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'score', images.score,
+        'comment_count', images.comments_count,
+        'width', images.image_width,
+        'height', images.image_height,
+        'file_name', images.image_name,
+        'description', images.description,
+        'uploader', case when images.anonymous = 't' or users.name is null then 'Background Pony' else users.name end,
+        'uploader_id', case when images.anonymous = 't' then null else images.user_id end,
+        'image', concat('Booru::CONFIG.settings[:image_url_root]/view/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), images.file_name_cache, '.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+        'upvotes', images.upvotes_count,
+        'downvotes', images.downvotes_count,
+        'faves', images.faves_count,
+        'tags', images.tag_list_cache,
+        'tag_ids', images.tag_ids,
+        'aspect_ratio', images.image_aspect_ratio,
+        'original_format', lower(images.image_format),
+        'mime_type', images.image_mime_type,
+        'sha512_hash', images.image_sha512_hash,
+        'orig_sha512_hash', images.image_orig_sha512_hash,
+        'source_url', images.source_url,
+        'representations', case
+          when images.is_animated = 't' and images.processed = 't' then
+            json_build_object(
+              'thumb_tiny', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb_tiny.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'thumb_small', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb_small.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'thumb', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'small', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/small.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'medium', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/medium.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'large', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/large.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'tall', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/tall.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'full', concat('Booru::CONFIG.settings[:image_url_root]/view/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), images.file_name_cache, '.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'webm', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/full.webm'),
+              'mp4', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/full.mp4')
+            )
+          else
+            json_build_object(
+              'thumb_tiny', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb_tiny.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'thumb_small', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb_small.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'thumb', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/thumb.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'small', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/small.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'medium', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/medium.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'large', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/large.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'tall', concat('Booru::CONFIG.settings[:image_url_root]/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), case when images.hidden_from_users = 'f' then images.id::text else concat(images.id, '-', images.hidden_image_key) end, '/tall.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end),
+              'full', concat('Booru::CONFIG.settings[:image_url_root]/view/', to_char(images.created_at, 'YYYY/fmMM/fmDD/'), images.file_name_cache, '.', case when images.image_mime_type = 'image/svg+xml' then 'png' else lower(images.image_format) end)
+            )
+        end,
+        'is_rendered', images.thumbnails_generated,
+        'is_optimized', images.processed
+      )
+    when images.duplicate_id is not null then
+      json_build_object(
+        'id', images.id,
+        'created_at', to_char(images.created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'updated_at', to_char(images.updated_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'first_seen_at', to_char(images.first_seen_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'duplicate_of', images.duplicate_id,
+        'uploader_id', case when images.anonymous = 't' then null else images.user_id end,
+        'tags', images.tag_list_cache,
+        'tag_ids', images.tag_ids
+      )
+    else
+      json_build_object(
+        'id', images.id,
+        'created_at', to_char(images.created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'updated_at', to_char(images.updated_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'first_seen_at', to_char(images.first_seen_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'deletion_reason', images.deletion_reason,
+        'uploader_id', case when images.anonymous = 't' then null else images.user_id end,
+        'tags', images.tag_list_cache,
+        'tag_ids', images.tag_ids
+      )
+  end as json

@@ -1,0 +1,51 @@
+h2 DNP Listing for Tag "#{ @dnp_entry.tag.name }"
+.block
+  .block__header
+    span.block__header__title DNP Information
+    = link_to 'Back to DNP List', dnp_entries_path
+  .block__content
+    table.table
+      tbody
+        tr
+          td Created:
+          td
+             = friendly_time(@dnp_entry.created_at)
+        tr
+          td Tag:
+          td
+            = render partial: 'tags/tag', locals: { tag: @dnp_entry.tag }
+        tr
+          td Restriction Type:
+          td
+            = @dnp_entry.dnp_type
+        - if @dnp_entry.conditions.present?
+          tr
+            td Conditions:
+            td
+              = render_textile(@dnp_entry.conditions)
+        - if @show_reason
+          tr
+            td Reason:
+            td
+              = render_textile(@dnp_entry.reason)
+        - if @show_feedback
+          tr
+            td Instructions:
+            td
+              = render_textile(@dnp_entry.instructions)
+          tr
+            td Feedback:
+            td
+              = @dnp_entry.feedback
+          tr
+            td Status:
+            td
+              = @dnp_entry.aasm_state.capitalize
+          tr
+            td Options:
+            td
+              - if can?(:rescind, @dnp_entry) && @dnp_entry.rescindable?
+                = link_to 'Rescind Request', dnp_entry_rescind_path(@dnp_entry), method: :post, data: { confirm: t('dnp.confirm_rescind') }
+              - if can?(:edit, @dnp_entry)
+                br
+                = link_to 'Edit', edit_admin_dnp_entry_path(@dnp_entry)

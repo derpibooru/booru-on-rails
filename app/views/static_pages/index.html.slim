@@ -1,0 +1,15 @@
+h1 Pages
+
+table.table
+  thead
+    tr
+      th Title
+
+  tbody
+    - @static_pages.each do |static_page|
+      tr
+        td = link_to static_page.title, static_page
+
+- if can? :manage, StaticPage
+  br
+  = link_to 'New Static page', new_static_page_path

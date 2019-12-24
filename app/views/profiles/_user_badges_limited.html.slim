@@ -1,0 +1,31 @@
+- if !user.awards.empty?
+  .badges
+    - if !defined? limit
+      - limit = 0
+    - badge_awards = user.awards.priority_first
+    - badge_awards[0..limit - 1].each do |award|
+      ruby:
+        badge = award.badge
+        title = if award.badge_name.blank?
+          award.label.blank? ? badge.title : "#{badge.title} - #{award.label}"
+        else
+          award.label.blank? ? award.badge_name : "#{award.badge_name} - #{award.label}"
+        end
+
+      .badge = image_tag badge.uploaded_image.url, alt: title, title: title, size: '18'
+
+    - if limit > 0 && user.awards.size > limit
+      .dropdown
+        i.fa.fa-caret-down
+        .dropdown__content.block__header
+          .badges.flex--column
+            - badge_awards[limit..-1].each do |award|
+              ruby:
+                badge = award.badge
+                title = if award.badge_name.blank?
+                  award.label.blank? ? badge.title : "#{badge.title} - #{award.label}"
+                else
+                  award.label.blank? ? award.badge_name : "#{award.badge_name} - #{award.label}"
+                end
+
+              .badge = image_tag badge.uploaded_image.url, alt: title, title: title, size: '18'

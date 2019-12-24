@@ -1,0 +1,8 @@
+- models = Tag.where(name: data.values).includes(:implied_tags).index_by(&:name)
+- data.each_slice(10) do |sliced|
+  div
+    - sliced.each do |key, value|
+      = key
+      | .
+      =< print_tag_link models[value], value
+      br/

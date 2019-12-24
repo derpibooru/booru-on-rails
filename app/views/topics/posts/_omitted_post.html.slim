@@ -1,0 +1,4 @@
+.block.block--fixed.block--fixed--sub
+  - destroyed_posts.each do |id|
+    a id="post_#{id}"
+  = "#{pluralize(destroyed_posts.size, 'destroyed post')} omitted."

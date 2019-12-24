@@ -1,0 +1,60 @@
+/ accepts :info_row (captured HTML) as a .block__content inserted between header and the image list itself,
+  :header_links as content inserted in the header (inserted in the right corner),
+  :random_image_href as the random image destination (default value is random_images_path, which is not always accurate)
+ruby:
+  page_layout :wide
+  render_images ||= 'images/display_images'.freeze
+  pagination = if @pagination_params
+    paginate(images, @pagination_params)
+  else
+    paginate(images)
+  end
+
+.block#imagelist_container
+  section.block__header.flex
+    h1.block__header__title.hide-mobile => header
+    = pagination
+    .flex__right
+      = local_assigns[:header_links]
+      a href=(local_assigns[:random_image_href] || search_path(q: '*', random_image: 'y')) title="Random Image"
+        i.fa.fa-random
+        span.hide-mobile.hide-limited-desktop<> Random Image
+      - if current_user && (params[:hidden] == '1'.freeze)
+        a href=url_for(params.permit!.merge(hidden: nil)) title='Hide Hidden Images'
+          i.fa.fa-eye-slash>
+          span.hide-mobile.hide-limited-desktop Hide Hidden
+      - elsif current_user
+        a href=url_for(params.permit!.merge(hidden: '1'.freeze)) title='Show Hidden Images'
+          i.fa.fa-eye-slash>
+          span.hide-mobile.hide-limited-desktop Show Hidden
+      = toggle_deleted_images
+      - if can? :batch_update, Tag
+        a.js-quick-tag href="#" title="Add tags to the images on this page"
+          i.fa.fa-tags
+          span.hide-mobile.hide-limited-desktop<> Tag
+        a.js-quick-tag--abort.hidden href="#"
+          i.fa.fa-exclamation-triangle
+          span.hide-mobile.hide-limited-desktop<> Abort Tagging
+        a.js-quick-tag--submit.hidden href="#"
+          i.fa.fa-tags
+          span.hide-mobile.hide-limited-desktop<> Submit Tag Changes
+      - if local_assigns[:info_row]
+        a href="#" data-click-toggle=".js-imagelist-info" title="More Info"
+          i.fa.fa-info-circle
+          span.hide-mobile.hide-limited-desktop<> More Info
+
+  - if local_assigns[:info_row]
+    = info_row
+
+  .block__content.js-resizable-media-container
+    = render partial: render_images, locals: { images: images }
+
+  .block__header.block__header--light.flex
+    = pagination
+    span.block__header__title = pagination_info(images)
+    .flex__right
+      a href='/settings/edit' title='Display Settings'
+        i.fa.fa-cog
+        span.hide-mobile.hide-limited-desktop<> Display Settings
+      |
+      =<> toggle_deleted_images

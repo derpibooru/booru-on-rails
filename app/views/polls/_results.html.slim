@@ -1,0 +1,60 @@
+.poll-results
+  h4.poll__header
+    | Poll
+    - if !poll.active?
+      |  results
+    | :
+    =< poll.title
+  .poll-option-list
+    ruby:
+      options = poll.ranked_options
+      winning_option_id = poll.winning_option_id
+      have_winners = poll.total_votes > 0
+      # Create a hash of { [option_id]: true } for faster checks later on
+      user_voted_ids = user_votes ? user_votes.map { |v| [v.poll_option_id, true] }.to_h : {}
+
+    - options.each do |option|
+      ruby:
+        class_name = 'poll-option'
+        title = []
+        is_top_option = have_winners && winning_option_id == option.id
+
+      - if is_top_option
+        - class_name += ' poll-option--top'
+        - title << 'Highest voted'
+      - if user_voted_ids[option.id].present?
+        - class_name += ' poll-option--user-vote'
+        - title << 'Your vote'
+      div class=class_name title=(title.any? ? title.join('; ') : nil)
+        .poll-option__text
+          span.poll-option__label = option.label
+          .poll-option__counts
+            span = "#{option.percent_of_total} (#{pluralize(option.vote_count, 'vote')})"
+        .poll-bar
+          - option_bar_fill_class = 'poll-bar__fill'
+          - if is_top_option
+            - option_bar_fill_class += ' poll-bar__fill--top'
+          svg.poll-bar__image width=option.percent_of_total height="100%" viewBox="0 0 1 1" preserveAspectRatio="none"
+            rect class=option_bar_fill_class width="1" height="1"
+  - if !poll.hidden_from_users
+    .poll-results__concluded-at
+      - if poll.active? && logged_out
+        p You must be signed in to vote.
+      p
+        - if poll.active?
+          | Poll ends
+          =< friendly_time(poll.active_until)
+          | .
+          br
+          - if poll.total_votes > 0
+            = pluralize(poll.total_votes, 'vote')
+          - else
+            | No votes have been
+          |  cast so far.
+        - else
+          | Poll ended
+          =<> friendly_time(poll.active_until)
+          - if poll.total_votes > 0
+            ' with
+            = pluralize(poll.total_votes, 'total vote')
+          | .

@@ -1,0 +1,7 @@
+h1 Recent Comments
+- pagination = paginate @recent_comments
+- if pagination.present?
+  .block: .block__header = pagination
+= render partial: 'comment_list', locals: { comments: @recent_comments }
+- if pagination.present?
+  .block: .block__header.block__header--light = pagination

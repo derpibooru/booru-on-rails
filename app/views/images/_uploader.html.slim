@@ -1,0 +1,21 @@
+span.image_uploader
+  - if @error
+    .block.block--fixed.block--danger
+      = @error
+  | by
+  strong =< link_to_author(@image, can?(:manage, Image))
+  - if @image.user && (!@image.anonymous || can?(:manage, Image))
+    = render partial: 'profiles/user_badges_limited', locals: { user: @image.user, limit: 7 }
+  - if can?(:manage, Image) && (cookies['hidestaff'] != 'true'.freeze)
+    = link_to_ip(@image.ip)
+    = link_to_fingerprint(@image.fingerprint, @image.user_agent) if @image.fingerprint
+    a#edit-uploader href="#" data-click-hide=".image_uploader" data-click-show="#uploader-form"
+      i.far.fa-edit
+- if can? :manage, Image
+  == form_tag image_uploader_path(@image), method: :put, class: 'block__content hidden', id: 'uploader-form', remote: true do
+    ==> label_tag :username, 'Uploader'
+    == text_field_tag :username, (@image.user ? @image.user.name : ''), class: 'input input--short input--small'
+    ==< label_tag :anonymous, 'Anonymous'
+    == check_box_tag :anonymous, '1', @image.anonymous?, class: 'checkbox'
+    == submit_tag 'Save changes', class: 'button button--small', autocomplete: 'off', data: { disable_with: raw('Saving&hellip;') }
+    div Changes IP to '127.0.0.1' and FP to 'ffffff'. Empty for anonymous.

@@ -1,0 +1,36 @@
+- content_for(:robots, true)
+- if @user
+  = render partial: 'gallery_list', locals: { user: @user }
+- else
+  h1 Galleries
+  .column-layout
+    .column-layout__left
+      .block
+        .block__content
+          h3 Search
+          = form_tag galleries_path, class: 'hform', method: :get, enforce_utf8: false do
+            .field = label_tag :title, 'Title'
+            .field = text_field_tag :title, params[:title], class: 'input hform__text', placeholder: 'Gallery title (use * as wildcard)'
+            .field = label_tag :description, 'Description'
+            .field = text_area_tag :description, params[:description], class: 'input hform__text', placeholder: 'Gallery description'
+            .field = label_tag :creator, 'Creator'
+            .field = text_field_tag :creator, params[:creator], class: 'input hform__text', placeholder: 'Gallery creator (exact match)'
+            .field = label_tag :include_image, 'Include image'
+            .field = text_field_tag :include_image, params[:include_image], class: 'input', placeholder: 'Image ID (e.g. 100)'
+            .field = label_tag :sf, 'Sort by'
+            .field
+              = select_tag :sf, options_for_select({ 'Creation date': :created_at, 'Last updated': :updated_at, 'Subscribers': :watcher_count, 'Images': :image_count, 'Title': :title }, params[:sf]), class: 'input'
+              = select_tag :sd, options_for_select({ 'Descending': :desc, 'Ascending': :asc }, params[:sd]), class: 'input input--separate-left'
+            .field
+            .field
+              => label_tag :show_empty, 'Show empty galleries'
+              =< check_box_tag :show_empty, '1', params[:show_empty], class: 'checkbox'
+            - if current_user
+              .field
+              .field
+                => label_tag :my_subs, "Only show galleries I'm subscribed to"
+                =< check_box_tag :my_subs, '1', params[:my_subs], class: 'checkbox'
+            .field
+            = submit_tag 'Search', class: 'button button--state-primary'
+    .column-layout__main
+      = render partial: 'gallery_list'

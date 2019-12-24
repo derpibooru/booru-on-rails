@@ -1,0 +1,9 @@
+ul.permission-choices
+  li
+    label.permission-choice__label
+      =<> radio_button_tag permission, '1', granted, class: 'checkbox'
+      span.choice-text.permission-option.permission-option--yes Yes
+  li
+    label.permission-choice__label
+      =<> radio_button_tag permission, '0', !granted, class: 'checkbox'
+      span.choice-text.permission-option.permission-option--no No

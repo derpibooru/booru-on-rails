@@ -1,0 +1,20 @@
+- page_layout :wide
+- list = capture do
+  table.table
+    thead
+      tr
+        th User
+        th Reason
+        th Options
+    tbody
+      - @user_whitelists.each do |whitelist|
+        tr
+          td
+            = whitelist.user.name rescue nil
+          td
+            = whitelist.reason
+          td
+            => link_to t('edit'), edit_admin_user_whitelist_path(whitelist)
+            ' &bull;
+            = link_to t('destroy'), admin_user_whitelist_path(whitelist), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { form_path: admin_user_whitelists_path, item_class: UserWhitelist, items: @user_whitelists, new_item_path: new_admin_user_whitelist_path, rendered_list: list }

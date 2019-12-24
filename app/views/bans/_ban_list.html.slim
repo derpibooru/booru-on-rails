@@ -1,0 +1,21 @@
+- if bans.present?
+  table.table
+    thead
+      tr
+        th Ban Enacted
+        th Ban Expires
+        th Duration
+        th Active?
+        th Reason
+        th Ban ID
+    tbody
+      - bans.each do |b|
+        tr
+          td = friendly_time b.created_at
+          td = friendly_time b.valid_until
+          td = distance_of_time_in_words b.created_at, b.valid_until
+          td class=(b.active? ? 'success' : 'danger') = b.active? ? 'Yes' : 'No'
+          td = b.reason
+          td = b.generated_ban_id
+- else
+  p Requested profile has never been banned before.

@@ -1,0 +1,11 @@
+h1
+  | New topic in
+  =< @topic.forum.name
+.block
+  .block__header
+    => link_to 'Forums', '/forums'
+    | &raquo;
+    =< link_to @forum.name, short_forum_path(@forum)
+    | &raquo;
+    span.block__header__title New Topic
+= render partial: 'form'

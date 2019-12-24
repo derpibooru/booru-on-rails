@@ -1,0 +1,7 @@
+.block__content.profile-about
+  - if @user.description
+    = render_textile(@user.description, true)
+  - else
+    em
+      | Want to
+      =< link_to 'add some info about yourself?', edit_profile_path(@user)

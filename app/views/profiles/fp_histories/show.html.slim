@@ -1,0 +1,13 @@
+- if can? :mod_read, User
+  h2 = "Fingerprint History for #{@user.name}"
+  ul
+    / FIXME yikes
+    - UserFingerprint.where(user: @user).order(updated_at: :asc).find_each do |ufp|
+      li
+        = link_to_fingerprint(ufp.fingerprint)
+        - other_users = UserFingerprint.where(fingerprint: ufp.fingerprint).includes(:user)
+        ul
+          - other_users.find_each do |u|
+            li
+              = link_to u.user.name, profile_path(u.user)
+              =< "(#{u.uses} uses, last used #{friendly_time(u.updated_at)})".html_safe

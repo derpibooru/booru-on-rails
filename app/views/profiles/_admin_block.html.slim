@@ -1,0 +1,107 @@
+.block--fixed
+  i.fa.fa-fw.fa-calendar
+  = "Account created #{(@user.created_at rescue 'on an unknown date')}"
+  br
+  i.fa.fa-fw.fa-filter
+  | Current Filter:
+  =< link_to @user.current_filter.name, filter_path(@user.current_filter)
+  br
+  i.far.fa-fw.fa-clock
+  | Last seen
+  =< friendly_time(@last_activity) || 'never'
+  | .
+  br
+  = pluralize(@user.sign_in_count, 'login')
+  | , last login
+  =<> friendly_time(@user.current_sign_in_at)
+  | from
+  =<> link_to_ip(@user.current_sign_in_ip)
+  br
+  | Previous login
+  =<> friendly_time(@user.last_sign_in_at)
+  | from
+  =<> link_to_ip(@user.last_sign_in_ip)
+  - if can? :twofactor, User
+    br
+    | Two factor auth is
+    strong =<> @user.otp_required_for_login ? 'enabled' : 'disabled'
+    | for this user.
+
+br
+
+a.label.label--primary.label--block href="#" data-click-toggle=".js-admin__options__toggle" title="Toggle Controls"
+  i.fa.fa-fw.fa-bars
+  span Toggle Controls
+
+.profile-top__options.js-admin__options__toggle.hidden
+  ul.profile-admin__options__column
+    - if can? :mod_read, User
+      li = link_to profile_details_path(@user) do
+        i.fa.fa-fw.fa-eye
+        span.admin__button View Details
+      li = link_to search_path(q: "upvoted_by_id:#{@user.id}") do
+        i.fa.fa-fw.fa-arrow-up
+        span.admin__button Upvotes
+      li = link_to search_path(q: "downvoted_by_id:#{@user.id}") do
+        i.fa.fa-fw.fa-arrow-down
+        span.admin__button Downvotes
+      li = link_to search_path(q: "hidden_by_id:#{@user.id}") do
+        i.fa.fa-fw.fa-eye-slash
+        span.admin__button Hidden Images
+      li = link_to admin_reports_path(rq: "user_id:#{@user.id}") do
+        i.fa.fa-fw.fa-exclamation
+        span.admin__button Reports
+      li = link_to profile_ip_history_path(@user) do
+        i.fab.fa-fw.fa-internet-explorer
+        span.admin__button IP History
+      li = link_to profile_fp_history_path(@user) do
+        i.fa.fa-fw.fa-desktop
+        span.admin__button FP History
+      li = link_to profile_aliases_path(@user) do
+        i.fa.fa-fw.fa-users
+        span.admin__button Potential Aliases
+
+  ul.profile-admin__options__column
+    - if can? :manage, User
+      li = link_to edit_admin_user_path(@user) do
+        i.fas.fa-fw.fa-edit
+        span.admin__button Edit User
+      - if @user.deleted_at
+        li = link_to admin_user_activation_path(@user), data: { confirm: t('are_you_sure') }, method: :post do
+          i.fa.fa-fw.fa-check
+          span.admin__button Reactivate Account
+      - else
+        li = link_to admin_user_activation_path(@user), data: { confirm: t('are_you_sure') }, method: :delete do
+          i.fa.fa-fw.fa-times
+          span.admin__button Deactivate Account
+      li = link_to admin_donations_user_path(@user.id) do
+        i.fas.fa-fw.fa-dollar-sign
+        span.admin__button Donations
+    - if can? :mod_read, User
+      li = link_to new_admin_user_link_path(user_id: @user.id) do
+        i.fa.fa-fw.fa-link
+        span.admin__button Add User Link
+    - if can? :tamper_votes, User
+      li = link_to profile_votes_and_faves_path(@user), data: { confirm: t('are_you_sure') }, method: :delete do
+        i.far.fa-fw.fa-file-excel
+        span.admin__button Remove All Votes/Faves
+      li = link_to profile_downvotes_path(@user), data: { confirm: t('are_you_sure') }, method: :delete do
+        i.fa.fa-fw.fa-arrow-down
+        span.admin__button Remove All Downvotes
+    - if can? :manage, UserWhitelist
+      li = link_to new_admin_user_whitelist_path(username: @user.name) do
+        i.fa.fa-fw.fa-check
+        span.admin__button Add to whitelist
+    - if can? :mod_read, UserBan
+      li = link_to new_admin_user_ban_path(user_id: @user.id) do
+        i.fa.fa-fw.fa-ban
+        span.admin__button Ban this sucker
+    - if can? :wipe, User
+      li = link_to admin_user_wipe_path(@user), data: { confirm: "This is irreversible, destroying all identifying information including email. Are you sure?" }, method: :post do
+        i.fas.fa-fw.fa-eraser
+        span.admin__button Wipe PII
+  - if can? :mod_read, User
+    ul.profile-admin__options__column
+      li = link_to admin_user_api_key_path(@user), data: { confirm: t('are_you_sure') }, method: :delete do
+        i.fas.fa-fw.fa-key
+        span.admin__button Reset API key

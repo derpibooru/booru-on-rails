@@ -1,0 +1,28 @@
+- if @current_ban
+  .block.block--fixed.block--warning
+    h4 You've been banned!
+    p
+      | You cannot post forum posts or make new topics (or do anything but read, really) until
+      =< friendly_time(@current_ban.valid_until)
+    = render partial: 'bans/ban_reason', locals: { ban: @current_ban }
+- else
+  = form_for([@forum, @topic]) do |f|
+    = render partial: 'layouts/errors', locals: { errors: @topic.errors }
+    - if current_user
+      = f.fields_for :posts do |pf|
+        - edit_area = capture do
+          .field = f.text_field :title, class: 'input input--wide', placeholder: 'Title'
+          = render partial: 'layouts/textile_toolbar'
+          = pf.text_area :body, class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: "Don't forget to read the rules before posting!"
+          = f.fields_for :poll do |pof|
+            - if can? :create, Poll
+              #add-poll
+                input.toggle-box id="add_poll" name="add_poll" type="checkbox" checked=!!params[:add_poll]
+                label for="add_poll" Add a poll
+                .toggle-box-container
+                  = render partial: 'polls/form', locals: { topic: @topic, pof: pof, editing: false }
+        - actions = capture do
+          = f.submit 'Create Topic', class: 'button spacing-right'
+          = f.check_box :anonymous, checked: current_user.anonymous_by_default, class: 'preview-anonymous'
+          =< f.label :anonymous, 'Post anonymously'
+        = render partial: 'communications/communication_edit', locals: { title: 'Create a Topic', edit_area: edit_area, actions: actions }

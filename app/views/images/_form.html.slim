@@ -1,0 +1,54 @@
+/ the form is only used for new records and would require changes if you want to use it for editing.
+= form_for(@image) do |f|
+  = render partial: 'layouts/errors', locals: { errors: @image.errors }
+  .dnp-warning
+    h4
+      | Read the
+      =<> link_to 'site rules', '/pages/rules'
+      | and check our
+      =< link_to 'do-not-post list', '/dnp'
+    p
+      | Don't post content the artist doesn't want here (or shared in general),
+      strong< including commercial content.
+  - if !current_user && $flipper[:captcha].enabled?
+    p
+      strong<> Sorry, but due to spam, anonymous uploaders need to fill this out.
+      | If you're logged in, you can still post anonymously and won't have to deal with captchas!
+    => captcha_tags
+  p
+    strong
+      | Please check it isn't already here with
+      =< link_to 'reverse search.', search_reverse_path
+  = render partial: 'layouts/image_upload', locals: { form: f, field: :image }
+  h4 About this image
+  .field
+    = f.label :source_url, 'The page you found this image on'
+    => f.url_field :source_url, class: 'input input--wide js-image-input', placeholder: 'Source URL'
+  .field
+    label for="image[tag_input]"
+      | Describe with
+      strong<> 3+
+      | tags, including ratings and applicable artist tags
+    = render partial: 'tags/tag_editor', locals: { f: f, name: :tag_input, type: :upload }
+    button.button.button--state-success.button--separate-left.button--bold id="tagsinput-save" type="button" title="This button saves the tags listed above to your browser, allowing you to retrieve them again by clicking the Load button" Save
+    button.button.button--state-warning.button--separate-left.button--bold id="tagsinput-load" type="button" title="This button loads any saved tags from your browser" Load
+    button.button.button--state-danger.button--separate-left.button--bold id="tagsinput-clear" type="button" title="This button will clear the list of tags above" Clear
+  p You can mouse over tags below to view a description, and click to add. Short tag names can be used and will expand to full.
+  = render partial: 'tags/quick_tag_table', locals: { target: '[name="image[tag_input]"]' }
+  br
+  .field
+    .block
+      .block__header.block__header--js-tabbed
+        =link_to 'Description', '#', class: 'selected', data: { click_tab: 'write' }
+        =link_to 'Preview', '#', data: { click_tab: 'preview' }
+      .block__tab.selected data-tab="write"
+        = render partial: 'layouts/textile_toolbar'
+        = f.text_area :description, class: 'input input--wide input--text js-preview-description js-image-input js-toolbar-input', placeholder: "Describe this image in plain words - this should generally be info about the image that doesn't belong in the tags or source."
+      .block__tab.hidden data-tab="preview"
+        | Loading preview...
+  - if current_user
+    .field
+      = f.label :anonymous, 'Post anonymously'
+      = f.check_box :anonymous, class: 'checkbox'
+  .actions
+    = f.submit class: 'button', autocomplete: 'off', data: { disable_with: 'Please wait...' }

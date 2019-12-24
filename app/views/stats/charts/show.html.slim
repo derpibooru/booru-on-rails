@@ -1,0 +1,165 @@
+doctype html
+html lang='en'
+  head
+    meta charset='utf-8'
+    meta name='robots' content='noindex, nofollow'
+
+    css:
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #graph {
+        height: 500px;
+        background: #fff;
+      }
+      .balloon {
+        margin: 5px;
+        font-size: 19px;
+      }
+      .balloon__content {
+        font-size: 13px;
+      }
+
+    script src='https://www.amcharts.com/lib/3/amcharts.js'
+    script src='https://www.amcharts.com/lib/3/serial.js'
+    script src='https://www.amcharts.com/lib/3/themes/dark.js'
+  body
+    - cache('site-statistics-uploads-v1', expires_in: 2.hours) do
+      #graph
+      javascript:
+        var data = #{{@images_aggregation.response.aggregations.non_deleted.all_time.buckets.map { |b| { date: DateTime.strptime(b['key'].to_s, '%Q').strftime('%Y-%m-%d'), value: b.doc_count } }.to_json}};
+        var events = {
+            "Season 2": {
+                "from": new Date(2012, 0, 0),
+                "to": new Date(2012, 3, 21)
+            },
+            "Ponibooru read-only": {
+                "from": new Date(2012, 5, 17),
+                "to": new Date(2012, 5, 17)
+            },
+            "Season 3": {
+                "from": new Date(2012, 10, 10),
+                "to": new Date(2013, 1, 16)
+            },
+            "Season 4": {
+                "from": new Date(2013, 10, 23),
+                "to": new Date(2014, 4, 10)
+            },
+            "Season 5": {
+                "from": new Date(2015, 3, 4),
+                "to": new Date(2015, 10, 28)
+            },
+            "Season 6": {
+                "from": new Date(2016, 2, 26),
+                "to": new Date(2016, 9, 22)
+            },
+            "Season 7": {
+                "from": new Date(2017, 3, 15),
+                "to": new Date(2017, 9, 15)
+            },
+            "Season 8": {
+                "from": new Date(2018, 2, 04),
+                "to": new Date(2018, 9, 13)
+            },
+            "Season 9": {
+                "from": new Date(2019, 3, 6),
+                "to": new Date(2019, 4, 25)
+            },
+            "Equestria Girls": {
+                "from": new Date(2013, 5, 16),
+                "to": new Date(2013, 5, 16)
+            },
+            "Rainbow Rocks": {
+                "from": new Date(2014, 8, 26),
+                "to": new Date(2014, 8, 26)
+            },
+            "Friendship Games": {
+                "from": new Date(2015, 8, 26),
+                "to": new Date(2015, 8, 26)
+            },
+            "Legend of Everfree": {
+                "from": new Date(2016, 9, 1),
+                "to": new Date(2016, 9, 1)
+            }
+        };
+        function drawChart() {
+            var chart = AmCharts.makeChart("graph", {
+                "type": "serial",
+                "theme": "light",
+                "dataDateFormat": "YYYY-MM-DD",
+                "valueAxes": [{
+                    "id": "v1",
+                    "axisAlpha": 0,
+                    "position": "left"
+                }],
+                "balloon": {
+                    "borderThickness": 1,
+                    "shadowAlpha": 0
+                },
+                "graphs": [{
+                    "id": "g1",
+                    "bullet": "round",
+                    "bulletBorderAlpha": 1,
+                    "bulletColor": "#FFFFFF",
+                    "bulletSize": 5,
+                    "hideBulletsCount": 50,
+                    "lineThickness": 2,
+                    "title": "red line",
+                    "useLineColorForBulletBorder": true,
+                    "valueField": "value",
+                    "balloonText": "<div class='balloon'><span class='balloon__content'>[[category]]</span><br>[[value]]</div>"
+                }],
+                "chartScrollbar": {
+                    "graph": "g1",
+                    "oppositeAxis": false,
+                    "offset": 30,
+                    "scrollbarHeight": 80,
+                    "backgroundAlpha": 0,
+                    "selectedBackgroundAlpha": 0.1,
+                    "selectedBackgroundColor": "#888888",
+                    "graphFillAlpha": 0,
+                    "graphLineAlpha": 0.5,
+                    "selectedGraphFillAlpha": 0,
+                    "selectedGraphLineAlpha": 1,
+                    "autoGridCount": true,
+                    "color":"#AAAAAA"
+                },
+                "chartCursor": {
+                    "pan": true,
+                    "valueLineEnabled": true,
+                    "valueLineBalloonEnabled": true,
+                    "cursorAlpha": 0,
+                    "valueLineAlpha": 0.2
+                },
+                "categoryField": "date",
+                "categoryAxis": {
+                    "parseDates": true,
+                    "dashLength": 1,
+                    "minorGridEnabled": true
+                },
+                "dataProvider": data
+            });
+            for (var s in events) {
+                var season = events[s];
+                var guide = new AmCharts.Guide();
+                guide.date = season.from;
+                guide.toDate = season.to;
+                guide.inside = true;
+                guide.labelRotation = 90;
+                guide.boldLabel = true;
+                guide.fontSize = 10;
+                guide.lineColor = "#CC0000";
+                guide.lineAlpha = 0.8;
+                guide.fillColor = "#CC0000";
+                guide.fillAlpha = 0.15;
+                guide.position = "left";
+                guide.label = s;
+                guide.above = true;
+                guide.dashLength = 2;
+                chart.guides.push(guide);
+            }
+        }
+        if (document.readyState !== 'loading') drawChart();
+        else document.addEventListener('DOMContentLoaded', drawChart);

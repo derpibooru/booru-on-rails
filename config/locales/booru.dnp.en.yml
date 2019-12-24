@@ -1,0 +1,9 @@
+en:
+  dnp:
+    request_submitted: "DNP request submitted sucessfully"
+    request_updated: "DNP request updated successfully"
+    request_rescinded: "DNP request rescinded succesfully"
+    confirm_rescind: "Are you sure you wish to rescind your DNP request?"
+    confirm: "Are you sure?"
+    error:
+      link_missing: "You must have a verified user link to create a DNP listing."

@@ -1,0 +1,97 @@
+# Copy this file as "settings.yml"
+
+##########################################
+# URLs ###################################
+##########################################
+
+# What's your public hostname? Used in creating email links
+:public_host: ''
+# Where is your site? No trailing slash.
+:public_url_root: ''
+# Where is your CDN root? Set this to an Amazon CloudFront distribution domain or CNAME origined at the public_url_root,
+# or just set this to the same as public_url_root if you're not using CloudFront or a similar CDN. No trailing slash.
+:cdn_url_root: ''
+
+:action_cable_url: wss://derpibooru.org/cable
+:action_cable_origins: ['https://derpibooru.org']
+:redis_url: redis://localhost:6379/0/derp
+
+##########################################
+# PASSWORDS ##############################
+##########################################
+
+# Secret token used for cookie authentication
+:secret_token: secret_goes_here
+:secret_key_base: secret_goes_here
+# Pepper used for password hash salting
+:devise_pepper: secret_goes_here
+:devise_secret_key: secret_goes_here
+# Livefeed bot API key
+:bot_api_key: secret_goes_here
+# Global salt used for preventing user enumeration attacks on comment/post anonymous IDs
+:anonyhash_salt: secret_goes_here
+:camo_key: secret_goes_here
+:picarto_api_key: secret_goes_here
+:tumblr_api_key: secret_goes_here
+:twitch_public_key: secret_goes_here
+:twitter_consumer_key: secret_goes_here
+:twitter_consumer_secret: secret_goes_here
+
+:smtp_settings:
+  :address:              mailbox.derpibooru.org
+  :port:                 '587'
+  :domain:               derpibooru.org
+  :user_name:            noreply@derpibooru.org
+  :password:             secret_goes_here
+  :authentication:       plain
+  :enable_starttls_auto: true
+
+##########################################
+# IMAGE STORAGE ##########################
+##########################################
+
+:default_file_path: '/home/vagrant/derpibooru/public/system/images'
+:adverts_file_path: '/home/vagrant/derpibooru/public/system/images/adverts'
+:avatars_file_path: '/home/vagrant/derpibooru/public/system/images/avatars'
+:badges_file_path: '/home/vagrant/derpibooru/public/system/images'
+:tags_file_path: '/home/vagrant/derpibooru/public/system/images'
+:channel_images_file_path: '/home/vagrant/derpibooru/public/system/images'
+:channel_banners_file_path: '/home/vagrant/derpibooru/public/system/images'
+
+:default_url_prefix: ''
+:adverts_url_prefix: '/spns'
+:avatars_url_prefix: '/avatars'
+:badges_url_prefix: '/media'
+:tags_url_prefix: '/media'
+:channel_images_url_prefix: '/media'
+:channel_banners_url_prefix: '/media'
+
+:image_url_root: '/img'
+:media_url_root: '/media' # badges, tag spoilers, channel images
+
+##########################################
+# GENERAL SETTINGS #######################
+##########################################
+
+# Public Discord Server invite URL
+:discord_invite_url: "discord_invite_url"
+:patreon_url: "patreon_url"
+:email_from: "no-reply@derpibooru.org"
+:max_comment_length: 10000
+:max_image_url_length: 2048
+:tags:
+  :min_count: 3
+  :max_count: 2000
+  :bad_words: ['tagme', 'tag me', 'not tagged', 'no tag', 'notag', 'notags']
+# Default setting for user is 15
+:min_images_per_page: 4
+:max_images_per_page: 50
+# Default setting for user is 20
+:min_comments_per_page: 1
+:max_comments_per_page: 100
+# Path to ffmpeg, to enable selection of statically linked binaries - default to PATH
+:ffmpeg_binary: "ffmpeg"
+:camo_host: "camo.derpicdn.net"
+:cdn_host: "derpicdn.net"
+:proxy_server: null
+:scraper_user_agent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36 BooruOnRails/1.0'

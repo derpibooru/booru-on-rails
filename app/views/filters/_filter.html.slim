@@ -1,0 +1,38 @@
+.filter
+  h3 = filter.name
+  - if filter.user
+    p
+      | Maintained by
+      =< link_to filter.user.name, profile_path(filter.user)
+      ' .
+      - if filter.public?
+        - if current_user && filter.user == current_user
+          p: em This filter is public; it can be used by others and your changes will affect them as well as you!
+        - else
+          p: em This is a shared filter. The maintainer can change it without your permission.
+  .filter-options
+    ul
+      li
+        ' Used by
+        => number_with_delimiter filter.user_count
+        ' #{'person'.pluralize(filter.user_count)}
+      li
+        ' Spoilers
+        => number_with_delimiter filter.spoilered_tag_ids.size
+        ' #{'tag'.pluralize(filter.spoilered_tag_ids.size)} and hides
+        => number_with_delimiter filter.hidden_tag_ids.size
+        = 'tag'.pluralize(filter.hidden_tag_ids.size)
+      li = link_to 'View this filter', filter_path(filter), class: 'button'
+      - if @filter && @filter == filter
+        li
+          strong Your current filter
+      - else
+        li = button_to 'Use this filter', filters_current_path(id: filter.id), method: :patch, class: 'button'
+      - if can?(:edit, filter) && current_user && filter.user_id == current_user.id
+        li = link_to 'Edit this filter', edit_filter_path(filter), class: 'button'
+        - if can?(:delete, filter) && current_user && filter.user_id == current_user.id
+          li = button_to 'Delete this filter', filter_path(filter), data: { confirm: 'Are you sure you want to delete this filter?' }, method: :delete, class: 'button'
+      - elsif can? :create, Filter
+        li = link_to 'Copy and Customize this filter', new_filter_path(based_on_filter_id: filter.id), class: 'button'
+  - if filter.description.present?
+    p: em = filter.description

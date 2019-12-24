@@ -1,0 +1,2 @@
+- cache_unless_can(:hide, Comment, "comment-v10-#{comment.id}-#{comment.hidden_from_users}-#{comment.updated_at.to_i}", expires_in: 5.days) do
+  = render partial: 'comments/comment', locals: { comment: comment }

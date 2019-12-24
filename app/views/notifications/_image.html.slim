@@ -1,0 +1,11 @@
+- if notification.actor.id
+  strong
+    - if notification.actor_child
+      = link_to_author notification.actor_child
+    // TODO remove this elsif clause once old notifications are gone
+    - elsif notification.user
+      = link_to notification.user.name, profile_path(notification.user)
+    - else
+      | Somebody
+  =<> notification.action
+  strong => link_to "##{notification.actor.id}", short_image_path(notification.actor, anchor: 'comments')

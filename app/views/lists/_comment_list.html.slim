@@ -1,0 +1,9 @@
+- comments = comments.select { |c| !c.nil? && c.image && c.image.visible_to?(current_user) }
+- if !comments.empty?
+  - avatar_type = :communication_image
+  - comments.each do |c|
+    - comment = c
+    include app/views/comments/_comment_cached.html.slim
+  .js-editable-comments data-editable=editable_communications(comments).to_json
+- else
+  p Nothing found.

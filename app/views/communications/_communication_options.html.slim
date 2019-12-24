@@ -1,0 +1,35 @@
+- path = polymorphic_path(communication.for_route)
+- show_advanced_options = (communication.class != Message) # TODO: I'm pretty sure messages can benefit from most of "advanced options"
+div
+  | Posted
+  =<> friendly_time(communication.created_at)
+  - if show_advanced_options
+    =<> link_to new_report_path(reportable_class: communication.class.to_s, reportable_id: communication.id), class: 'communication__interaction' do
+      i.fa.fa-flag
+      =<> 'Report'
+    - if communication.edited_at && (can? :read, communication)
+      br
+      a href="#{path}/history"
+        | Edited
+        =<> friendly_time(communication.edited_at)
+        - if communication.edit_reason.present?
+          | because:
+          =<> communication.edit_reason
+- if show_advanced_options
+  div
+    - link_path = communication.link_to_route
+    =<> link_to link_path, title: "Link to #{communication.class.name.downcase}", class: 'communication__interaction' do
+      i.fa.fa-link
+      =<> 'Link'
+    - if @render_image.blank?
+      =<> link_to link_path, 'data-author': safe_author(communication), 'data-reply-url': link_path, 'data-post': (communication.try(:hidden_from_users) ? '' : communication.body), class: 'communication__interaction post-reply post-reply-quote' do
+        i.fa.fa-quote-right
+        =<> 'Quote'
+      =<> link_to link_path, 'data-author': safe_author(communication), 'data-reply-url': link_path, class: 'communication__interaction post-reply' do
+        i.fa.fa-reply
+        =<> 'Reply'
+    - edit_path = "#{path}/edit"
+    span.owner-options.hidden
+      strong =<> link_to edit_path, class: 'communication__interaction' do
+        i.fas.fa-edit
+        =<> 'Edit'

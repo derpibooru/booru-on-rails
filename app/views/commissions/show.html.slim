@@ -1,0 +1,42 @@
+- page_layout :medium
+h1
+  = @listing_name
+
+- if @user.commission.present?
+
+  - if @user == current_user && @commission.commission_items_count == 0
+    #error_explanation
+      h2 Your listing is not visible in the directory yet
+      p You must add at least one item (Such as a sketch or fully shaded image) to your listing before it will show up in the directory and search results. Please scroll down and click "Add an item" to add information about the various types of commissions you draw.
+  .column-layout
+
+    / Side column
+    .column-layout__left
+      = render partial: 'listing_sidebar'
+
+    / Main column
+    .column-layout__main
+
+      / Commission sheet block
+      = render partial: 'listing_sheet'
+
+      / Types and prices block
+      = render partial: 'listing_items'
+
+-else
+  / Doesn't have commissions block
+  .block
+    .block__header
+      span.block__header__title Listing Unavailable
+    .block__content
+      - if @user == current_user
+        - if @user.linked_tags.blank?
+          p You must setup a verified user link before you can create a commission listing.
+          p
+            = link_to 'Click here to request a verified user link.', user_links_path
+        - else
+          p You have not created a commission listing yet.
+          p
+            = link_to 'Setup your commissions', new_commission_path
+      - else
+        | This user isn't advertising any commissions at the moment.

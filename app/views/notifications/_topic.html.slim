@@ -1,0 +1,15 @@
+- if !notification.actor.hidden_from_users
+  - topic = notification.actor
+  - post = topic.last_post
+
+  // TODO remove all this logic and just link to author
+  // when old notifications are gond
+  strong
+    - if notification.actor_child
+      => link_to_author post
+    - elsif notification.user
+      => link_to notification.user.name, profile_path(notification.user)
+    - else
+      ' Somebody
+  =<> notification.action
+  strong => link_to topic.title, short_topic_post_path(topic.forum, topic, post, anchor: "post_#{post.id}")

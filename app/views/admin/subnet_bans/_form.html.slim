@@ -1,0 +1,10 @@
+= form_for [:admin, @ban] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @ban.errors }
+  .field
+    => f.label :specification, 'IP address:'
+    - if params[:ip].present?
+      = params[:ip]
+      = f.hidden_field :specification, value: params[:ip]
+    - else
+      = f.text_field :specification, class: 'input input--wide', placeholder: 'IP address', required: true
+  = render partial: 'admin/bans/form', locals: { f: f }

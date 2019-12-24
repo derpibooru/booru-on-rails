@@ -1,0 +1,963 @@
+h2#about About Search Syntax
+p
+  ' The search engine allows users to locate uploads via tags
+  ' that are associated with an upload and some other metadata such
+  ' as uploader and user count. It also permits chaining together
+  ' specified tags and metadata to search for specific logical combinations,
+  ' to allow more precise filtering. This guide explains the syntax
+  ' and features of individual terms and then shows how they are
+  ' combined into more complex queries.
+ol
+  li = link_to 'About Search Syntax', '#about'
+  li
+    = link_to 'Search Terms', '#terms'
+    ol
+      li = link_to 'Tag Search Behavior', '#tag-behavior'
+      li = link_to 'Searching Through Other Fields', '#fields'
+      li = link_to 'Numeric Range Queries', '#numeric-range'
+      li = link_to 'Date/Time Range Queries', '#date-range'
+      li = link_to 'Supported Fields', '#supported-fields'
+  li
+    = link_to 'Special Characters and Suffixes', '#special-characters'
+    ol
+      li = link_to 'Wildcards', '#wildcards'
+      li = link_to 'Escaping Special Characters', '#escaping'
+      li = link_to 'Approximate (Fuzzy) String Matching', '#fuzzy'
+  li
+    = link_to('Search Grammar: Term Operators and Combinations',
+              '#grammar')
+    ol
+      li = link_to 'Expressions', '#expressions'
+      li = link_to 'Summary Table', '#expressions-summary'
+      li = link_to 'Negation', '#negation'
+      li = link_to 'Commas and AND Expressions', '#and-expressions'
+      li = link_to 'OR Expressions', '#or-expressions'
+      li
+        = link_to 'Compound Expressions', '#compound'
+        ol
+          li = link_to 'Operator Precedence', '#precedence'
+          li = link_to('Defining Subexpressions with Parentheses',
+                      '#parentheses')
+          li = link_to 'Automatic Parentheses Escaping', '#auto-escaping'
+  li = link_to 'Boosting Terms', '#boosting'
+h2#terms Search Terms
+p
+  ' Specific searches require the inclusion of search terms, which
+  ' individually define the criteria expected of each upload result
+  ' to be returned by the search engine.
+h3#tag-behavior Tag Search Behavior
+p
+  ' Searching a single term is obvious: merely type in the term you
+  ' want. By default, the term you use will be searched among the
+  ' indexed image tags and aliases. Thus, a search for
+  code<> = link_to 'pinkie pie', '/search?q=pinkie+pie'
+  ' would, as you may surmise, result in all appropriately tagged and
+  ' indexed pictures of Pinkie Pie.
+  ' Aliases are also indexed, so a search for the tag alias
+  code<> = link_to 'ts', '/search?q=ts'
+  ' is the same as one for
+  code< = link_to 'twilight sparkle', '/search?q=twilight+sparkle'
+  | .
+p
+  ' The default tag search has particular aspects associated with it
+  ' for your convenience. For tag searches, case is insensitive. This
+  ' means capitalization is irrelevant for queries. For example,
+  ' the search queries
+  code<> = link_to 'pinkie pie', '/search?q=pinkie+pie'
+  ' and
+  code<> = link_to 'Pinkie Pie', '/search?q=Pinkie+Pie'
+  ' will share the same result set.
+h3#fields Searching Through Other Fields
+p
+  ' Other fields are also indexed, and you can search them using the
+  ' namespace convention that is also used by tags. Namely, one enters
+  ' the field name followed by a colon, and finally, the target value.
+  ' For example, to search for images with a width of 1920, we would
+  ' search within the
+  code width
+  ' field and so construct the query
+  code = link_to 'width:1920', '/search?q=width%2a1920'
+  | . If a tag with namespace were to share the namespace with a given
+  ' field, it can still be queried via quoting or escaping.
+h3#numeric-range Numeric Range Queries
+p
+  ' Numeric fields in particular support queries for ranges of possible
+  ' values. A qualifier can be added to the end of the field name with
+  ' a single period to indicate desired results that are greater than or
+  ' less than the supplied value; the value can be optionally included,
+  ' too. To find images with a score greater than 100, we would enter
+  code <= link_to 'score.gt:100', '/search?q=score.gt%2a100'
+  | . For an inclusive search of scores greater than
+  em<> or equal to
+  ' 100, we would instead enter
+  code = link_to 'score.gte:100', '/search?q=score.gt%2a100'
+  | . The following table enumerates the supported qualifiers.
+table.table
+  thead
+    tr
+      th Qualifier
+      th Meaning
+      th Example
+  tbody
+    tr
+      td
+        code gt
+      td
+        ' Values greater than specified, and not including the
+        ' specified value
+      td
+        code = link_to 'score.gt:100', '/search?q=score.gt%3a100'
+    tr
+      td
+        code gte
+      td
+        ' Values greater than or equal to specified
+      td
+        code = link_to 'score.gte:100', '/search?q=score.gte%3a100'
+    tr
+      td
+        code lt
+      td
+        ' Values less than specified, and not including the
+        ' specified value
+      td
+        code = link_to 'width.lt:100', '/search?q=width.lt%3a100'
+    tr
+      td
+        code lte
+      td
+        ' Values less than or equal to specified
+      td
+        code = link_to 'width.lte:100', '/search?q=width.lte%3a100'
+h3#date-range Date/Time Range Queries
+p
+  ' Date and time values are specified using a tweaked subset of the
+  =link_to 'ISO 8601 standard', 'https://en.wikipedia.org/wiki/ISO_8601'
+  ' .  A full date is specified by four-digit year, followed by
+  ' two-digt month and date, with each value delimited by a hyphen,
+  '  i.e., "YYYY-mm-DD".  Like in ISO 8601, one can specify just the month
+  ' or even just the year, as long as the less precise information is
+  ' included in left-to-right order without dangling hyphens. This is
+  ' semantically interpreted as the range of the entire period (not just
+  ' the first day of the month, etc.).  For example,
+  code<> 2015-04
+  '  represents the entire month of April 2015.
+p
+  ' Given a full date, a specification for the time of day can be added.
+  ' To do so, separate the time with a
+  code<> T
+  ' or space, followed by the hours, minutes, and seconds, each
+  ' specified ' with two digits and separated by a colon, i.e., "HH:MM:SS".
+  ' The hours follow a 24-hour clock.  As with date values, one may
+  ' alternatively specify entire minutes and even hours by truncating the
+  ' value without a dangling colons. The value
+  code<> 2014-04-20 16
+  '  represents the entire hour of 4 PM on 20 April 2014 (UTC). The entire
+  ' first minute can be specified with
+  code< 2014-04-20 16:00
+  '.
+p
+  ' By default, time follows international UTC ("Zulu") time.
+  ' (In terms of the ISO 8601 standard, a
+  code<> Z
+  '  suffix is implied.)
+  ' One may specify an offset for local time by affixing a plus or minus
+  ' sign, followed by the offset hours as two digits, a colon, and the
+  ' offset minutes (usually
+  code< 00
+  ' ), e.g.,
+  code<> -04:00
+  ' for US Eastern Daylight Time (EDT). Note that unlike ISO 8601, this can
+  ' be attached to dates as well as times, to ensure date boundaries fit the
+  ' locale of interest.  For example,
+  code<> 2015-05:00
+  ' represents the year of 2015 with an offset of minus five hours (US
+  ' Eastern Standard Time).
+p
+  ' Date/time range queries also accept range qualifiers. The
+  code<> gt
+  ' and
+  code<> lt
+  ' qualifiers omit everything matching the implied time range of
+  ' the specified value, whereas
+  code<> gte
+  ' and
+  code<> lte
+  ' include the entirety of said time range.
+p
+  ' The following examples are valid search queries.
+table.table
+  thead
+    tr
+      th Example
+      th Explanation
+  tbody
+    tr
+      td
+        code = link_to 'created_at:2015', '/search?q=created_at%3a2015'
+      td Returns all uploads made in 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015+08:00', '/search?q=created_at%3a2015%2b08:00'
+      td Returns all uploads made in 2015 (SGT).
+    tr
+      td
+        code = link_to 'created_at:2015-04', '/search?q=created_at%3a2015-04'
+      td Returns all uploads made in April 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015-04-03:00', '/search?q=created_at%3a2015-04-03%3a00'
+      td Returns all uploads made in April 2015 (BRT).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01', '/search?q=created_at%3a2015-04-01'
+      td Returns all uploads made in 1 April 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01+08:00', '/search?q=created_at%3a2015-04-01%2b08%3a00'
+      td Returns all uploads made in 1 April 2015 (SGT).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 01', '/search?q=created_at%3a2015-04-01+01'
+      td Returns all uploads made in the hour of 1 AM of 1 April 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 01Z', '/search?q=created_at%3a2015-04-01+01Z'
+      td
+        ' Returns all uploads made in the hour of 1 AM on 1 April 2015 (UTC).
+        ' The zero UTC offset designator ("Zulu") is explicit.
+    tr
+      td
+        code = link_to 'created_at:2015-04-01T01Z', '/search?q=created_at%3a2015-04-01T01Z'
+      td
+        ' Returns all uploads made in the hour of 1 AM on 1 April 2015 (UTC).
+        ' This uses the standard "T" separator associated with ISO 8601.
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 01-04:00', '/search?q=created_at%3a2015-04-01+01-04%3a00'
+      td Returns all uploads made in the hour of 1 AM on 1 April 2015 (EDS).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 01:00', '/search?q=created_at%3a2015-04-01+01%3a00'
+      td Returns all uploads made sometime in the minute of 1:00 AM on 1 April 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 01:00Z', '/search?q=created_at%3a2015-04-01+01%3a00Z'
+      td
+        ' Returns all uploads made sometime in the minute of 1:00 AM on 1 April 2015 (UTC).
+        ' The zero UTC offset designator ("Zulu") is explicit.
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 00:00:00', '/search?q=created_at%3a2015-04-01+00%3a00%3a00'
+        td Returns all uploads made exactly at midnight on 1 April 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at:2015-04-01 00:00:00+08:00', '/search?q=created_at%3a2015-04-01+00%3a00%3a00%2b08%3a00'
+      td Returns all uploads made exactly at midnight on 1 April 2015 (SGT).
+    tr
+      td
+        code = link_to 'created_at.lt:2015', '/search?q=created_at.lt%3a2015'
+      td Returns all uploads before the start of 2015 (UTC).
+    tr
+      td
+        code = link_to 'created_at.gte:2015-04-04', '/search?q=created_at.gte%3a2015-04-04'
+      td Returns all uploads since and including the entire day of 4 April 2015 (season 5 premiere, UTC).
+h3#supported-fields Supported Fields
+p
+  ' The following table enumerates all of the supported fields, with
+  ' examples.
+table.table
+  thead
+    tr
+      th Field Selector
+      th Type
+      th Description
+      th Example
+  tbody
+    tr
+      td
+        code aspect_ratio
+      td Numeric Range
+      td Matches any image with the specified aspect ratio.
+      td
+        code = link_to 'aspect_ratio:1', '/search?q=aspect_ratio%3a1'
+    tr
+      td
+        code comment_count
+      td Numeric Range
+      td Matches any image with the specified number of comments
+      td
+        code = link_to 'comment_count.gt:50', '/search?q=comment_count.gt%3a50'
+    tr
+      td
+        code created_at
+      td Date/Time Range
+      td Matches any image posted at the specified date and/or time.
+      td
+        code = link_to 'created_at:2015-04-01', '/search?q=created_at%3a2015-04-01'
+    tr
+      td
+        code description
+      td Full Text
+      td
+        ' Full-text search against image descriptions with the specified
+        ' string.
+      td
+        code = link_to 'description:derp', '/search?q=description%3aderp'
+    tr
+      td
+        code downvotes
+      td Numeric Range
+      td Matches any image with the specified downvote count.
+      td
+        code = link_to 'downvotes:0', '/search?q=downvotes%3a0'
+    tr
+      td
+        code faved_by
+      td Literal
+      td Matches any image favorited by the specified user. Case-insensitive.
+      td
+        code = link_to 'faved_by:roboshi', '/search?q=faved_by%3aroboshi'
+    tr
+      td
+        code faves
+      td Numeric Range
+      td Matches any image with the specified number of favorites.
+      td
+        code = link_to 'faves:20', '/search?q=faves%3a20'
+    tr
+      td
+        code height
+      td Numeric Range
+      td Matches any image with the specified height.
+      td
+        code = link_to 'height:1080', '/search?q=height%3a1080'
+    tr
+      td
+        code id
+      td Numeric Range
+      td Matches any image with the specified number.
+      td
+        code = link_to 'id:111111', '/search?q=id%3a111111'
+    tr
+      td
+        code orig_sha512_hash
+      td Literal
+      td
+        ' Matches the
+        em<> original
+        ' SHA-512 checksum of an uploaded image.
+      td
+        code = link_to '', ''
+    tr
+      td
+        code score
+      td Numeric Range
+      td Matches any image with the specified net score.
+      td
+        code = link_to 'score.gt:200', '/search?q=score.gt%3a200'
+    tr
+      td
+        code sha512_hash
+      td Literal
+      td
+         ' Matches any image with the specified SHA-512 checkusm.
+         ' N.B.: Image optimization usually alters the original checksum!
+      td
+        code = link_to '', ''
+    tr
+      td
+        code source_url
+      td Literal
+      td
+        ' Matches image source URLs. Case-insensitive.
+      td
+        code = link_to('source_url:*deviantart.com*',
+                      '/search?q=source_url%3a%2adeviantart.com%2a')
+    tr
+      td
+        code tag_count
+      td Numeric Range
+      td Matches any image with the specified number of tags
+      td
+        code = link_to 'tag_count.gt:10', '/search?q=tag_count.gt%3a10'
+    tr
+      td
+        code uploader
+      td Literal
+      td Matches any image with the specified uploader account. Case-insensitive.
+      td
+        code = link_to 'uploader:k_a', '/search?q=uploader%3ak_a'
+    tr
+      td
+        code upvotes
+      td Numeric Range
+      td Matches any image with the specified upvote count.
+      td
+        code = link_to 'upvotes.gt:200', '/search?q=upvotes.gt%3a200'
+    tr
+      td
+        code width
+      td Numeric Range
+      td Matches any image with the specified width.
+      td
+        code = link_to 'width:1920', '/search?q=width%3a1920'
+    tr
+      td
+        code wilson_score
+      td Numeric Range
+      td Matches any image with the specified upper bound of a 99.5% Wilson CI.
+      td
+        code = link_to 'wilson_score.gt:0.9', '/search?q=wilson_score.gt%3a0.9'
+p
+  ' It is worth noting the absence of certain &ldquo;fields&rdquo;
+  ' such as
+  code<> artist
+  ' and
+  code< spoiler
+  | . These are
+  em<> tag namespaces,
+  ' not metadata, but they are functionally the same. Thus, a
+  ' search for
+  code<> = link_to 'spoiler:s04', '/search?q=spoiler%3as04'
+  ' performs as expected.
+h2#special-charcters Special Characters and Suffixes
+h3#wildcards Wildcards
+p
+  ' Wildcards allow for matching with terms that begin with, end with,
+  ' or contain a given string of characters, like wildcards used in
+  ' file management. Two wildcards are recognized: the asterisk (or
+  ' star) and the question mark.
+p
+  ' An asterisk "expands" or matches to any number of characters in
+  ' its place, including 0. For example,
+  code<> = link_to 'apple*', '/search?q=apple%2a'
+  ' matches to uploads with any of the tags
+  code<> apple bloom
+  | ,
+  code<> applejack
+  | , and simply
+  code< apple
+  | .
+p
+  ' A question mark matches to a single character in its place. For
+  ' example,
+  code<> = link_to 't?ixie', '/search?q=t%3fixie'
+  ' can match to either
+  code<> trixie
+  ' or
+  code< twixie
+  | .
+table.table
+  thead
+    tr
+      th Wildcard Character
+      th Match
+  tbody
+    tr
+      td
+        code *
+      td Zero or more characters
+    tr
+      td
+        code ?
+      td A single character
+h3#escaping Escaping Special Characters
+p
+  ' The use of special characters that modify search terms or exist
+  ' outside search terms mandates a facility for &ldquo;escaping&rdquo;
+  ' those characters, so that they are not excluded from search terms
+  ' themselves. To use special characters within a search term, both
+  ' of the conventional string escaping mechanisms are used:
+  ' the backslash and quoting. The following are special characters
+  ' and sequences that may need to be escaped:
+ul
+  li
+    code = '('
+  li
+    code = ')'
+  li
+    code *
+  li
+    code ?
+  li
+    code> -
+    | (when placed in front of a term)
+  li
+    code> !
+    | (when placed in front of a term)
+  li
+    code ,
+  li
+    code &&
+  li
+    code ||
+  li
+    code> OR
+    | (if all-capitalized)
+  li
+    code> AND
+    | (if all-capitalized)
+  li
+    code> NOT
+    | (if all-capitalized)
+  li
+    code "
+  li
+    code \
+  li
+    code> ~
+    ' (with
+    = link_to 'fuzzy matching syntax', '#fuzzy'
+    | )
+  li
+    code> ^
+    ' (with
+    = link_to 'boosting', '#boosting'
+    | )
+p
+  ' A backslash is placed in front of a special character (and can also
+  ' be placed in front of a sequence like the ones in the preceding list).
+  ' This forces a given character to be counted as part of the preceding or
+  ' following term. In front of any other character, it effectively has no
+  ' effect. For example,
+  code<> = link_to '\-_-', '/search?q=%5c%2d_%2d'
+  ' forces a search for the emoticon
+  code< -_-
+  | , despite it following the syntax for
+  code<> = link_to 'negation', '#negation'
+  ' if without the backslash. Also consider the search term
+  code< = link_to 'rose \(flower\)', '/search?q=rose+%5c%28flower%5c%29'
+  ' , although parentheses have intuitive rules that do not make escaping
+  ' them necessary in most cases. The backslash is a special character
+  ' and thus must also be escaped; a literal backslash is indicated with
+  code \\
+  ' .
+p
+  ' The alternative to escaping is to simply surround the search query in
+  | double quotes (
+  code "
+  ' ), e.g.,
+  code< = link_to '"rose (flower)"', '/search?q=%22rose+%28flower%29%22'
+  '. When searching with a specified field, quotes
+  strong must surround the field and colon as well
+  ' , e.g.,
+  code< = link_to '"width:1920"', '/search?q=%22faved_by%3ak_a%22'
+  ' . Eveything in quotes is together treated as a verbatim search term,
+  ' with one exception. Note that the double quote character itself
+  ' bounds the search term, so if it appears inside, it must be escaped
+  ' with a backslash.
+  strong All other uses of backslash are treated literally.
+h3#fuzzy Approximate (Fuzzy) String Matching
+p
+  ' The search engine backend, Apache Lucene, also enables so-called
+  ' &ldquo;fuzzy&rdquo; string matching. Fuzzy string matching can be used
+  ' with any literal search term, including the default tags field.
+  ' A fuzzy match is specified using a similarity metric either ranging
+  ' from 0 to 1.0 or a whole number. The whole number specifies an
+  i<> optimal string alignment edit distance,
+  ' which is the maximum number of edits done to a string to match a given
+  ' target, with an edit defined as a deletion, insertion, replacement, or
+  ' switching two adjacent characters. One may alternatively define a
+  ' similarity factor ranging from 0 to 1.0, with a 1.0 the least
+  ' &ldquo;fuzzy&rdquo;. The derived edit distance is the length of the
+  ' term sans the field name prefix, multiplied by the difference of unity
+  ' minus the similarity factor, all rounded down.
+  ' To specify either, a term is followed with a tilde
+  ' followed by the edit distance or similarity factor.
+  strong<
+    ' Note in both cases that Lucene caps the maximum edit distance at 2, as an
+    ' optimization. Therefore, very large edit distances or small similarities
+    ' will not behave as expected.
+p
+  ' For example,
+  code<> = link_to 'fluttersho~0.8', '/search?q=fluttersho%7e1.0'
+  ' searches for uploads with tags that approximately match
+  code fluttersho
+  ' , with a similairty of 0.8. This is an edit distance of
+  ' &lfloor;(1 &minus; 0.8)(10)&rfloor; = 2.
+  ' Note that uploads tagged
+  code> fluttershy
+  ' are included in the result set. The utility of this is obvious:
+  ' if you are unsure of a character or tag's exact spelling, you can
+  ' use this as an aid, like a more manual and controlled version of
+  ' Google's (in)famous spelling correction features.
+p
+  ' Fuzziness can also be applied to numeric queries to specify a range.
+  ' In this case, the fuzziness parameter is the magnitude above
+  ' and below the specified number that will be included in the result
+  ' set.
+  ' For example,
+  code<> = link_to 'width:800~200', '/search?q=width%3a800%7e200'
+  ' specifies images with a width ranging from 600 (800 &minus; 200) to
+  ' 1000 (800 &plus; 200), inclusive.
+p
+  ' Fuzzy matching can be freely applied to any term inside an
+  code< = link_to 'expression', '#expressions'
+  ' .
+
+h2#grammar Search Grammar: Term Operators and Combinations
+h3#expressions Expressions
+p
+  ' Terms can be combined to define a search query corresponding to a
+  ' specific result set. These combinations are formulized as
+  b> expressions
+  ' that are constructed from terms, operators, and even
+  ' other expressions, which are then called
+  strong subexpressions
+  ' . Expressions recognized by the
+  ' search frontend are the negation of a term or subexpression, the
+  ' requirement of any search term or subexpression, or the requirement
+  ' of both search terms or subexpressions.
+p
+  ' At its core, a search
+  ' expression is either
+  strong> binary
+  ' or
+  strong unary
+  ' . A binary expression consists of a term or subexpression, an
+  strong> operator
+  ' indicating the type of expression, and another term or
+  ' subexpression. Binary expressions can be &ldquo;chained&rdquo;
+  ' by adding the operator followed by another term. A unary expression
+  ' consists of the operator followed by a single term or subexpression.
+  ' Both expression types and how to use subexpressions will be covered
+  ' in the following sections.
+h3#expressions-summary Summary Table
+table.table
+  thead
+    tr
+      th Operator
+      th Symbols
+      th Comments
+  tbody
+    tr
+      td Negation (NOT)
+      td
+        ul
+          li
+            code NOT
+          li
+            code -
+          li
+            code !
+      td
+        ' Applied in front of a single term or parenthesized
+        ' subexpression. The minus sign does not require padding
+        ' to the right. Specifies that the term or subexpression
+        em> must not
+        ' match.
+    tr
+      td Conjunction (AND)
+      td
+        ul
+          li
+            code ,
+          li
+            code &&
+          li
+            code AND
+      td
+        ' Applied between two terms. The comma may be optionally
+        ' padded with space on either side; the other forms must
+        ' be padded. Specifies that both terms match. Can be chained
+        ' to more terms.
+    tr
+      td Disjunction (OR)
+      td
+        ul
+          li
+            code ||
+          li
+            code OR
+      td
+        ' Applied between two terms, with surrounding space. Specifies
+        ' that either of the terms match. Can be chained to more terms.
+h3#negation Negation
+p
+  b> Negation
+  ' of a term or expression specifies that the the original term or
+  ' subexpression
+  em<> must not
+  ' match. The corresponding negation operator is
+  b unary
+  ' , that is, applied to either a single term or to a subexpression.
+  ' It is specified with the all-capitalized word
+  code NOT
+  | , a dash of the non-multi-chromatic variety (
+  code -
+  | ), or an exclamation point (
+  code !
+  ' ). For example,
+  code<> = link_to '-fluttershy', '/search?q=%2dfluttershy'
+  ' or
+  code<> = link_to 'NOT fluttershy', '/search?q=NOT+fluttershy'
+  ' matches pictures that are
+  em<> not
+  ' tagged with
+  code< fluttershy
+  ' . In set theory terms, this is taking the
+  em< complement
+  ' of the original result set, that is, all uploads outside it.
+figure
+  = image_tag 'search_manual/NOT_exp.png'
+  figcaption Figure 1: A NOT expression syntax tree and Venn diagram.
+h3#and-expressions Commas and AND Expressions
+p
+  ' An expression that queries for images that meet
+  em<> all
+  ' specified terms is a
+  b<> conjunction
+  ' or
+  b< AND expresssion
+  |. As in the past, you can query images that meet a list of terms
+  ' by hooking the terms together with commas. For example,
+  code<> = link_to 'fluttersy,pinkie pie', '/search?q=fluttershy%2cpinkie+pie'
+  ' results in pictures that contain
+  em> both
+  ' the
+  code> fluttersy
+  ' and
+  code> pinkie pie
+  ' tags. In set theory terms, the result set is the intersection of
+  ' uploads tagged
+  code> fluttershy
+  ' and uploads tagged
+  code pinkie pie
+  | .
+p
+  ' Commas can be padded with spaces however you like.
+  ' Unlike the past, commas are now plain AND operators,
+  ' so they are more versatile. As will be discussed, they can
+  ' be used in subexpressions and alongside the OR operator.
+p
+  ' AND operators can also be expressed using
+  code<> &&
+  ' (derived from typical programming notation) or the all-capitalized
+  ' word
+  code AND
+  ' , e.g.,
+  code> = link_to('rarity && pinkie pie',
+                 '/search?q=rarity+%26%26+pinkie+pie')
+  ' or
+  code = link_to 'rarity AND pinkie pie', '/search?q=rarity+AND+pinkie+pie'
+  ' . These forms, unlike the comma, require padding space on either side.
+figure
+  = image_tag 'search_manual/AND_exp.png'
+  figcaption Figure 2: An AND expression syntax tree and Venn diagram.
+h3#or-expressions OR Expressions
+p
+  ' A
+  b<> disjunction
+  ' or
+  b<> OR expression
+  ' requests for uploads that meet
+  em<> any
+  ' of the specified search terms. This is markedly
+  ' different from the aforementioned AND expression, which, to reiterate,
+  ' mandates that
+  em> all
+  ' terms match. OR operators are expressed either with
+  code<> ||
+  ' (also a programming notation) or the all-capitalized word
+  code< OR
+  ' , e.g.,
+  code> = link_to 'rarity || pinkie pie', '/search?q=rarity+%7c%7c+pinkie+pie'
+  ' or
+  code = link_to 'rarity OR pinkie pie', '/search?q=rarity+OR+pinkie+pie'
+  ' . In set theory terms, the result set is the union of uploads tagged
+  code<> rarity
+  ' and uploads tagged
+  code< pinkie pie
+  ' . All forms of the OR operator require padding on either side.
+figure
+  = image_tag 'search_manual/OR_exp.png'
+  figcaption Figure 3: An OR expression syntax tree and Venn diagram.
+h3#compound Compound Expressions
+p
+  ' Complex combinations of terms, and therefore search criteria, are
+  ' possible by combining expressions together. Doing so effectively
+  ' is analogous to arithmetic. Consider multiplication and addition
+  ' (which in so-called
+  em Boolean alegra
+  ' are respectively analogous to AND and OR operations). We can
+  ' express an algebraic expression with multiplication and addition
+  ' several ways. For three terms,
+  i A
+  ' ,
+  i B
+  ' ,
+  ' and
+  i C
+  ' , consider the expression
+  i> A
+  ' &times;
+  i> B
+  ' &plus;
+  i C
+  ' . Multiplication is evaluated before addition, so this expression is
+  ' equivalent to
+  | (
+  i> A
+  ' &times;
+  i B
+  ' ) &plus;
+  i> C,
+  ' in which case the order of operations is explicit.
+h4#precedence Operator Precedence
+p
+  ' Likewise, precedence is applied to determine the order in which
+  ' chained OR, AND, and NOT operations are evaluated. The order of
+  ' operations in the search syntax is as follows:
+ol
+  li negation (NOT)
+  li conjunction (AND)
+  li disjunction (OR)
+p
+  ' Consider the query
+  code = link_to('twilight sparkle || fluttershy && pinkie pie',
+                '/search?q=twilight+sparkle+%7c%7c+fluttershy+%26%26+pinkie+pie')
+  | . In this example,
+  code<> fluttershy && pinkie pie
+  ' is evaluated first, as an implicit
+  em<> subexpression.
+  ' Then, that result is OR'd together with
+  code< twilight sparkle
+  ' . Thus, the query instructs the engine to return uploads
+  em> either
+  ' tagged with
+  code twilight sparkle
+  em<> or
+  ' tagged with
+  em> both
+  code> fluttershy
+  em> and
+  code pinkie pie
+  | . Note how if the OR expression
+  code<> twilight sparkle || fluttershy
+  ' were evaluated first, the result set would differ.
+figure
+  = image_tag 'search_manual/AND_OR_exp.png'
+  figcaption
+    ' Figure 4: A syntax tree and Venn diagram illustrating operator
+    ' precedence in a compound expression.
+h4#parentheses Defining Subexpressions with Parentheses
+p
+  ' Returning to an earlier example with arithmetic, we can trump the
+  ' order of operations using explicit subexpressions. This requires
+  ' the use of
+  em> delimiters
+  ' that act as boundaries, and most often parentheses are used for this
+  ' purpose. Hence,
+  i<> A
+  | &times; (
+  i> B
+  ' &plus;
+  i< C
+  | ) forces
+  i<> B
+  ' &plus;
+  i<> C
+  ' to be evaluated, and then multiplied with
+  i< A
+  | , which is contrary to the order otherwise followed. Likewise,
+  code<> = link_to('(twilight sparkle || fluttershy) && pinkie pie',
+                  '/search?q=%28twilight+sparkle+%7c%7c+fluttershy%29+%26%26+pinkie+pie')
+  ' instructs the search engine to return results that have
+  em<> either
+  code<> twilight sparkle
+  em<>  or
+  code<> fluttershy
+  em<> and always match
+  ' the tag
+  code< pinkie pie
+  ' .
+figure
+  = image_tag 'search_manual/OR_AND_exp.png'
+  figcaption
+    ' Figure 5: A syntax tree and Venn diagram illustrating the effect
+    ' of explicit subexpressions on the result set.
+p
+  ' As was mentioned earlier, the unary NOT operator can be applied to
+  ' parenthesized subexpressions. The semantics of this is analogous
+  ' to applying it to a single term: a negated subexpression specifies
+  ' uploads that
+  em<> do not
+  ' adhere to what the subexpression specifies. For example, the query
+  code<> = link_to('-(pinkamena diane pie, grimdark)',
+                  '/search?q=%2d%28pinkamena%2c+grimdark%29')
+  ' returns all uploads that are
+  em> not
+  ' tagged with
+  em> both
+  code<> pinkamena diane pie
+  em<> and
+  code< grimdark
+  '. Uploads tagged with
+  em> either
+  ' of the two would be returned as long as they do not have both.
+  ' Thus light-hearted Pinkamena images and grimdark material not
+  ' involving Pinkamena would be included, yet the intersection
+  ' of those two sets of images would be excluded, that is, images
+  ' that are grimdark and feature Pinkamena.
+figure
+  = image_tag 'search_manual/NOT_AND_exp.png'
+  figcaption
+    ' Figure 6: A syntax tree and Venn diagram illustrating a negated
+    ' AND expression.
+p
+  ' Explicit subexpressions with parentheses allow for complex
+  ' queries as they can be arbitrarily nested inside other
+  ' subexpressions, to fine-tune the result set even more.
+h4#auto-escaping Automatic Parentheses Escaping
+p
+  ' Finally, a footnote about paretheses is warranted. Traditionally,
+  ' if an expression parser encounters an open parenthesis
+  ' without a closing parenthesis, or if parentheses are swapped,
+  ' an error is raised. This is indeed the case with the search engine,
+  ' as highlighted in the search parsing error page. However, to a
+  ' limited extent, a term can contain parentheses within. Parentheses
+  ' are accepted within search terms as long as they are closed and
+  ' do not cover the entire expression. The first limit is a heuristic
+  ' to address the typical use of parentheses, and the latter
+  ' arises from the legal use of parentheses to single out a term.
+  ' Thus, the search
+  code<> = link_to 'rose (flower)', '/search?q=rose+%28flower%29'
+  ' searches for uploads tagged with
+  code< rose (flower)
+  ' ; however, the emoticon query
+  code<> = link_to '))B-(', '/search?q=%29%29B-%28'
+  ' raises an error, while
+  code<> = link_to '(q)', '/search?q=%28q%29'
+  ' effectively searches for
+  code< q
+  ' , instead. For the latter two examples, simply surround with double
+  ' quotes to clarify your meaning to the search engine.
+h2#boosting Boosting Terms
+p
+  ' The search engine also allows the boosting of specific terms
+  ' when sorting by relevance, so that uploads including or not
+  ' including the term occur earlier or later in the results.
+  ' Boosting is done by modifying a term's relevance score with a
+  ' positive or negative value. This value is affixed to a term with
+  | a preceding caret (
+  code ^
+  ' ) and with a positive or negative decimal number.
+  ' For example,
+  code> = link_to('pinkie pie^1 || tara strong',
+                '/search?q=pinkie+pie%5e1+%7c%7c+tara+strong&sf=relevance&sd=desc')
+  ' returns uploads tagged either with
+  code> pinkie pie
+  ' or
+  code tara strong
+  ' , but when sorting by relevance descending, uploads with
+  code> pinkie pie
+  ' are prioritized. A negative value meanwhile reduces the relevance score
+  ' and deprioritizes the affected term when sorting by relevance, e.g.,
+  code = link_to('pinkie pie^-1 || tara strong',
+                '/search?q=pinkie+pie%5e1+%7c%7c+tara+strong&sf=relevance&sd=desc')
+  ' . Sorting options are found below the search box on this page and
+  strong> must be set to sort by relevance
+  ' for boosting to take proper effect. Thus, in both cases, pictures with
+  em<> both
+  ' tags will still appear first.

@@ -1,0 +1,46 @@
+tr
+  td
+    = link_to_reported_thing report.reportable
+  td
+    span[title=report.reason]
+      = render_textile truncate(report.reason, length: 50)
+  td
+    - if report.user
+      = link_to(report.user.name, profile_path(report.user)) rescue 'error'
+    - else
+      em>
+        = link_to(truncate(report.ip.to_s, length: 25), "/ip_profiles/#{report.ip}") rescue 'error'
+      = link_to_fingerprint(report.fingerprint) rescue 'error'
+    - if report.user && report.user.linked_tags.present?
+      = render partial: 'tags/tag_list', locals: { tags: report.user.linked_tags.sort_by(&:name) }
+  td.hide-mobile
+    = friendly_time report.created_at
+  ruby:
+    td_class = case report.state
+    when 'closed'
+      'success'
+    when 'in_progress'
+      'warning'
+    else
+      'danger'
+    end
+  td[class=td_class]
+    => report.state.humanize
+    = user_abbrv report.admin
+  td
+    = link_to t('show'), admin_report_path(report)
+    - if report.open
+      - if report.user
+        '  &bull;
+        = link_to 'Send PM', new_conversation_path(title: "Your Report of #{reported_thing(report.reportable)}", recipient: report.user.name)
+      - if report.admin != current_user
+        '  &bull;
+        - if report.admin.present?
+          = link_to 'Claim', admin_report_claim_path(report), method: :post, data: { confirm: t('admin.reports.change_owner') }
+        - else
+          = link_to 'Claim', admin_report_claim_path(report), method: :post
+      - if report.admin == current_user
+        '  &bull;
+        = link_to 'Release', admin_report_claim_path(report), method: :delete
+      '  &bull;
+      = link_to t('close'), admin_report_close_path(report), data: { confirm: t('are_you_sure') }, method: :post

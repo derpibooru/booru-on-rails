@@ -1,0 +1,106 @@
+- page_layout :medium
+- is_current = (current_user && current_user.id == @user.id)
+.profile-top
+  .profile-top__avatar = user_avatar(@user, 'avatar--125px', @user.name)
+  .profile-top__name-and-links
+    div
+      h1.profile-top__name-header = "#{@user.name}'s profile"
+      - if @user.last_renamed_at > 14.days.ago
+        ' (Previously known as
+        = @user.previous_usernames.last
+        ' )
+        br
+      - if user_label(@user).present?
+        = user_label(@user)
+        br
+      - if is_current || can?(:manage, User)
+        = link_to 'Edit Personal Title', edit_profile_path(@user)
+        br
+      span title="Account created on #{(@user.created_at rescue 'on an unknown date')}"
+        = "Member for #{(time_ago_in_words(@user.created_at) rescue 'unknown time')}"
+    .profile-top__options
+      = render partial: 'profile_options'
+
+- if can?(:mod_read, User)
+  .block.js-staff-action
+    .block__content
+      = render partial: 'admin_block'
+
+  .block.js-staff-action
+    .block__header
+      -if can? :mod_read, User
+        a.block__header--single-item href=admin_user_bans_path(q: @user.name) Ban History
+      -else
+        | Ban History
+    .block__content
+      = render partial: 'bans/ban_list', locals: { bans: @bans }
+
+.column-layout
+  .column-layout__left
+    .block
+      - if can?(:manage, Commission) && @user.commission.present?
+        a.block__header--single-item href=commission_path(@user.commission) Commissions
+      - else
+        .block__header: span.block__header__title Commissions
+      - if @user.commission.present? || is_current
+        = render partial: 'user_commission_area'
+    .block
+      - if is_current
+        a.block__header--single-item href=new_user_link_path User Links
+      - elsif can?(:manage, UserLink)
+        a.block__header--single-item href=new_admin_user_link_path(user_id: @user.id) User Links
+      - else
+        .block__header: span.block__header__title User Links
+      - if !@links.empty? || is_current
+        = render partial: 'user_link_area'
+    .block
+      - if can?(:award, Badge)
+        a.block__header--single-item href=new_profile_badge_award_path(@user) Badges
+      - else
+        .block__header: span.block__header__title Badges
+      = render partial: 'user_badge_area'
+    .block
+      - if is_current || can?(:manage, User)
+        a.block__header--single-item href=edit_profile_path(@user) About Me
+      - else
+        .block__header: span.block__header__title About Me
+      - if @user.description || is_current
+        = render partial: 'user_about'
+    - if can?(:manage, ModNote)
+      .block.js-staff-action
+        a.block__header--single-item href=profile_details_path(@user) Mod Notes
+        table.table
+          thead
+            tr
+              th Note
+              th Created
+          tbody
+            - @user.mod_notes.where(deleted: false).order(id: :desc).limit(5).each do |note|
+              tr
+                td
+                  = render_textile note.body
+                td
+                  = friendly_time note.created_at
+    - if can?(:mod_read, User)
+      .block.js-staff-action
+        a.block__header--single-item href=edit_profile_scratchpad_path(@user) Moderation Scratchpad
+        .block__content = render_textile @user.scratchpad.to_s
+  .column-layout__main
+    - cache_unless_can(:mod_read, User, "profile_stats_v3_#{@user.id}", expires_in: 10.minutes) do
+      = render partial: 'stats_area'
+    - if !@recent_artwork.empty?
+      = render partial: 'recent_images', locals: { title: 'Recent Artwork', images: @recent_artwork, view_all_path: search_path(q: @tags.map(&:name).join(' || ')) }
+    - if !@recent_uploads.empty?
+      = render partial: 'recent_images', locals: { title: 'Recent Uploads', images: @recent_uploads, view_all_path: search_path(q: "uploader:#{@user.name.downcase}") }
+    - if !@recent_favs.empty?
+      = render partial: 'recent_images', locals: { title: 'Recent Favorites', images: @recent_favs, view_all_path: search_path(q: "faved_by:#{@user.name.downcase}") }
+    - if !@recent_galleries.empty?
+      = render partial: 'recent_galleries'
+    - if !@recent_comments.empty?
+      = render partial: 'recent_comments'
+    - if !@recent_posts.empty?
+      = render partial: 'recent_posts'
+    - if is_current && !@bans.empty?
+      .block
+        .block__header: span.block__header__title Ban History
+        .block__content = render partial: 'bans/ban_list', locals: { bans: @bans }

@@ -1,0 +1,22 @@
+table.table
+  thead
+    tr
+      th User
+      th Email
+      th Amount
+      th Note
+      th At
+  tbody
+    - @donations.each do |donation|
+      tr
+        td
+          - if donation.user
+            = link_to donation.user.name, profile_path(donation.user)
+        td
+          = donation.email
+        td
+          = format '%.2f', donation.amount
+        td[title=donation.note]
+          = truncate donation.note, length: 30
+        td
+          = friendly_time donation.created_at

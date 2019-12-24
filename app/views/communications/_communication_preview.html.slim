@@ -1,0 +1,13 @@
+.block.flex
+  .flex__fixed.spacing-right
+    =<> user_avatar((communication.user if communication.user_visible?), 'avatar--100px')
+  .flex__grow.communication__body
+    - if communication.user_visible?
+      span.communication__body__sender-name =<> link_to communication.user.name, profile_path(communication.user)
+      =<> render partial: 'profiles/user_badges', locals: { user: communication.user }
+      br
+      = user_label communication.user, small: true
+    - else
+      span.communication__body__sender-name<> = t('booru.anonymous_user')
+    .communication__body__text
+      =<> render_post communication

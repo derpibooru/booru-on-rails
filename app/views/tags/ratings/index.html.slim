@@ -1,0 +1,16 @@
+- content_for(:robots, true)
+h1 Rating Tags
+p
+  | Rating tags are used around the site as 'official' markers for certain content types.
+table.table
+  thead
+    tr
+      th This tag..
+      th .. is for
+  tbody
+    - @rating_tags.each do |t|
+      tr
+        td = link_to t.name, t
+        td
+          => t.short_description
+          = "(#{t.images_count} images)"

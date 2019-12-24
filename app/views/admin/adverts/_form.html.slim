@@ -1,0 +1,29 @@
+= form_for [:admin, @advert] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @advert.errors }
+  - if @advert.image.present?
+    = image_tag @advert.uploaded_image.url
+  .field
+    => f.label :image, 'Upload image:'
+    = f.file_field :uploaded_image, class: 'input input--wide'
+  .field
+    => f.label :link, 'Link which the advert should take users to:'
+    = f.url_field :link, class: 'input input--wide', placeholder: 'Link', required: true
+  .field
+    => f.label :title, 'Title/alt-text for the advert:'
+    = f.text_field :title, class: 'input input--wide', placeholder: 'Title', required: true
+  .field
+    => f.label :start, 'Start time for the advert (usually "now"):'
+    = f.text_field :start, class: 'input input--wide', placeholder: 'Start'
+  .field
+    => f.label :finish, 'Finish time for the advert (e.g. "2 weeks from now"):'
+    = f.text_field :finish, class: 'input input--wide', placeholder: 'Finish'
+  .field
+    =>f.label :notes, 'Notes (Payment details, contact info, etc):'
+    = f.text_field :notes, class: 'input input--wide', placeholder: 'Notes'
+  .field
+    => f.label :restrictions, 'Restriction:'
+    = f.select :restrictions, Advert::RESTRICTIONS, {}, class: 'input'
+  .field
+    => f.check_box :live, checked: @advert.new_record? || @advert.live, class: 'checkbox'
+    = f.label :live, 'Live'
+  = f.submit 'Save Advert', class: 'button'

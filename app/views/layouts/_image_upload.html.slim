@@ -1,0 +1,22 @@
+/ accepts :form — form builder (can be nil) — and :field, the column uploader is mounted as
+/ for example, = render partial: 'layouts/image_upload', locals: { form: f, field: :image }
+h4 Select an image
+.image-other
+  - image_preview = form.object.send(:"#{field}").dirty_preview_url if form && form.object.send(:"#{field}?")
+  #js-image-upload-previews
+    - if image_preview
+      label.checked
+        = image_tag image_preview
+  p Upload a file from your computer or provide a link to the page containing the image.
+  .field
+    - if form
+      = form.file_field field, class: 'input js-scraper'
+      = form.hidden_field :"#{field}_cache"
+    - else
+      = file_field_tag field, class: 'input js-scraper'
+      = hidden_field_tag :"#{field}_cache"
+  .field.field--inline
+    / scraper preview is routed to images_controller, hence the input names
+    = url_field_tag :scraper_url, params[:scraper_url] || params[:url] || '', class: 'input input--wide js-scraper', placeholder: 'Link a deviantART page, a Tumblr post, or the image directly'
+    button.button.button--separate-left#js-scraper-preview type="button" title="Fetch the image at the specified URL" data-disable-with='Fetch' Fetch
+  .field-error-js.hidden.js-scraper

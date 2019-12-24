@@ -1,0 +1,67 @@
+- if (!@current_ban && !(@topic.locked_at || @topic.hidden_from_users)) || (can?(:assist, Topic) && !@topic.hidden_from_users)
+  = form_for([@forum, @topic, @post]) do |f|
+    - if @post.errors.any?
+      #error_explanation
+        h2 = "#{pluralize(@post.errors.count, 'error')} prevented this from being posted:"
+        ul
+        - @post.errors.full_messages.each do |msg|
+          li = msg
+    - if @topic.locked_at
+      .block.block--fixed.block--warning
+        h4 This topic has been locked to new posts from non-moderators.
+        p
+          | Locked
+          =<> friendly_time @topic.locked_at
+          - if can? :lock, @topic
+            | by
+            =< @topic.locked_by.name
+        p
+          | Lock reason:
+          em =< @topic.lock_reason
+    - elsif @topic.hidden_from_users
+      .block.block--fixed.block--warning
+        h4 Posting to a deleted thread.
+    - edit_area = capture do
+      - if @post.persisted? && @post.first?
+        .field
+          => f.label :edit_title, 'Thread Subject'
+          => f.text_field :edit_title, class: 'input input--wide', value: @post.topic.title
+      = render partial: 'layouts/textile_toolbar'
+      = f.text_area :body, class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: 'Please read the site rules before posting and use [spoiler][/spoiler] for NSFW stuff in SFW forums.', required: true
+    - title = @post.persisted? ? 'Edit' : 'Write'
+    - actions = capture do
+      - if @post.persisted?
+        .field
+          = f.text_field :edit_reason, class: 'input input--wide', placeholder: 'Reason for edit'
+        = f.submit 'Edit', class: 'button', autocomplete: 'off', data: { disable_with: 'Updating...' }
+      - else
+        = f.button class: 'button', autocomplete: 'off', data: { disable_with: 'Posting...' } do
+          i.fa.fa-comment>
+          | Post
+        - if current_user
+          = f.check_box :anonymous, checked: current_user.anonymous_by_default, class: 'checkbox preview-anonymous spacing-left'
+          =< f.label :anonymous
+    = render partial: 'communications/communication_edit', locals: { title: title, edit_area: edit_area, actions: actions }
+- elsif @topic.locked_at
+  .block.block--fixed.block--warning
+    h4 This topic has been locked to new posts
+    p
+      | Locked
+      =<> friendly_time @topic.locked_at
+      - if can? :lock, @topic
+        | by
+        =< @topic.locked_by.name
+    p
+      | Lock reason:
+      em =< @topic.lock_reason
+- elsif @topic.hidden_from_users
+  .block.block--fixed.block--warning
+    h4 This topic has been deleted and cannot be replied to.
+- elsif @current_ban
+  .block.block--fixed.block--warning
+    h4 You've been banned!
+    p
+      | You cannot post forum posts or make new topics (or do anything but read, really) until
+      =< friendly_time(@current_ban.valid_until)
+      | .
+    = render partial: 'bans/ban_reason', locals: { ban: @current_ban }

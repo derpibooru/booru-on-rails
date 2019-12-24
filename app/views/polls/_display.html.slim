@@ -1,0 +1,29 @@
+- if poll
+  - if poll.hidden_from_users
+    .walloftext
+      .block.block--fixed.block--warning
+        h1 This poll has been deleted
+        p
+          ' Reason:
+          strong = poll.deletion_reason || 'Unknown (likely deleted in error). Please contact a moderator.'
+        - if can? :manage, poll
+          p
+            strong> Spoilers!
+            ' Done by:
+            strong = poll.deleted_by&.name || 'System'
+  - if poll.visible_to? current_user
+    .poll
+      ruby:
+        logged_out = !current_user
+        user_votes = poll.votes_of current_user
+        can_vote = poll.active? && user_votes.empty? && can?(:create, PollVote)
+        area_class = 'poll-area'
+        area_class += ' poll-area--in-tab' if can? :manage, Poll
+
+      - voting = capture do
+        div class=area_class
+          - if can_vote
+            = render partial: 'polls/vote_form', locals: { poll: poll, user_votes: user_votes, can_vote: can_vote, logged_out: logged_out }
+          - else
+            = render partial: 'polls/results', locals: { poll: poll, user_votes: user_votes, can_vote: can_vote, logged_out: logged_out }
+      = render partial: 'polls/voting', locals: { voting: voting, poll: poll, user_votes: user_votes, can_vote: can_vote }

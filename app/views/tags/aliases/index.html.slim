@@ -1,0 +1,24 @@
+- content_for(:robots, true)
+h1 Tag Aliases
+p
+  | Tag aliases are used to correct common typos and to canonicalize various spellings into one tag, amongst other things.
+.block
+  - pagination = paginate @aliased_tags
+  .block__header = pagination
+  .block__content
+    table.table
+      thead
+        tr
+          th This tag..
+          th .. goes to this tag
+      tbody
+        - @aliased_tags.each do |t|
+          tr
+            td = t.name
+            td
+              - if t.aliased_tag
+                => link_to(t.aliased_tag.name, t.aliased_tag)
+                = "(#{t.aliased_tag.images_count} images)"
+              - else
+                | (tag deleted)
+  .block__header.block__header--light = pagination

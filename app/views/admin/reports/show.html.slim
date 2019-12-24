@@ -1,0 +1,29 @@
+h1
+  = t '.title'
+p
+  = link_to_reported_thing @report.reportable
+- options = capture do
+  div
+    ' Reported
+    = friendly_time @report.created_at
+  .flex__right
+    => link_to_ip @report.ip
+    = link_to_fingerprint @report.fingerprint, @report.user_agent
+  .div
+    ' User-Agent:
+    code
+      = @report.user_agent
+= render partial: 'communications/communication', locals: { avatar_type: :user, communication: @report, communication_options: options, html_id: nil, post_text: render_textile(@report.reason) }
+p
+  - if @report.user
+    = link_to 'Send PM', new_conversation_path(title: "Your Report of #{reported_thing(@report.reportable)}", recipient: @report.user.name), class: 'button button--link'
+  - if @report.open
+    =<> link_to 'Close', admin_report_close_path(@report), class: 'button', method: :post
+    - if @report.admin == current_user
+      = link_to 'Release', admin_report_claim_path(@report), class: 'button', method: :delete
+    - else
+      = link_to 'Claim', admin_report_claim_path(@report), class: 'button', method: :post
+br
+= render partial: 'admin/mod_notes/table', locals: { notable: @report }
+br
+= link_to 'Back', admin_reports_path, class: 'button button--link'

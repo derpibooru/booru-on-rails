@@ -1,0 +1,7 @@
+h1 Edit Poll
+= form_for([:admin, @poll]) do |pof|
+  = render partial: 'layouts/errors', locals: { errors: @poll.topic.errors }
+  = render partial: 'polls/form', locals: { pof: pof, editing: true }
+  .poll-form__actions
+    = submit_tag 'Save', class: 'button button--separate-right'
+    = link_to 'Back to Topic', @poll.link_to_route

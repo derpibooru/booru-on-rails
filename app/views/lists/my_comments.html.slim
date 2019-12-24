@@ -1,0 +1,7 @@
+h1 = params[:user_id] ? "#{User.find(params[:user_id]).name}'s Comments" : 'Your Comments'
+- pagination = paginate @my_comments
+- if pagination.present?
+  .block: .block__header = pagination
+= render partial: 'comment_list', locals: { comments: @my_comments }
+- if pagination.present?
+  .block: .block__header.block__header--light = pagination

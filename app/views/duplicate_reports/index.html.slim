@@ -1,0 +1,19 @@
+- page_layout :wide
+h1 Duplicate Reports
+- pagination = paginate @duplicate_reports
+.block
+  .block__header
+    = pagination
+    span.block__header__title Display only:
+    => link_to 'Open (All)', duplicate_reports_path(states: 'open,claimed')
+    => link_to 'Open (Unclaimed)', duplicate_reports_path(states: 'open')
+    => link_to 'Open (Claimed)', duplicate_reports_path(states: 'claimed')
+    => link_to 'Open + Rejected', duplicate_reports_path(states: 'open,rejected')
+    => link_to 'Rejected', duplicate_reports_path(states: 'rejected')
+    => link_to 'Rejected + Accepted', duplicate_reports_path(states: 'rejected,accepted')
+    => link_to 'Accepted', duplicate_reports_path(states: 'accepted')
+    = link_to 'All', duplicate_reports_path(states: 'open,rejected,accepted,claimed')
+  = render partial: 'list', locals: { duplicate_reports: @duplicate_reports }
+  .block
+    .block__header.block__header--light
+      = pagination

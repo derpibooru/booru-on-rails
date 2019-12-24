@@ -1,0 +1,13 @@
+h2
+  | New Mod Note for
+  =< link_to_noted_thing(@mod_note.notable)
+
+= form_for [:admin, @mod_note] do |f|
+  .field
+    label for="body"
+      ' Note
+    = f.text_field :body, class: 'input input--wide', placeholder: 'Insufficient Rainbow Dash', required: true
+    = hidden_field_tag :notable_id, params[:notable_id]
+    = hidden_field_tag :notable_class, params[:notable_class]
+  .action
+    = f.submit 'submit', class: 'button'

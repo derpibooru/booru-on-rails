@@ -1,0 +1,8 @@
+- if current_user
+  = link_to 'Filters', filters_path, class: 'hide-mobile-t'
+  = form_tag filters_current_path, method: :patch, id: 'filter-quick-form' do
+    = select_tag :id, grouped_options_for_select(Filter.for_menu(current_user), [@current_filter.name, @current_filter.id.to_s]), id: 'filter-quick-menu', class: 'input', 'data-change-submit': '#filter-quick-form'
+  = form_tag spoiler_type_path, method: :put, id: 'spoiler-quick-form', class: 'hide-mobile-t' do
+    = select_tag :id, grouped_options_for_select([['Spoilers', %w[static click hover off]]], current_user.spoiler_type), id: 'spoiler-quick-menu', class: 'input', 'data-change-submit': '#spoiler-quick-form'
+- else
+  = link_to "Filters (#{@current_filter.name})", filters_path, class: 'hide-mobile'

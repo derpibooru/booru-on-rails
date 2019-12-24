@@ -1,0 +1,36 @@
+/ partial, accepts :form_info (help string/captured HTML),
+  :form_path (omit for lists without search), :item_class (e.g. Advert),
+  :items (array of list items), :new_item_path (may be omitted),
+  :rendered_list (captured HTML)
+- item_name = item_class.name.underscore.humanize
+h1
+  = item_name.pluralize.titleize
+- if local_assigns[:form_path]
+  = render partial: 'layouts/search', locals: { info: local_assigns[:form_info] ? form_info : nil, path: form_path }
+- pagination = paginate items if items.present?
+.block
+  - if @query || local_assigns[:new_item_path] || pagination.present?
+    .block__header
+      - if @query
+        span.block__header__title
+          ' Searching
+          - if @query.present?
+            = @query.inspect
+          - else
+            ' all
+            = item_name.pluralize.downcase
+      - if local_assigns[:new_item_path]
+        = icon_link "New #{item_name.downcase}", 'fa fa-plus', new_item_path
+      = pagination.presence
+  - if rendered_list.present?
+    .block__content
+      - if items.blank?
+        p
+          ' We couldn't find any
+          => item_name.pluralize.downcase
+          | for you, sorry!
+      - else
+        = rendered_list
+  - if pagination.present?
+    .block__header.block__header--light
+      = pagination

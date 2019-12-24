@@ -1,0 +1,30 @@
+- pagination = paginate @notes
+h2 Mod Notes
+= render partial: 'layouts/search', locals: { path: admin_mod_notes_path }
+.block
+  .block__header
+    span.block__header__title Mod Notes
+    = pagination
+  .block__content
+    - if @notes.blank?
+      | No results found for your query
+    - else
+      table.table
+        thead
+          tr
+            td Object
+            td Note
+            td Time
+            td Moderator
+            td Actions
+        tbody
+          - @notes.each do |note|
+            tr
+              td = link_to_noted_thing(note.notable)
+              td = render_textile note.body
+              td = friendly_time note.created_at
+              td = link_to note.moderator.name, profile_path(note.moderator)
+              td
+                => link_to 'Edit', edit_admin_mod_note_path(note)
+                ' &bull;
+                => link_to 'Delete', admin_mod_note_path(note), data: { confirm: t('are_you_sure') }, method: :delete

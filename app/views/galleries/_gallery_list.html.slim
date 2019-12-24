@@ -1,0 +1,25 @@
+/ set :user for per-user listings
+- viewing_own_galleries = local_assigns[:user] && local_assigns[:user] == current_user
+- page_layout :wide
+.block
+  .block__header.flex
+    - if viewing_own_galleries
+      = icon_link 'New Gallery', 'fa fa-plus', new_gallery_path
+    - else
+      span.block__header__title = @title
+    - pagination = paginate @galleries
+    = pagination
+    - if local_assigns[:user]
+      .flex__right = icon_link 'Search', 'fa fa-search', galleries_path(user: local_assigns[:user].name), responsive: true
+  .block__content.js-resizable-media-container
+    - if @galleries.present?
+      - box_size = !current_user || current_user.show_large_thumbnails ? :thumb : :thumb_small
+      - @galleries.each do |gallery|
+        = render partial: 'galleries/gallery_box', locals: { user: (local_assigns[:user] || gallery.creator), gallery: gallery, size: box_size }
+    - elsif viewing_own_galleries
+      .block.block--fixed.block--no-margin.block--primary You don't have any galleries yet! Click "New Gallery" to create one.
+    - else
+      .block.block--fixed.block--no-margin.block--warning No galleries found.
+  .block__header.block__header--light
+    = pagination
+    span.block__header__title = pagination_info @galleries

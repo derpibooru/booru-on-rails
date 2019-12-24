@@ -1,0 +1,6 @@
+.block
+  .block__header
+    span.block__header__title Recent Comments
+    = link_to 'View all', "/lists/user_comments/#{@user.id}"
+  .block__content
+    = render partial: 'lists/comment_list', locals: { comments: @recent_comments }

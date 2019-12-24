@@ -1,0 +1,22 @@
+article.block.communication
+  .block__content.flex.flex--no-wrap
+    .flex__fixed.spacing-right
+      =<> user_avatar(message.from, 'avatar--100px', message.from.name)
+    .flex__grow.communication__body
+      span.communication__body__sender-name =<> link_to_author(message)
+      =<> render partial: 'profiles/user_badges', locals: { user: message.from }
+      br
+      - if message.from.last_renamed_at > 14.days.ago
+        p.small-text
+          ' (Previously known as
+          = message.from.previous_usernames.last
+          ' )
+      = user_label message.from, small: true
+      .communication__body__text
+        = render_post message
+
+  .block__content.communication__options
+    .flex.flex--wrap.flex--spaced-out
+      div
+        ' Posted
+        = friendly_time(message.created_at)

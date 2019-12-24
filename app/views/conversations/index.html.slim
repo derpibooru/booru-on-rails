@@ -1,0 +1,39 @@
+h1 My Conversations
+- conversations_present = @conversations && @conversations.first
+- pagination = paginate @conversations if conversations_present
+.block
+  .block__header
+    - if can? :create, Conversation
+      = icon_link 'Create New Conversation', 'fa fa-paper-plane', new_conversation_path
+      = pagination
+  .block__content
+    - if conversations_present
+      = form_tag conversations_hide_batch_path, id: 'conversation-management-form'
+        table.table.table--communication-list
+          thead
+            tr
+              th.table--communication-list__name Conversation
+              th.table--communication-list__stats With
+              th.table--communication-list__options Options
+          tbody
+            - @conversations.each do |c|
+              tr class=('warning' unless c.read_by? current_user)
+                td.table--communication-list__name
+                  => check_box_tag :ids, c.slug, false, class: 'checkbox'
+                  => link_to c.title, conversation_path(c)
+                  .small-text.hide-mobile
+                    ' #{pluralize(c.messages.count, 'message')};
+                    ' started #{friendly_time(c.created_at) rescue 'some time'};
+                    | last message #{friendly_time(c.last_message_at) rescue 'some time'}
+                td.table--communication-list__stats
+                  = link_to c.other_party_name(current_user), profile_path(c.other_party(current_user))
+                td.table--communication-list__options
+                  => link_to 'Last message', conversation_path(c, page: (c.messages.count / 25.0).ceil)
+                  | &#149;
+                  =<> link_to 'Hide', conversation_hide_path(c), data: { confirm: t('are_you_sure') }, method: :post
+    - else
+      p Nobody's started any conversations with you yet. Don't worry, I'm sure someone will eventually!
+  .block__header.block__header--light
+    - if conversations_present
+      = icon_link 'Remove selected', 'fa fa-trash', '#', data: { click_submit: '#conversation-management-form' }
+    = pagination

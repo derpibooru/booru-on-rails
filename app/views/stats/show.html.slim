@@ -1,0 +1,148 @@
+- content_for(:robots, true)
+h1 Site Statistics
+| These counts are cached and may be behind by up to 2 hours.
+.walloftext
+  - cache('site-statistics-v6', expires_in: 2.hours) do
+    ruby:
+      buckets = @images_aggregation.response.aggregations
+      ic = Image.last.id - Image.first.id rescue 0
+      ichidden = buckets.deleted.doc_count
+      # add stuff that was merged before dupe reports were added, roughly
+      icdupe = DuplicateReport.where(state: 'accepted').count + 37_000
+
+    h3 Images
+    p
+      | There are
+      span.stat =<> number_with_delimiter(buckets.non_deleted.doc_count)
+      | non-deleted images total in our database. Of these,
+      span.stat =<> number_with_delimiter(buckets.non_deleted.last_24h.doc_count)
+      | images were uploaded in the last 24 hours.
+    p
+      | This net total excludes the
+      =<> number_with_delimiter(ichidden - icdupe)
+      | images that have been deleted, and the
+      =<> number_with_delimiter(icdupe)
+      | images that have been marked as duplicates. About
+      =<> ic / (ichidden - icdupe) rescue 0
+      | legitimate images (including duplicates) are posted for every image we have to remove for rule violations or takedown requests.
+  - cache('site-statistics-comments-v5', expires_in: 2.hours) do
+    ruby:
+      buckets = @comments_aggregation.response.aggregations
+      commentcount = Comment.last.id - Comment.first.id
+    h3 Comments
+    p
+      | There are
+      span.stat =<> number_with_delimiter(@comments_aggregation.response.hits.total)
+      | comments on the site. Of these,
+      =<> number_with_delimiter(buckets.deleted.doc_count)
+      | have been deleted. This roughly equates to
+      =<> number_with_delimiter(commentcount / buckets.deleted.doc_count) rescue 0
+      | legitimate comments posted for every spam/offensive comment we have to remove.
+    p
+      | In the last 24 hours,
+      span.stat =<> number_with_delimiter(buckets.last_24h.doc_count)
+      | comments have been posted.
+    p
+      | There are, on average,
+      span.stat =<> number_with_delimiter(@images_aggregation.response.aggregations.non_deleted.avg_comments.value.round(2)) rescue 0
+      | comments on each image on the site.
+  - cache('site-statistics-votes-v5', expires_in: 2.hours) do
+    - buckets = @images_aggregation.response.aggregations.non_deleted
+    h3 Votes
+    p
+      | Out of
+      =<> number_with_delimiter(buckets.doc_count)
+      | images,
+      span.stat =<> number_with_delimiter(buckets.score_gt_0.doc_count)
+      | images have a score above 0, and
+      span.stat =<> number_with_delimiter(buckets.score_lt_0.doc_count)
+      | images have a score below 0.
+      span.stat =<> number_with_delimiter(buckets.faves_gt_0.doc_count)
+      | images have been faved by at least one user.
+  - cache('site-statistics-forums', expires_in: 70.minutes) do
+    ruby:
+      topics = Topic.last.id - Topic.first.id
+      posts = Post.last.id - Post.first.id
+      forums = Forum.where(access_level: 'normal').count
+
+    h3 Forums
+    p
+      | In our
+      =<> forums
+      | forums there have been
+      span.stat =<> number_with_delimiter topics
+      | topics started. There have been
+      span.stat =<> number_with_delimiter(posts - topics)
+      | replies to topics in total.
+  - cache('site-statistics-users-v5', expires_in: 40.minutes) do
+    ruby:
+      uc = User.last.id - User.first.id
+      ucr = User.where('created_at > ?', Time.zone.now - 24.hours).count
+
+    h3 Users
+    p
+      | There are
+      span.stat =<> number_with_delimiter(uc)
+      | users on the site. Of these,
+      span.stat =<> number_with_delimiter(ucr)
+      | users joined in the last 24 hours.
+  - cache('site-statistics-galleries-v1', expires_in: 2.hours)
+    ruby:
+      existing_galleries = Gallery.count
+      average_gallery_size = Gallery.average(:image_count)&.round(2)
+      users_with_galleries = Gallery.distinct.select(:creator_id).count
+      images_with_galleries = GalleryInteraction.last.id - GalleryInteraction.first.id rescue 0
+
+    h3 Galleries
+    p
+      | There are
+      span.stat =<> number_with_delimiter(existing_galleries)
+      | existing image galleries on the site, created by
+      span.stat =<> number_with_delimiter(users_with_galleries)
+      | users. There are, on average,
+      span.stat =<> number_with_delimiter(average_gallery_size)
+      | images in each gallery.
+    p
+      | In total, images have been added to galleries
+      span.stat =<> number_with_delimiter(images_with_galleries)
+      | times.
+  - cache('site-statistics-commissions-v1', expires_in: 2.hours)
+    ruby:
+      open_commissions = Commission.where(open: true).count
+      commission_items = Commission.where(open: true).sum('commission_items_count')
+
+    h3 Commissions
+    p
+      | There are
+      span.stat =<> number_with_delimiter(open_commissions)
+      | open commission listings on the site, offering a total of
+      span.stat =<> number_with_delimiter(commission_items)
+      | items.
+  - cache('site-statistics-moderation-v1', expires_in: 2.hours) do
+    ruby:
+      rc = Report.last.id - Report.first.id rescue 0
+      rcopen = Report.where(open: true).count
+      latestreportresponsetime = 0
+
+      Report.where(open: false).order(created_at: :desc).limit(250).all.each do |r|
+        latestreportresponsetime += (r.updated_at - r.created_at)
+      end
+
+      latestreportresponsetime = latestreportresponsetime.to_f / 250
+
+    h3 Moderation
+    p
+      | We have received
+      span.stat =<> number_with_delimiter(rc)
+      | reports relating to images. Out of these reports,
+      =<> number_with_delimiter(rcopen)
+      | reports are outstanding and awaiting action.
+    p
+      | On the last 250 reports we've received, it's taken us on average
+      span.stat =<> distance_of_time_in_words(latestreportresponsetime)
+      | between a report being made and the report being resolved.
+br
+h1 Historical statistics
+.walloftext
+  h3 Uploads by day
+iframe.seamless-frame src='/stats/chart' sandbox='allow-scripts' width='100%' height='500'

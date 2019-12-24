@@ -1,0 +1,33 @@
+= form_for @link do |f|
+  = render partial: 'layouts/errors', locals: { errors: @link.errors }
+  .field
+    .field
+      p
+        label for="tag_name"
+          ' The tag,
+          em> specific
+          ' to you, usually
+          code>
+            | artist:
+            em artist name here
+          | or a series name
+      p Should be blank only if your content isn't on the site, generally
+      = f.text_field :tag_name, class: 'input', autocomplete: 'off', placeholder: 'artist:name', data: { ac: 'true', ac_min_length: '3', ac_source: '/tags/autocomplete.json?term=' }
+  .field
+    label for="uri"
+      | URL of your art webpage
+    = f.url_field :uri, class: 'input input--wide', placeholder: 'https://name.deviantart.com/', required: true
+  .field
+    => f.radio_button :public, '1', checked: (@link.new_record? ? true : @link.public)
+    => f.label :public, 'Visible to everyone', value: '1'
+  .field
+    => f.radio_button :public, '0', checked: (@link.new_record? ? false : @link.public)
+    => f.label :public, 'Visible only to site staff', value: '0'
+  h4 Instructions
+  p
+    strong Review details carefully as only site staff can edit later.
+  p
+    strong> For quick results, put the LINKVALIDATION code on your linked webpage after submission.
+    | We'll message you there otherwise.
+  .actions
+    = f.submit 'Submit', class: 'button'

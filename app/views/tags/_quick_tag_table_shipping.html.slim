@@ -1,0 +1,5 @@
+- implied_by_multitag(data['implying'], data['not_implying']).each_slice(10) do |tags|
+  div
+    - tags.each do |tag|
+      = print_tag_link tag, tag.name
+      br/

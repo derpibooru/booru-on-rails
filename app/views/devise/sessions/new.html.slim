@@ -1,0 +1,31 @@
+h1 Sign in
+p = link_to 'Forgot your password?', new_password_path(resource_name)
+
+.flex.flex--maybe-wrap
+  div
+    = form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+      .field
+        = f.email_field :email, autofocus: flash[:email].blank?, class: 'input', placeholder: :email, required: true, value: flash[:email].presence
+      .field
+        = f.password_field :password, class: 'input', placeholder: :password, required: true, value: flash[:password].presence
+
+      - if flash[:otp_challenge]
+        .field
+          h4 Please enter your 2FA code
+          = f.text_field :otp_attempt, class: 'input', placeholder: '6-digit code', required: true, autofocus: true, autocomplete: 'off'
+
+      - if devise_mapping.rememberable?
+        .field
+          => f.check_box :remember_me, class: 'checkbox', checked: flash[:remember_me].presence == '1'
+          => f.label :remember_me
+
+      = f.submit 'Sign in', class: 'button'
+  - if flash[:otp_challenge]
+    .derpy__login
+      a href=short_image_path(888_888)
+        img.derpy__2fa src=asset_path('derpy_stop.png')
+p
+  strong
+    | Haven't read the
+    =<> link_to 'site rules', '/pages/rules'
+    | lately? Make sure you read them before posting or editing metadata!

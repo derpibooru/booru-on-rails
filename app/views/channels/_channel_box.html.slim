@@ -1,0 +1,36 @@
+- link_class = 'media-box__header media-box__header--channel media-box__header--link'
+.media-box
+  a.media-box__header.media-box__header--channel.media-box__header--link href=channel_path(channel) title=channel.title
+    = channel.title.presence || channel.short_name
+  .media-box__header.media-box__header--channel
+    - if channel.is_live
+      .spacing-right.label.label--success.label--block.label--small: strong LIVE NOW
+      =< pluralize channel.viewers, 'viewer'
+    - else
+      .label.label--danger.label--block.label--small: strong OFF AIR
+  - if channel.nsfw?
+    .media-box__overlay
+      | NSFW
+  .media-box__content.media-box__content--channel
+    - if channel.channel_image.present? && !channel.is_live
+      a href=channel_path(channel)
+        .image-constrained.media-box__content--channel
+          - if channel.channel_image.present?
+            = image_tag channel.uploaded_channel_image.url, alt: "#{channel.title}'s logo"
+          - else
+            = image_tag 'no_avatar_original.svg', alt: "#{channel.title}'s logo"
+    - else
+      a href=channel_path(channel)
+        .image-constrained.media-box__content--channel
+          = channel_image(channel)
+  - if channel.associated_artist_tag
+    = icon_link channel.associated_artist_tag.name, 'fa fa-fw fa-tags', tag_path(channel.associated_artist_tag.slug), class: link_class
+  - else
+    .media-box__header.media-box__header--channel No artist tag
+  - if current_user
+    = subscription_link channel, current_user, class: link_class
+  - else
+    .media-box__header.media-box__header--channel Login to subscribe
+  - if can? :manage, Channel
+    = icon_link 'Edit Channel', 'fa fa-fw fa-info-circle', edit_channel_path(channel), class: link_class
+    = icon_link 'Delete Channel', 'fa fa-fw fa-trash', channel_path(channel), method: :delete, data: { confirm: t('are_you_sure') }, class: link_class

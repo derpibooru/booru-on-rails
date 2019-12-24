@@ -1,0 +1,11 @@
+en:
+  commissions:
+    listing_saved: "Commissions information saved succesfully."
+    listing_deleted: "Commission listing successfully destroyed."
+    item_added: "Item saved succesfully."
+    item_edited: "Item edited successfully."
+    item_deleted: "Item removed successfully."
+    confirm_delete_listing: "This will delete your listing permanently. If you wish to close your commissions for the time being, you can do so by clicking 'edit this listing'. Are you sure you wish to delete your listing?"
+    error:
+      link_missing: "You must have a verified user link in order to create a commissions listing."
+      not_enough_info: "You must fill out all required fields."

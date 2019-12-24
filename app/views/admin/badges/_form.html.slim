@@ -1,0 +1,23 @@
+= form_for [:admin, @badge] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @badge.errors }
+  .field
+    => f.label :title, 'Badge name:'
+    = f.text_field :title, class: 'input input--wide', placeholder: 'Name', required: true
+  .field
+    => f.label :description, 'An optional short description:'
+    = f.text_field :description, class: 'input input--wide', placeholder: 'Description'
+  .field
+    => f.check_box :disable_award, class: 'checkbox'
+    = f.label :disable_award, 'Prevent image from appearing in \'Badge to award\' list'
+  .field
+    => f.check_box :priority, class: 'checkbox'
+    = f.label :priority, "Displays before badges that don't have this checkbox checked"
+  - if @badge.image.present?
+    .fieldlabel
+      ' Existing image:
+      = image_tag @badge.uploaded_image.url, size: '32'
+  h4 Image
+  .field
+    => f.label :uploaded_image, 'Upload image:'
+    = f.file_field :uploaded_image, class: 'input input--wide'
+  = f.submit 'Save Badge', class: 'button', data: { disable_with: raw('Saving&hellip;') }

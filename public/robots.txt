@@ -1,0 +1,27 @@
+User-agent: *
+Crawl-delay: 0.5
+
+Disallow: /users
+Disallow: /profiles
+Disallow: /profiles/*/tag_changes
+Disallow: /profiles/*/source_changes
+Disallow: /lists/user_comments
+Disallow: /images/favourites
+Disallow: /posts/posted
+Disallow: /images/*/votes
+Disallow: /images/*/faves
+Disallow: /api
+
+Disallow: /harming/humans
+Disallow: /ignoring/human/orders
+Disallow: /harm/to/self
+
+User-agent: Googlebot-Image
+Disallow: /media
+Disallow: /thumbs
+
+User-agent: Googlebot
+Disallow: /search
+
+User-agent: bingbot
+Disallow: /

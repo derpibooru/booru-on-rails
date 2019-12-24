@@ -1,0 +1,30 @@
+h1 Changelog
+.walloftext
+  p This list shows the latest commits to this running copy of the site, to show what has changed recently.
+  p
+    ' You can find more detailed information about our recent changes in
+    => link_to 'this', '/meta/site-changelog-developers-notes'
+    | forum thread.
+  br
+  - cache('site-changelog-v1', expires_in: 3.minutes) do
+    table.table
+      - @changes.commits.each do |c|
+        tr
+          td
+            = user_avatar @changes.users[c.email], 'avatar--50px', @changes.author_name(c)
+          td
+            code.commit-message
+              = h(c.message).gsub("\n", '<br/>').html_safe
+            small
+              => @changes.display_name(c)
+              ' committed
+              => friendly_time(c.time)
+              span.success
+                | +
+                = c.insertions
+              | /
+              span.danger
+                | -
+                = c.deletions
+          td
+            span.commit-sha => c.id[0..9]

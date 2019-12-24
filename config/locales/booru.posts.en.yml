@@ -1,0 +1,16 @@
+en:
+  posts:
+    update:
+      success: "The post has been edited."
+      error: "Whoops, couldn't edit your post! Something went wrong."
+  polls:
+    destroy:
+      success: "Poll successfully deleted."
+      error: "Whoops, couldn't delete the poll! Something went wrong."
+    errors:
+      poll_id_not_found: "Poll with ID %{id} not found."
+  poll_votes:
+    destroy:
+      success: "Vote successfully deleted."
+    errors:
+      not_found: "Vote with user ID %{user_id} and option ID %{poll_option_id} not found."

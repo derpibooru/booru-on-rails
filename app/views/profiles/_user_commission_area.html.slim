@@ -1,0 +1,18 @@
+.block__content.profile
+  - if @user.commission
+    strong> Status:
+    = @user.commission.open ? 'Open' : 'Closed'
+    br
+    strong> Price Range:
+    = format '$%.2f - $%.2f USD', @user.commission.minimum_price, @user.commission.maximum_price
+    br
+    br
+    = render_textile(@user.commission.information)
+    br
+    br
+    = link_to 'More information', commission_path(@user.commission)
+  - else
+    em
+      ' You don't have any commission information listed yet.
+      => link_to 'Click here', new_commission_path
+      | to set it up.

@@ -1,0 +1,8 @@
+/ locals: title, images, view_all_path (nil if not applicable)
+.block
+  .block__header
+    span.block__header__title = title
+    - if view_all_path
+      = link_to 'View all', view_all_path
+  .block__content.js-resizable-media-container
+    =<> render partial: 'images/display_images', locals: { images: images, compact: true }

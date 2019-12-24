@@ -1,0 +1,15 @@
+h1
+  = t '.title'
+- if params[:fingerprint].present?
+  - fpcount = UserFingerprint.where(fingerprint: params[:fingerprint]).where('updated_at > ?', 3.days.ago).count
+  - if fpcount > 10
+    .dnp-warning
+      h4 This is a bad idea
+      | There have been #{fpcount} users seen from this Fingerprint within the past 72 hours. Setting a ban on this fingerprint will almost certainly have collateral damage.
+  - elsif fpcount > 3
+    .dnp-warning
+      h4 Use Caution
+      | There have been #{fpcount} users seen from this Fingerprint within the past 72 hours. Use caution as this may unintentionally ban a legitimate user.
+= render partial: 'form'
+br
+= link_to 'Back', admin_fingerprint_bans_path, class: 'button button--link'

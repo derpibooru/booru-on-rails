@@ -1,0 +1,35 @@
+- display_mod_tools = can?(:manage, @image) && (cookies['hidestaff'] != 'true'.freeze)
+.block
+  = form_with(model: image, url: image_source_path(image), method: :put, class: 'hidden', id: 'source-form') do |f|
+    .flex
+      = f.url_field :source_url, id: 'source-field', class: 'input input--wide', autocomplete: 'off', placeholder: 'Source URL'
+      = f.submit 'Save source', class: 'button button--separate-left'
+      = button_tag type: :reset, class: 'button button--separate-left', data: { 'click-hide': '#source-form', 'click-show': '#image-source' } do
+        | Cancel
+    - if !current_user && $flipper[:captcha].enabled?
+      = captcha_tags
+  .flex.flex--wrap#image-source
+    - if can?(:update_metadata, image) && !@current_ban
+      a.button.button--separate-right#edit-source data-click-focus="#source-field" data-click-hide="#image-source" data-click-show="#source-form" title='Edit source' accessKey='s'
+        i.far.fa-edit>
+        | Source:
+    - else
+      ' Source:
+    p
+      - if image.source_url.present?
+        - source_display = CGI.unescape(image.source_url) rescue image.source_url
+        a.js-source-link href=image.source_url
+          strong = source_display
+      - else
+        em> not provided yet
+    - if image.source_changes.count > 1 || display_mod_tools
+      a.button.button--link.button--separate-left href=image_source_changes_path(@image) title='Source history'
+        i.fas.fa-history>
+        | History (
+        = image.source_changes.count
+        | )
+      - if can? :delete, SourceChange
+        = form_tag image_source_history_path(@image), method: :delete do
+          = button_tag :submit, data: { confirm: t('are_you_sure') }, class: 'button button--state-danger button--separate-left', title: 'Wipe sources' do
+            i.fas.fa-eraser>
+            | Wipe

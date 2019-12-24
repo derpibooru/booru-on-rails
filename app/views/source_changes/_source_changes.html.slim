@@ -1,0 +1,58 @@
+.block
+  - pagination = paginate @source_changes
+  .block__header = pagination
+
+  .block__content
+    - can_manage = can? :manage, SourceChange
+    - if @source_changes.any?
+      table.table
+        thead
+          tr
+            th colspan=2 Image
+            th New Source
+            th Timestamp
+            th User
+            th Initial?
+        tbody
+          - @source_changes.order(created_at: :desc).each do |sc|
+            tr
+              - if sc.image && sc.image.visible_to?(current_user)
+                td.center
+                  = link_to sc.image.id, short_image_path(sc.image)
+                  - if sc.image.hidden_from_users
+                    | (deleted)
+                td.center = render partial: 'images/image_container', locals: { image: sc.image, size: :thumb_tiny }
+              - else
+                td.center N/A
+                td.center Image Merged/Deleted
+              td
+                =<> sc.new_value || '<Value missing>'
+                - if can_manage
+                  =<> link_to 'Delete', source_change_path(sc), method: :delete
+              td = friendly_time(sc.created_at)
+              - signify_staff = sc.user_visible? && sc.user.staff?
+              td[class=(signify_staff ? 'success' : 'blank')]
+                =<> link_to_author(sc, can_manage)
+                - if can_manage
+                  => link_to_ip sc.ip
+                  => link_to_fingerprint sc.fingerprint
+                - if sc.image && sc.image.uploader_is?(sc.user, sc.ip)
+                  br
+                  - if sc.user_visible?
+                    | (Image Uploader)
+                  - else
+                    | (Anonymous Uploader)
+                - if signify_staff
+                  br
+                  small
+                  strong> Stop!
+                  | This user is a staff member.
+                  br
+                  | Ask them before reverting their changes.
+              td
+                - if sc.initial
+                  | &#x2713;
+    - else
+      | No source changes!
+
+  .block__header = pagination

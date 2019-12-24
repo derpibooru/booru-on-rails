@@ -1,0 +1,45 @@
+- pagination = paginate(@listable_commissions)
+.block
+  .block__header
+    span.block__header__title Open Commissions
+    = pagination
+    - if current_user.present? && current_user.commission.present?
+      = link_to 'View my listing', commission_path(current_user.commission)
+    - elsif current_user.present?
+      = link_to 'Create my listing', new_commission_path
+  .block__content
+    - if @listable_commissions.blank?
+      p We couldn't find any commission listings to display. Sorry!
+    - else
+      - @listable_commissions.each do |c|
+        .block.commission
+          .block__content.flex.flex--no-wrap
+            .flex__fixed.spacing-right
+              = user_avatar(c.user, 'avatar--100px', c.user.name)
+            .flex__grow.commission__listing_body
+              span.commission__listing_artist => link_to c.user.name, commission_path(c)
+              = render partial: 'profiles/user_badges', locals: { user: c.user }
+              br
+              = user_label c.user, small: true
+              .commission__listing__body_text
+                p
+                  strong> Price Range:
+                  = format '$%.2f - $%.2f USD', c.minimum_price, c.maximum_price
+                p
+                  strong> Categories:
+                  = c.categories.join(', ')
+                p
+                  strong> Offers:
+                  = c.commission_items.pluck(:item_type).sort_by(&:downcase).uniq.join(', ')
+                p
+                  strong Example Artwork:
+                  br
+                  - items = c.commission_items.reject { |x| filter_hits?(x.example_image) }.sample(5)
+                  - if items.empty?
+                    i Your filter hides all example images.
+                  - else
+                    - items.each do |item|
+                      = render partial: 'images/image_container', locals: { image: item.example_image, size: :thumb_small }
+                p
+                  strong = link_to 'More information', commission_path(c.user)
+  .block__header.block__header--light = pagination

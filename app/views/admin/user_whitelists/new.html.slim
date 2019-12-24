@@ -1,0 +1,9 @@
+- if @username
+  h1
+    ' Whitelisting
+    = @username
+- else
+  h1 New Whitelist Entry
+= render partial: 'form'
+br
+= link_to 'Back', @username ? admin_users_path : admin_user_whitelists_path, class: 'button button--link'

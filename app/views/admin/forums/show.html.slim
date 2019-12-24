@@ -1,0 +1,12 @@
+h1 Admin - Showing Forum
+p
+  strong> Name:
+  = @forum.name
+p
+  strong> Short Name:
+  = @forum.short_name
+p
+  strong> Description:
+  = @forum.description
+br
+= link_to 'Back', admin_forums_path, class: 'button button--link'

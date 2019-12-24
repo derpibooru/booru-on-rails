@@ -1,0 +1,9 @@
+- options = poll.options.select { |o| o.vote_count > 0 }
+- if options.empty?
+  p
+    em No votes to display.
+- options.each do |option|
+  h5 = option.label
+  - option.users.each do |user|
+    span.interaction-user-list-item
+      = link_to user.name, profile_path(user)

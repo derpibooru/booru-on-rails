@@ -1,0 +1,10 @@
+div
+  input type="hidden" name="_captcha_id" value=@captcha.solution_id
+  img src="data:image/jpeg;base64,#{@captcha.image_base64}"
+
+  - 6.times do |i|
+    .field
+      label> for="_captcha_sln[#{i + 1}]"
+        = Booru::CONFIG.captcha[:name]
+        = i + 1
+      = select_tag "_captcha_sln[#{i + 1}]", options_for_select(Booru::CONFIG.captcha[:solutions].invert.to_a), class: 'input'

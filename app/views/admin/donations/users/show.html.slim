@@ -1,0 +1,23 @@
+.walloftext
+  h1
+    = @user.name
+    | 's Donations
+  = render partial: 'admin/donations/table'
+  h1 Add Donation
+  = form_for [:admin, @donation] do |f|
+    .field
+      => f.label :user_id, 'User ID:'
+      = f.number_field :user_id, class: 'input input--short', value: @user.id
+    .field
+      => f.label :email, 'Email:'
+      = f.text_field :email, class: 'input input--wide', value: @user.email
+    .field
+      => f.label :amount, 'Amount (EUR):'
+      = f.text_field :amount, class: 'input input--wide'
+    .field
+      => f.label :note, 'Note:'
+      = f.text_area :note, class: 'input input--wide', placeholder: 'I love small, multicolored horses'
+    .field
+      => f.label :at, 'Time of donation (blank = now):'
+      = f.text_field :at, class: 'input input--wide', placeholder: Time.zone.now.strftime('%B %-d, %Y')
+    = f.submit 'Create Donation', class: 'button'

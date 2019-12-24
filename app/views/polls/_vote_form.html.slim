@@ -1,0 +1,23 @@
+= form_tag poll_votes_path, method: :post, class: 'poll-vote-form' do
+  input type="hidden" name="poll_id" value=poll.id
+  h4.poll__header
+    | Poll:
+    =< poll.title
+  .poll-form__options
+    ruby:
+      input_type = poll.multiple_choice ? 'checkbox' : 'radio'
+      input_name = poll.multiple_choice ? 'poll_option_ids[]' : 'poll_option_id'
+      require_answer = poll.multiple_choice ? false : true
+
+    - poll.options.each do |option|
+      label.poll-form__options__label
+        input.button--separate-right> type=input_type name=input_name value=option.id required=require_answer
+        span = option.label
+  .poll-form__status
+    p
+      | Voting ends
+      =< friendly_time(poll.active_until)
+  - if can_vote
+    button.button.button--state-success>
+      i.fa.fa-check>
+      | Vote

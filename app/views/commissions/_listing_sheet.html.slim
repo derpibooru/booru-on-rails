@@ -1,0 +1,6 @@
+- if @commission.sheet_image.present?
+  .block
+    .block__header
+      span.block__header__title Commissions Sheet
+    .block__content.center
+      = render partial: 'images/image_container_filterable', locals: { image: @commission.sheet_image, size: :tall }

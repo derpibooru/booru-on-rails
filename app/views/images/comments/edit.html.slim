@@ -1,0 +1,4 @@
+h1 Editing Comment
+p
+  = link_to "Back to Image >>#{@image.id}", image_path(@image)
+= render partial: 'form', locals: { comment: @comment, image: @image }

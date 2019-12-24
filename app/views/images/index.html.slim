@@ -1,0 +1,3 @@
+- content_for(:robots, true)
+- random_image_href = url_for(params.permit!.merge(random: 'y')) if @random_entry
+= render partial: 'images/imagelist', locals: { images: @images, header: @title, random_image_href: random_image_href }

@@ -1,0 +1,10 @@
+- image = gallery.thumbnail
+.media-box
+  a.media-box__header.media-box__header--link{ class=('media-box__header--small' if size == :thumb_small)
+      href=gallery_path(gallery) title=gallery.title }
+    = gallery.title
+  - if gallery.spoiler_warning.present?
+    .media-box__overlay = gallery.spoiler_warning
+  .media-box__content class="media-box__content--#{size == :thumb_small ? 'small' : 'large'}"
+    - local_assigns[:link] = gallery_path(gallery)
+    include app/views/images/_image_container.html.slim

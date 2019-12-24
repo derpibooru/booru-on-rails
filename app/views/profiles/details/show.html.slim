@@ -1,0 +1,33 @@
+h2
+  = link_to @user.name, profile_path(@user)
+  | 's User Details
+- if can?(:manage, ModNote)
+  = render partial: 'admin/mod_notes/table', locals: { notable: @user }
+
+- if can? :mod_read, User
+  h4 Name History
+  table.table
+    thead
+      tr
+        th Name
+        th Changed
+    tbody
+      - if @user.name_changes.present?
+        - @user.name_changes.order(id: :desc).each do |nc|
+          tr
+            td
+              = nc.name
+            td
+              = friendly_time nc.created_at
+      - else
+        tr
+          td colspan=2 No name changes on record
+
+  h4 More Details
+  ul
+    li
+      =< link_to 'IP Address Usage History', profile_ip_history_path(@user)
+    li
+      =< link_to 'Fingerprint Usage History', profile_fp_history_path(@user)
+    li
+      =< link_to 'Potential Aliases', profile_aliases_path(@user)

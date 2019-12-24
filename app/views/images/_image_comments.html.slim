@@ -1,0 +1,38 @@
+- max_comments_per_page = (current_user&.comments_per_page || 20)
+.js-editable-comments id="image_comments" data-editable="#{{editable_communications(comments).to_json}}"
+  - if @notice
+    .block
+      .block__content.block--warning
+        h4 Whoops
+        = @notice
+  ruby:
+    comment_count = image.comments.count
+    displayed_comment_count = image.comments.where(destroyed_content: false).count
+    comments_posted = "#{pluralize(displayed_comment_count, 'comment')} posted"
+
+  - if comment_count > max_comments_per_page
+    - pagination = paginate comments, params: { action: :index, controller: 'images/comments', image_id: image.id, comment_id: nil }
+
+  .block
+    .block__header
+      = pagination if defined? pagination
+      span.block__header__title = comments_posted
+      button.button id='js-refresh-comments' title='Refresh' data-disable-with='...'
+        i.fa.fa-sync
+        span.hide-mobile<> Refresh
+  - if comments.present?
+    - if local_assigns[:comment] && comment.errors.any?
+      #error_explanation
+        ul
+        - comment.errors.full_messages.each do |msg|
+          li = msg
+    - avatar_type = :user
+    - comments.each do |c|
+      - comment = c
+      include app/views/comments/_comment_cached.html.slim
+    - if comment_count > max_comments_per_page
+      .block
+        .block__header.block__header--light
+          span.block__header__title Comments
+          = pagination if defined? pagination
+          => comments_posted

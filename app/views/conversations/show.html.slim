@@ -1,0 +1,38 @@
+ruby:
+  collocutor = @conversation.other_party(current_user)
+  collocutor_name = @conversation.other_party_name(current_user)
+  total_ct = @conversation.messages.count
+
+h1 = @conversation.title
+.block
+  .block__header
+    =<> link_to 'Message Center', conversations_path
+    | &raquo;
+    =<> link_to @conversation.title, conversation_path(@conversation)
+    | Conversation with
+    =<> link_to collocutor_name, profile_path(collocutor.slug)
+  .block__header--sub.block__header--light
+    span.block__header__title = pluralize(total_ct, 'Message')
+    - if total_ct >= 25
+      = paginate @messages
+    =<> link_to 'Remove conversation', conversation_hide_path(@conversation), data: { confirm: t('are_you_sure') }, method: :post
+    =<> link_to 'Mark as unread', conversation_read_path(@conversation), method: :delete
+    =<> link_to 'Report conversation', new_report_path(reportable_class: 'conversation', reportable_id: @conversation.id)
+
+= render partial: 'conversations/messages/message', collection: @messages
+
+.block
+  .block__header.block__header--light
+    span.block__header__title = pluralize(total_ct, 'Message')
+    - if total_ct >= 25
+      = paginate @messages
+- if total_ct < 1000
+  = render partial: 'conversations/messages/form'
+- else
+  div
+    h2 Okay, we're impressed
+    p You've managed to send over 1,000 messages in this conversation!
+    p We'd like to ask you to make a new conversation. Don't worry, this one won't go anywhere if you need to refer back to it.
+    p
+      => link_to 'Click here', new_conversation_path(to_id: collocutor)
+      | to make a new conversation with this user.

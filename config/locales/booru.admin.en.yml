@@ -1,0 +1,46 @@
+en:
+  admin:
+    tags:
+      index:
+        title: "Tag Administration"
+      new:
+        title: "Create Tag"
+      edit:
+        title: "Edit Tag"
+      destroy:
+        enqueued: "Tag \"%{tag}\" has been enqueued for destruction. It will remain visible for a short amount of time."
+    tags_aliases:
+      index:
+        title: "Tag Alias Administration"
+      new:
+        title: "Create Tag Alias"
+      edit:
+        title: "Edit Tag Alias"
+    subnet_bans:
+      index:
+        title: "Subnet Ban Administration"
+      new:
+        title: "Create Subnet Ban"
+      edit:
+        title: "Edit Subnet Ban"
+    fingerprint_bans:
+      index:
+        title: "Fingerprint Ban Administration"
+      new:
+        title: "Create Fingerprint Ban"
+      edit:
+        title: "Edit Fingerprint Ban"
+    reports:
+      index:
+        title: "Reports"
+      show:
+        title: "Showing Report"
+      change_owner: "Report already claimed, are you sure you wish to claim ownership?"
+    users:
+      index:
+        title: "User Administration"
+      new:
+        title: "Create User"
+      edit:
+        title: "Editing user: %{name}"
+        title-simple: "Edit User"

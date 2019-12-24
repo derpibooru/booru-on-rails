@@ -1,0 +1,10 @@
+= form_for [:admin, @ban] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @ban.errors }
+  .field
+    => f.label :fingerprint, 'Fingerprint:'
+    - if params[:fingerprint].present?
+      = params[:fingerprint]
+      = f.hidden_field :fingerprint, value: params[:fingerprint]
+    - else
+      = f.text_field :fingerprint, class: 'input input--wide', placeholder: 'Fingerprint', required: true
+  = render partial: 'admin/bans/form', locals: { f: f }

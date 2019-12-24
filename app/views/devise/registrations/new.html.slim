@@ -1,0 +1,34 @@
+h1 Sign Up
+
+= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f|
+  =<> devise_error_messages!
+  .fieldlabel
+    | Non-anonymous posts
+    strong<> permanently
+    | show the username as of posting time, and may appear on Google or such. Choose wisely.
+  .field
+    = f.text_field :name, class: 'input', placeholder: 'Username', required: true
+  .fieldlabel You'll use your email address to log in, and we'll use this to get in touch if we need to. Don't worry, we won't share this or spam you.
+  .field
+    = f.email_field :email, class: 'input', placeholder: :email, required: true
+  .fieldlabel
+    | Pick a good strong password - longer is better! Minimum of 6 characters.
+    br
+    | We don't allow the use of passwords that have been compromised in public data breaches. To keep your account secure we suggest you use a
+    a<> href="https://en.wikipedia.org/wiki/Password_manager" password manager
+    | to generate and store your passwords securely.
+  .field
+    = f.password_field :password, class: 'input', placeholder: :password, required: true, pattern: '[\s\S]{6,}'
+  .field
+    = f.password_field :password_confirmation, class: 'input', placeholder: 'Confirm password', required: true, pattern: '[\s\S]{6,}'
+  - if $flipper[:captcha].enabled?
+    = captcha_tags
+  .block.block--fixed.block--warning
+    p We won't share your personal information, won't send you spam emails, and take your security seriously.
+    p
+      strong
+        | Don't forget to read the
+        =<> link_to 'site rules', '/pages/rules'
+        | before you dive in - they contain a quick introduction on to how to use the site.
+
+  = f.submit 'Sign Up', class: 'button'

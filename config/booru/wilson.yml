@@ -1,0 +1,5 @@
+:script:
+  :inline: double n = 1.0*doc['upvotes'].value+doc['downvotes'].value; if (n <= 0) return 0; double p_hat = 1.0*doc['upvotes'].value / n; return (p_hat + params.z2/(2*n) - params.z*Math.sqrt((p_hat*(1-p_hat) + params.z2/(4*n))/n))/(1+params.z2/n);
+  :params:
+    :z: 2.57583
+    :z2: 6.634900189

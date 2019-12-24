@@ -1,0 +1,18 @@
+en:
+  errors:
+    messages:
+      carrierwave_processing_error: 'failed to be processed'
+      carrierwave_integrity_error: 'is not of an allowed file type'
+      carrierwave_download_error: 'could not be downloaded'
+      extension_whitelist_error: 'is not allowed to be a %{extension} file, try uploading %{allowed_types} instead'
+      extension_blacklist_error: 'is not allowed to be a %{extension} file; please do not upload %{prohibited_types}'
+      content_type_whitelist_error: 'is not allowed to be an %{content_type} file'
+      content_type_blacklist_error: 'is not allowed to be an %{content_type} file'
+      rmagick_processing_error: 'Processing error, please contact the site staff.'
+      mini_magick_processing_error: 'Processing error, please contact the site staff.'
+      min_file_size_error: 'should not be smaller than %{limit}'
+      max_file_size_error: 'should not be larger than %{limit}'
+      min_image_width_error: 'is too narrow; the width should be larger than %{limit}'
+      max_image_width_error: 'is too wide; the width should be smaller than %{limit}'
+      min_image_height_error: 'is too short; the height should be larger than %{limit}'
+      max_image_height_error: 'is too tall; the height should be smaller than %{limit}'

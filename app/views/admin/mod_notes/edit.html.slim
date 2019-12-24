@@ -1,0 +1,9 @@
+h2 Editing Mod Note
+
+= form_for [:admin, @mod_note], url: admin_mod_note_path(note_id: @mod_note.id) do |f|
+  .field
+    label for="body"
+      ' Note
+    = f.text_field :body, class: 'input input--wide', placeholder: 'Insufficient Rainbow Dash', required: true
+  .action
+    = f.submit 'submit', class: 'button'

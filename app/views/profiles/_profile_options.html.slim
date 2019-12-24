@@ -1,0 +1,19 @@
+ul.profile-top__options__column
+  li = link_to 'Send message', new_conversation_path(recipient: @user.name)
+  li = link_to 'Our conversations', conversations_path(with: @user.id)
+  li = link_to 'Report this user', new_report_path(reportable_class: 'user', reportable_id: @user.id)
+
+ul.profile-top__options__column
+  - if can? :mod_read, User
+    li = link_to 'Uploads', search_path(q: "true_uploader:#{@user.name.downcase}")
+  - else
+    li = link_to 'Uploads', search_path(q: "uploader:#{@user.name.downcase}")
+  li = link_to 'Comments', "/lists/user_comments/#{@user.id}"
+  li = link_to 'Posts', posts_posted_path(user_id: @user.id)
+  - if @user == current_user && @user.reports_made.present?
+    li = link_to 'My reports', reports_path
+
+ul.profile-top__options__column
+  li = link_to 'Favorites', search_path(q: "faved_by:#{@user.name.downcase}")
+  li = link_to 'Tag changes', profile_tag_changes_path(@user)
+  li = link_to 'Source changes', profile_source_changes_path(@user)

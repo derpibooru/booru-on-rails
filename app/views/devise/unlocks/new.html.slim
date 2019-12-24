@@ -1,0 +1,8 @@
+h1 Unlock my account
+
+= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f|
+  =<> devise_error_messages!
+  .field
+    => f.label :email
+    => f.email_field :email, class: 'input'
+  = f.submit 'Resend unlock instructions', class: 'button'

@@ -1,0 +1,51 @@
+ruby:
+  featured ||= false
+  compact ||= false
+  list = images.to_a
+
+- list.each do |image|
+  / TODO: consider a CSS solution to size instead
+  ruby:
+    big = if featured
+      true
+    elsif compact
+      false
+    else
+      current_user ? current_user.show_large_thumbnails : true
+    end
+    if featured
+      klass = 'media-box__content--featured'
+      size = :medium
+    elsif big
+      klass = 'media-box__content--large'
+      size = :thumb
+    else
+      klass = 'media-box__content--small'
+      size = :thumb_small
+    end
+  - if image.present? && image.visible_to?(current_user)
+    .media-box data-image-id=image.id
+      .media-box__header.media-box__header--link-row class=('media-box__header--small'.freeze unless big) data-image-id=image.id
+        a.interaction--fave href="#" rel="nofollow" data-image-id=image.id
+          span.fave-span title='Fave!'
+            i.fa.fa-star
+          span.favorites title='Favorites' data-image-id=image.id = image.faves_count
+        a.interaction--upvote href="#" rel="nofollow" data-image-id=image.id
+          i.fa.fa-arrow-up title='Yay!'
+        span.score title='Score' data-image-id=image.id = image.score
+        a.interaction--downvote href="#" rel="nofollow" data-image-id=image.id
+          i.fa.fa-arrow-down title='Neigh!'
+        a.interaction--comments href="/#{image.id}#comments" title='Comments'
+          i.fa.fa-comments
+          span.comments_count data-image-id=image.id = image.comments_count
+        a.interaction--hide href="#" rel="nofollow" data-image-id=image.id
+          i.fa.fa-eye-slash title='Hide'
+      .media-box__content.flex.flex--centered.flex--center-distributed class=klass
+        include _image_container.html.slim
+
+- if list.empty?
+  - if compact
+    em No Images Found
+  - else
+    h3 No Images Found
+    p You should check your filter settings are not too restrictive or that you're not trying to look for things that don't exist.

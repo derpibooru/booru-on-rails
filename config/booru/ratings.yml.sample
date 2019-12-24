@@ -1,0 +1,29 @@
+:ratings:
+  safe:
+    :name: safe
+    :excludes: [suggestive, questionable, explicit, semi-grimdark, grimdark]
+    :replaces: []
+  suggestive:
+    :name: suggestive
+    :excludes: [safe, questionable, explicit]
+    :replaces: [safe]
+  questionable:
+    :name: questionable
+    :excludes: [safe, suggestive, explicit]
+    :replaces: [safe, suggestive]
+  explicit:
+    :name: explicit
+    :excludes: [safe, suggestive, questionable]
+    :replaces: [safe, suggestive, questionable]
+  semi-grimdark:
+    :name: semi-grimdark
+    :excludes: [safe, grimdark]
+    :replaces: [safe]
+  grimdark:
+    :name: grimdark
+    :excludes: [safe, semi-grimdark]
+    :replaces: [safe, semi-grimdark]
+  grotesque:
+    :name: grotesque
+    :excludes: [safe]
+    :replaces: [safe]

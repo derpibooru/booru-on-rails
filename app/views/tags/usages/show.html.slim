@@ -1,0 +1,77 @@
+h1
+  ' Tag Usage for
+  = link_to @tag.name, @tag
+
+h3 Filters that spoiler this tag:
+- if @filters_spoilering.empty?
+  | There are no filters that spoiler this tag!
+- else
+  table.table
+    thead
+      tr
+        th Filter
+        th User count
+        th Type
+        th Owner
+        th Spoilers
+        th Hides
+    tbody
+      - @filters_spoilering.each do |filter|
+        tr
+          td = link_to filter.name, filter_path(filter)
+          td = filter.user_count
+          td
+            - if filter.system
+              | System
+            - elsif filter.public
+              | Public
+            - else
+              | Private
+          td
+            - if filter.user
+              = link_to filter.user.name, profile_path(filter.user)
+            - else
+              | No user associated
+          td = number_with_delimiter filter.spoilered_tag_ids.size
+          td = number_with_delimiter filter.hidden_tag_ids.size
+
+h3 Filters that hide this tag:
+- if @filters_hiding.empty?
+  | There are no filters that hide this tag!
+- else
+  table.table
+    thead
+      tr
+        th Filter
+        th User count
+        th Type
+        th Owner
+        th Spoilers
+        th Hides
+    tbody
+      - @filters_hiding.each do |filter|
+        tr
+          td = link_to filter.name, filter_path(filter)
+          td = filter.user_count
+          td
+            - if filter.system
+              | System
+            - elsif filter.public
+              | Public
+            - else
+              | Private
+          td
+            - if filter.user
+              = link_to filter.user.name, profile_path(filter.user)
+            - else
+              | No user associated
+          td = number_with_delimiter filter.spoilered_tag_ids.size
+          td = number_with_delimiter filter.hidden_tag_ids.size
+
+h3 Users that watch this tag (#{@users_watching.count}):
+- if @users_watching.empty?
+  | There are no users that watch this tag!
+- else
+  - @users_watching.each do |u|
+    = link_to u.name, profile_path(u), class: 'interaction-user-list-item'
+  .clearfix &nbsp;

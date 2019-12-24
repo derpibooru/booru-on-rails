@@ -1,0 +1,21 @@
+DEFAULTS: &DEFAULT
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  pool: 3
+
+development:
+  <<: *DEFAULT
+  database: derpibooru_development
+
+test:
+  <<: *DEFAULT
+  database: derpibooru_test
+
+staging:
+  <<: *DEFAULT
+  database: derpibooru_staging
+
+production:
+  <<: *DEFAULT
+  database: derpibooru_migration

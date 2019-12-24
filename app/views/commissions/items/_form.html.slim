@@ -1,0 +1,24 @@
+= form_for [@commission, @commission_item], url: @commission_item.new_record? ? :commission_items : :commission_item do |f|
+  = render partial: 'layouts/errors', locals: { errors: @commission_item.errors }
+
+  .field
+    => f.label :item_type, 'Type of item:'
+    = f.select :item_type, options_for_select(CommissionItem::ITEM_TYPES.map, @commission_item.item_type), {}, class: 'input'
+  br
+  .field
+    => f.label :base_price, 'Base Price:'
+    = f.number_field :base_price, class: 'input', placeholder: '20.00', step: 'any', min: 0
+  br
+  .field
+    => f.label :example_image_id, 'ID of example image:'
+    = f.number_field :example_image_id, class: 'input', placeholder: '1345604'
+  br
+  .field
+    => f.label :description, 'Short description:'
+    = f.text_field :description, class: 'input input--wide', placeholder: 'Description'
+  br
+  .field
+    => f.label :add_ons, 'Add-ons (optional):'
+    = f.text_area :add_ons, class: 'input input--wide input--text', placeholder: 'Additional character: $10.00'
+  br
+  = f.submit class: 'button'

@@ -1,0 +1,31 @@
+= form_for @commission do |f|
+  = render partial: 'layouts/errors', locals: { errors: @commission.errors }
+
+  .field
+    => f.label :information, 'General Information:'
+    = f.text_area :information, class: 'input input--wide input--text', placeholder: 'A general overview about your commissions.'
+  .field
+    => f.label :contact, 'Contact Information:'
+    = f.text_area :contact, class: 'input input--wide input--text', placeholder: 'How you would like potential customers to contact you (PM, Discord, Email, etc). Remember that this information will be publicly visible.'
+  .field
+    => f.label :will_create, 'Content you are particularly interested in drawing or creating (optional):'
+    = f.text_area :will_create, class: 'input input--wide input--text', placeholder: 'List specific content you are willing to accept commissions for.'
+  .field
+    => f.label :will_not_create, 'Content you will not draw or create (optional):'
+    = f.text_area :will_not_create, class: 'input input--wide input--text', placeholder: 'List specific content you are not willing to accept commissions for.'
+  .field
+    => f.label :categories, 'Art Categories:'
+    br
+    = f.collection_check_boxes :categories, Commission::CATEGORIES.sort_by(&:downcase), :itself, :itself do |b|
+      span.commission__category
+        => b.label
+        = b.check_box
+  .field
+    => f.label :sheet_image_id, 'Image ID of your commissions sheet (optional but recommended):'
+    br
+    = f.number_field :sheet_image_id, class: 'input', placeholder: '1227409'
+  .field
+    = f.label :open, 'Currently accepting commissions.' do
+    => f.check_box :open, class: 'checkbox'
+  br
+  = f.submit 'Save', class: 'button'

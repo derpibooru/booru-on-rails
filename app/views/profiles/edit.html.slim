@@ -1,0 +1,24 @@
+h1 Updating Profile Description
+
+= form_tag(profile_path(@user), method: :put) do
+  - if @user.errors.any?
+    #error_explanation
+      h2 = "#{pluralize(@user.errors.count, 'error')} prevented this from being saved:"
+      ul
+        - @user.errors.full_messages.each do |msg|
+          li = msg
+
+  .block
+    .block__header
+      span.block__header__title Personal Title
+    .block__content
+      .field
+        = text_field_tag :title, @user.personal_title || '', class: 'input input--short', placeholder: 'Title'
+
+  - edit_area = capture do
+    .field
+      = label_tag :body, 'Description (up to 10000 characters)'
+    = render partial: 'layouts/textile_toolbar'
+    = text_area_tag :body, @user.description || '', class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: 'About Me is treated as a comment on a safe image; remember to use [spoiler][/spoiler] for anything above-rating.'
+  - actions = submit_tag 'Update', class: 'button', autocomplete: 'off', data: { disable_with: 'Updating...' }
+  = render partial: 'communications/communication_edit', locals: { title: 'About Me', edit_area: edit_area, actions: actions }

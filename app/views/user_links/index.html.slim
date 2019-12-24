@@ -1,0 +1,25 @@
+h1 Your Links
+p
+  a.button href=new_user_link_path
+    | Create a link
+p
+  ' User links associate your account on
+  => t('booru.name')
+  ' with tags about content you create and with accounts on sites elsewhere. This allows users to easily identify artists and admins to act more rapidly on takedown requests.
+- if @links.present?
+  table.table
+    thead
+      tr
+        th URI
+        th Options
+        th Verification Code
+        th Verified?
+        th Public
+    tbody
+      - @links.each do |link|
+        tr
+          td = link_to link.uri, link.uri
+          td = link_to 'View Details', link
+          td = link.verification_code
+          th = link.verified? ? 'Yes' : 'No'
+          th = link.public? ? 'Yes' : 'No'

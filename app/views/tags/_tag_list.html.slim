@@ -1,0 +1,7 @@
+.tag-list
+  - if tags.present?
+    - tags.each do |tag|
+      include _tag.html.slim
+  - else
+    p No tags.
+.clearfix

@@ -1,0 +1,96 @@
+h1
+  ' Link to
+  == link_to h(@link.uri), h(@link.uri)
+h3 User
+p
+  ' This link belongs to
+  = link_to @link.user.name, profile_path(@link.user)
+  | .
+h3 Artist Tags
+- if @link.tag.present?
+  = render partial: 'tags/tag', locals: { tag: @link.tag }
+- else
+  p There are no tags associated with this link.
+p
+  = link_to 'Edit tags/public flag', edit_admin_user_link_path(@link)
+h3 Status
+- verification_code = capture do
+  code
+    h1 = @link.verification_code
+- if @link.contacted?
+  p
+    strong The artist has been contacted. This link is pending a response from the artist. Wake up, artist!
+  p
+    | A member of the administration team (
+    = @link.contacted_by_user.name
+    | ) has manually contacted the artist at the address above.
+  p
+    ' The message was sent
+    = friendly_time @link.contacted_at
+  p The verification code is:
+  p
+    = verification_code
+  p Check the associated tags before verifying this link.
+- if @link.verified?
+  p
+    strong This link has been verified by a member of the administration team.
+  p You may now remove the verification text from your website, if you have not already done so.
+  - if @link.verified_by_user
+    p
+      em
+        ' This link was verified by
+        strong
+          = @link.verified_by_user.name
+- if @link.link_verified?
+  p
+    strong This link is pending verification by a member of the administration team.
+  p The verification code has been found automatically on the linked website. The code should be checked manually to ensure that it appears in a place that only the owner could put it, e.g. not in a comment.
+  p The verification code is:
+  p
+    = verification_code
+  p Check the associated tags before verifying this link.
+- if @link.unverified?
+  p
+    strong This link is pending verification by a member of the administration team.
+  p The artist may place the following text somewhere on the page linked above in order to facilitate the verification process and prevent the need for further contact:
+  p
+    = verification_code
+- if @link.rejected?
+  p This link has been rejected by a member of the administration team. This is probably because you could not be reached to verify the link.
+p
+  ' This link was created
+  = friendly_time @link.created_at
+- if @link.may_mark_contacted? || @link.may_mark_verified? || @link.may_reject?
+  h3 Verification Options
+  - if @link.may_mark_verified?
+    p
+      = link_to 'Verify this link', admin_user_link_transition_path(@link, do: 'mark_verified'), method: :post
+  - if @link.may_reject?
+    p
+      = link_to 'Reject this link', admin_user_link_transition_path(@link, do: 'reject'), method: :post
+  - if @link.may_mark_contacted?
+    h4 Artist Contact
+    - if @link.contacted?
+      p
+        strong The artist has already been contacted.
+    - else
+      p
+        = link_to 'Confirm artist was contacted', admin_user_link_transition_path(@link, do: 'mark_contacted'), method: :post
+    h5 Form Message
+    pre
+      strong Artist Identity Confirmation
+      br
+      br
+      => t('booru.name')
+      ' site staff here. Are you the user
+      => @link.user ? @link.user.name : '#<error>'
+      ' on
+      = t('booru.name')
+      ' ?
+h3 Visibility
+- if @link.public?
+  p This link is public, and will be shown around the site.
+- else
+  p This link is private, and will be shown only to administrative staff.
+br
+= link_to 'Back', admin_user_links_path, class: 'button button--link'

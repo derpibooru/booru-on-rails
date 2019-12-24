@@ -1,0 +1,10 @@
+- models = Tag.where(name: data.values.flat_map(&:values)).includes(:implied_tags).index_by(&:name)
+- data.each do |heading, maps|
+  div
+    strong = heading
+    br/
+    - maps.each do |key, value|
+      => key
+      | -
+      =< print_tag_link models[value], value
+      br/

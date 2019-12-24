@@ -1,0 +1,88 @@
+/ TODO: convert this to use layouts/searchable; this would also take care of issue #662
+- page_layout :medium
+h1 User Links
+p Link creation is done via the Users menu.
+p Verifying a link will automatically award an artist badge if the link is public, no artist badge exists, and an "artist:" tag is specified.
+= render partial: 'layouts/search', locals: { path: admin_user_links_path }
+- pagination = paginate @links if @links.present?
+.block
+  .block__header
+    - if params[:all] == 'true'
+      = link_to 'Show unverified only', admin_user_links_path
+    - else
+      = link_to 'Show all', admin_user_links_path(all: 'true')
+    = pagination
+  .block__content
+    - if @links.blank?
+      p There are no links yet.
+    - else
+      table.table
+        thead
+          tr
+            th State
+            th User
+            th URL
+            th Options
+            th Mark
+            /th Verification Code
+            th Public
+        tbody
+          - @links.each do |link|
+            tr
+              ruby:
+                td_class = if link.verified? || link.link_verified?
+                  'success'
+                elsif link.unverified? || link.rejected?
+                  'danger'
+                elsif link.contacted?
+                  'warning'
+                end
+              td[class=td_class]
+                strong
+                  = link.aasm_state.humanize.capitalize
+                - if link.contacted?
+                  br
+                  ' by
+                  = link.contacted_by_user.name
+                  br
+                  | (
+                  = friendly_time link.contacted_at
+                  | )
+              td
+                - if link.user
+                  = link_to link.user.name, profile_path(link.user)
+                  = render partial: 'profiles/user_badges', locals: { user: link.user }
+                  - if link.user.linked_tags.present?
+                    = render partial: 'tags/tag_list', locals: { tags: link.user.linked_tags.sort_by(&:name) }
+                - else
+                  | Broken link
+              td
+                = link_to truncate(link.uri, length: 100), link.uri
+                - if link.tag
+                  br
+                  = render partial: 'tags/tag', locals: { tag: link.tag }
+              td
+                => link_to 'View', admin_user_link_path(link)
+                ' &bull;
+                = link_to 'Edit', edit_admin_user_link_path(link)
+              td
+                - if link.may_mark_verified?
+                  = link_to 'Verify', admin_user_link_transition_path(link, do: 'mark_verified'), method: :post
+                - if link.may_mark_verified? && link.may_reject?
+                  '  &bull;
+                - if link.may_reject?
+                  = link_to 'Reject', admin_user_link_transition_path(link, do: 'reject'), method: :post
+                - if (link.may_mark_verified? || link.may_reject?) && (!link.verified? && link.may_mark_contacted?)
+                  br
+                - if !link.verified? && link.may_mark_contacted?
+                  - if link.contacted?
+                    | Artist contacted
+                  - else
+                    = link_to 'Artist contacted', admin_user_link_transition_path(link, do: 'mark_contacted'), method: :post
+              /td
+                = link.verification_code.gsub(/\ADERPI-LINKVALIDATION-/, '')
+              td
+                = link.public? ? 'Yes' : 'No'
+  - if pagination.present?
+    .block__header.block__header--light
+      = pagination

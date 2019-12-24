@@ -1,0 +1,66 @@
+article.block.communication id="post_#{post.id}"
+  .block__content.flex.flex--no-wrap
+    .flex__fixed.spacing-right
+      =<> user_avatar((post.user if post.user_visible?), 'avatar--100px', post.author)
+      - if post.user_visible? && post.user.forum_posts_count > 0
+        span.communication__sender__stats.center
+          ' Posts:
+          = post.user.forum_posts_count
+    .flex__grow.communication__body
+      span.communication__body__sender-name =<> link_to_author(post, can?(:manage, Post))
+      - if post.user_visible?
+        =<> render partial: 'profiles/user_badges', locals: { user: post.user }
+        br
+        - if post.name_at_post_time != post.user.name
+          p.small-text
+            ' (Previously known as
+            = post.name_at_post_time
+            ' )
+        - elsif post.user.last_renamed_at > 14.days.ago
+          p.small-text
+            ' (Previously known as
+            = post.user.previous_usernames.last
+            ' )
+        = user_label post.user, small: true
+      .communication__body__text
+        - if post.hidden_from_users
+          strong.comment_deleted
+            | Deletion reason:
+            =<> post.deletion_reason
+            -if can?(:read, post)
+              | (
+              = post.deleted_by&.name || 'Orbital Friendship Cannon'
+              | )
+            br
+            - if post.destroyed_content
+              | This post's contents have been destroyed.
+              br
+        - if can?(:read, post)
+          =<> render_post post
+
+  .block__content.communication__options
+    .flex.flex--wrap.flex--spaced-out
+      include app/views/topics/posts/_post_options.html.slim
+
+    - if can?(:hide, Post)
+      .js-staff-action
+        - if !post.hidden_from_users && !post.destroyed_content
+          =<> link_to '#', class: 'communication__interaction togglable-delete-form-link', 'data-click-toggle': "#inline-del-form-post-#{post.id}" do
+            i.fa.fa-times
+            =<> 'Delete'
+        - elsif post.hidden_from_users && !post.destroyed_content
+          =<> link_to forum_topic_post_hide_path(post.topic.forum, post.topic, post), data: { confirm: t('are_you_sure') }, method: :delete, class: 'communication__interaction' do
+            i.fa.fa-check
+            =<> 'Restore'
+          - if can?(:manage, Post)
+            =<> link_to forum_topic_post_path(post.topic.forum, post.topic, post, deletion_reason: post.deletion_reason), method: :delete, data: { confirm: t('are_you_sure') }, class: 'communication__interaction' do
+              i.fa.fa-times
+              =<> 'Delete Contents'
+        - if can?(:manage, Post)
+          .communication__info
+            =<> link_to_ip(post.ip)
+          .communication__info
+            =<> link_to_fingerprint(post.fingerprint, post.user_agent)
+      = form_tag forum_topic_post_hide_path(post.topic.forum, post.topic, post), class: 'togglable-delete-form hidden flex', id: "inline-del-form-post-#{post.id}"
+        = text_field_tag :deletion_reason, nil, class: 'input input--wide', placeholder: 'Deletion Reason', id: "inline-del-reason-post-#{post.id}", required: true
+        = submit_tag 'Delete', class: 'button'

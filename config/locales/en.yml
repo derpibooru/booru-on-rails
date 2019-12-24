@@ -1,0 +1,73 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# The following keys must be escaped otherwise they will not be retrieved by
+# the default I18n backend:
+#
+# true, false, on, off, yes, no
+#
+# Instead, surround them with single quotes.
+#
+# en:
+#   'true': 'foo'
+#
+# To learn more, please read the Rails Internationalization guide
+# available at https://guides.rubyonrails.org/i18n.html.
+
+en:
+  errors:
+    messages:
+      expired: "has expired, please request a new one"
+      not_found: "not found"
+      already_confirmed: "was already confirmed, please try signing in"
+      not_locked: "was not locked"
+      not_saved:
+        one: "Just one tiny issue with your request..."
+        other: "Sorry, but there are %{count} problems with your submission..."
+      pwned_password: "has previously been compromised in a public data breach and cannot be used. Please pick something unique."
+
+  are_you_sure: "Are you really, really sure about that?"
+  are_you_sure_destroy_image: "CP, or similarly illegal to so much as store? Better be."
+  destroy: "Destroy"
+  edit: "Edit"
+  close: "Close"
+  show: "Show"
+  upvote: "yay"
+  downvote: "neigh"
+  fave: "fave"
+  faved: "faved!"
+  voted: "voted!"
+  total_images: "total images"
+  last_updated: "Last Updated"
+  automatically_refresh: "Automatically Refresh"
+  not_showing_images_tagged: "Not showing images tagged"
+  display_settings: "Display Settings"
+  grid_view_link: "Grid View"
+  grid:
+    index:
+      title: "The Grid"
+      back_to_the_booru: "Back to the Booru"
+  activerecord:
+    attributes:
+      filter:
+        hidden_complex_str: "Complex Hide Filter"
+        spoilered_complex_str: "Complex Spoiler Filter"
+      poll:
+        active_until: "Poll end date"
+      poll_option:
+        label: "Poll options"

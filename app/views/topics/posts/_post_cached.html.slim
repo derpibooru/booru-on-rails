@@ -1,0 +1,3 @@
+/ see app/views/communications/_communication.html.slim for usage notes
+- cache_unless_can(:assist, Post, "post-v16-#{post.id}-#{post.hidden_from_users}-#{post.updated_at.to_i}", expires_in: 6.minutes) do
+  = render partial: 'topics/posts/post', locals: { post: post }

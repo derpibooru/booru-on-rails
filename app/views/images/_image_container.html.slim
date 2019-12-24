@@ -1,0 +1,48 @@
+ruby:
+  size ||= :thumb_small
+  image_link = local_assigns[:link] || short_image_path(image, scope_key)
+  hover_text = "Size: #{image.image_width}x#{image.image_height} | Tagged: #{image.tag_list}"
+  vid = image.image_mime_type == 'video/webm'.freeze
+  show_vid = cookies['webm'.freeze] == 'true'.freeze
+  use_gif = vid && !show_vid && [:thumb, :thumb_small, :thumb_tiny].include?(size)
+
+.image-container class=size data=image_container_data(image).merge(size: size)
+  - if image.duplicate_id.present?
+    .media-box__overlay
+      strong Marked Duplicate
+  - elsif image.destroyed_content
+    .media-box__overlay
+      strong Destroyed Content
+  - elsif image.hidden_from_users
+    .media-box__overlay
+      strong Deleted:
+      =< image.deletion_reason
+
+  .media-box__overlay.js-spoiler-info-overlay class=(use_gif ? ''.freeze : 'hidden'.freeze)
+    - if vid
+      | WebM
+  a href=image_link title=hover_text
+    - if image.thumbnails_generated
+      ruby:
+        display_hidden = image.hidden_from_users? && image.can_see_when_hidden?(current_user)
+        uris = image.image.view_urls(hidden: display_hidden)
+        filtered = filter_or_spoiler_hits?(image)
+
+      / TODO: this is a bit ridiculous
+      - if !filtered && cookies['hidpi'.freeze] == 'true'.freeze && image.image_mime_type != 'image/gif'.freeze && !vid
+        picture: img src=uris[size] srcset="#{uris[size]} 1x, #{uris[:medium]} 2x" alt=hover_text
+      - elsif !filtered
+        - if !vid || use_gif
+          picture: img src=uris[size].gsub(/webm\z/, 'gif'.freeze) alt=hover_text
+        - else
+          video alt=hover_text autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline"
+            source src=uris[size] type="video/webm"
+            source src=uris[size].gsub(/webm\z/, 'mp4'.freeze) type="video/mp4"
+          img.hidden src=asset_path('1x1.png'.freeze)
+      - elsif !vid || use_gif
+        picture = image_tag '1x1.png'.freeze, alt: hover_text
+      - else
+        video[autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline"]
+        = image_tag '1x1.png'.freeze, alt: hover_text
+    - else
+      | Thumbnails not yet generated

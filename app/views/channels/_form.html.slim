@@ -1,0 +1,20 @@
+= form_for(@channel, (action_name == 'edit' ? { url: { controller: :channels, action: :update } } : {})) do |f|
+  - if @channel.errors.any?
+    #error_explanation
+      h2 = "#{pluralize(@channel.errors.count, 'error')} prevented this from being created:"
+      ul
+      - @channel.errors.full_messages.each do |msg|
+        li = msg
+  .field
+    = f.label :url, 'Livestream URL'
+    = f.text_field :url, class: 'input input--wide'
+  .field
+    = f.label :artist_tag, 'Artist:tag'
+    = f.text_field :artist_tag, class: 'input input--wide'
+  .fieldlabel
+    | If applicable, provide the artist: tag this stream is associated with
+  .field
+    = f.label :nsfw, 'Stream not safe-for-work?'
+    = f.check_box :nsfw, class: 'checkbox'
+  .actions
+    = f.submit 'Create', class: 'button'

@@ -1,0 +1,17 @@
+h1 Comment Search
+= form_tag comments_path, method: :get, class: 'hform', enforce_utf8: false do
+  .field
+    = text_field_tag :cq, params[:cq], class: 'input hform__text', placeholder: 'Search comments'
+    = submit_tag 'Search', class: ' hform__button button'
+  label for="cq"
+    ' Syntax: Comment search follows the same search syntax as images.
+    ' Entering "body:phrase" or a phrase without a field label will perform a
+    ' full-text search over the body. Using wildcards may not work as
+    ' expected because of how the field is indexed; try searching just the
+    ' phrase. Other fields: author, ip, fingerprint
+- if @comments.present?
+  = paginate @comments
+  = render partial: 'lists/comment_list', locals: { comments: @comments }
+  = paginate @comments
+- else
+  p Couldn't find any comments.

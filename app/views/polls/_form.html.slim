@@ -1,0 +1,49 @@
+p
+  - if !editing
+    | Create a simple poll alongside the topic with
+  - else
+    | Polls may have
+  |  a maximum of
+  strong.js-max-option-count =<> Poll.max_option_count
+  | options. Leave any options you don't want to use blank.
+  - if !editing
+    |  Only registered users will be able to vote.
+  - else
+    = pof.hidden_field :id
+.field.field--block
+  = pof.text_field :title, class: 'input input--wide', placeholder: 'Poll title', maxlength: 140
+p.fieldlabel
+  | End date
+.field.field--block
+  = pof.text_field :until, class: 'input input--wide', placeholder: '2 weeks from now', maxlength: 255
+p.fieldlabel
+  | Specify when the poll should end. Once the poll ended no more votes can be cast and the final results will be displayed. Good values to try are "1 week from now" and "24 hours from now". Polls must last for at least
+  =< pluralize(Poll.min_run_time_hours, 'hour')
+  | .
+p.fieldlabel
+  | Voting method:
+.field.field--block
+  => pof.radio_button :vote_method, 'single', required: true, checked: 'checked'
+  => pof.label :vote_method_single, 'Single option'
+  => pof.radio_button :vote_method, 'multiple', required: true
+  => pof.label :vote_method_multiple, 'Multiple options'
+  /=> pof.radio_button :vote_method, 'runoff'
+  /=> pof.label :vote_method_runoff, 'Instant runoff'
+- if editing
+  - ix = 0
+  = pof.fields_for :options do |fopt|
+    - ix += 1
+    .field.js-poll-option.field--inline.flex--no-wrap.flex--centered
+      = fopt.text_field :label, class: 'input flex__grow js-option-label', maxlength: 80, placeholder: "Option #{ix}"
+      = fopt.hidden_field :id
+      label.input--separate-left.flex__fixed.flex.flex--centered
+        = fopt.check_box :_destroy
+        | &nbsp;
+        span Delete
+- else
+  - [[@topic&.poll&.options&.length, 2].max, Poll.max_option_count].min.times do |i|
+    .field.js-poll-option.field--block
+      input.input.input--wide.js-option-label type="text" name="topic[poll_attributes][options_attributes][][label]" placeholder="Option #{i + 1}" maxlength="80" value=@topic&.poll&.options.to_a[i]&.label
+button.button.js-poll-add-option type="button"
+  i.fa.fa-plus>
+  | Add option

@@ -1,0 +1,29 @@
+h1
+  ' Viewing Ban Edits for IP
+  = link_to_ip @ban.specification, true
+p
+  | (Not yet implemented!)
+/ TODO: @ban.versions is not yet implemented
+/table.table
+  thead
+    tr
+      th User
+      th Timestamp
+      th Changes
+  tbody
+    - @ban.versions.each do |version|
+      tr
+        td
+          = version.modifier.name
+        td
+          = friendly_time version.created_at
+        td
+          = friendly_changes version.tracked_changes
+h2 Options
+ul
+  li
+    = link_to t('edit'), edit_admin_subnet_ban_path(@ban), class: 'button'
+  li
+    = link_to t('destroy'), admin_subnet_ban_path(@ban), class: 'button', data: { confirm: t('are_you_sure') }, method: :delete
+br
+= link_to 'Back', :back, class: 'button button--link'

@@ -1,0 +1,28 @@
+= form_for @conversation do |f|
+  - if @conversation.errors.any?
+    = render partial: 'layouts/errors', locals: { errors: @conversation.errors }
+
+  .field
+    .fieldlabel Specify any user's exact name here, case-sensitive
+    = f.text_field :recipient, class: 'input input--wide', placeholder: 'Recipient', required: true
+  .field
+    = f.text_field :title, class: 'input input--wide', placeholder: 'Title', required: true
+
+  = f.fields_for :messages do |mf|
+    .block
+      .block__header.block__header--js-tabbed
+        = link_to '#', class: 'selected', data: { click_tab: 'write' } do
+          i.fa.fa-pencil-alt>
+          | Reply
+        = link_to '#', data: { click_tab: 'preview' } do
+          i.fa.fa-eye>
+          | Preview
+      .block__tab.communication-edit__tab.selected data-tab="write"
+        = render partial: 'layouts/textile_help'
+        = render partial: 'layouts/textile_toolbar'
+        = mf.text_area :body, class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: 'Your reply', required: true
+      .block__tab.communication-edit__tab.hidden data-tab="preview"
+        | [Loading preview...]
+
+  .block__content.communication-edit__actions
+    = f.submit 'Send', class: 'button', autocomplete: 'off', data: { disable_with: 'Sending...' }

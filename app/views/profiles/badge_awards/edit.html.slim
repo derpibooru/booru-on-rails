@@ -1,0 +1,6 @@
+h1
+  | Updating badge
+  =<> @award.badge_name.presence || @award.badge.title
+  | on
+  =<> @user.name
+= render partial: 'form'

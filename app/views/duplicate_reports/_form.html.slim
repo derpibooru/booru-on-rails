@@ -1,0 +1,8 @@
+= form_tag duplicate_reports_path, method: :post do
+  = hidden_field_tag :image_id, image.id
+  .field
+    ' Delete this image and redirect to
+    = number_field_tag :duplicate_of_image_id, nil, class: 'input', min: 0, placeholder: 'image number.', required: true
+    = text_field_tag :reason, nil, class: 'input input--separate-left', placeholder: 'Explanation'
+  .actions
+    = submit_tag 'Report Duplicate', class: 'button'

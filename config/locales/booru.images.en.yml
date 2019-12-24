@@ -1,0 +1,113 @@
+en:
+  images:
+    thumbs:
+      hover: "Size: %{width}x%{height} | Tagged: %{tags}"
+    interactions:
+      fave: "Fave!"
+      upvote: "Yay!"
+      downvote: "Neigh!"
+      favourites: "Favorites"
+      upvotes: "Upvotes"
+      downvotes: "Downvotes"
+      score: "Score"
+      comments: "Comments"
+      hide: "Hide"
+      hidden: "Hidden"
+    index:
+      title: "All Images"
+    watched:
+      title: "Watched Images"
+      random: "Random Watched Image"
+    upvoted:
+      title: "Images I've Upvoted"
+      title_user: "%{user}'s Upvoted Images"
+      random: "Random Upvoted Image"
+    downvoted:
+      title: "Images I've Downvoted"
+      title_user: "%{user}'s Downvoted Images"
+      random: "Random Downvoted Image"
+    favourites:
+      title: "My Favorites"
+      title_user: "%{user}'s Favorite Images"
+      random: "Random Favorite"
+    hidden:
+      title: "My Hidden Images"
+      title_user: "%{user}'s Hidden Images"
+    uploaded:
+      title: "Images I've Uploaded"
+      title_user: "%{user}'s Uploaded Images"
+      random: "Random Uploaded Image"
+    show:
+      image_duplicate_redirect: "The image you were looking for has been marked a duplicate of the image below"
+    new:
+      title: "Upload"
+    create:
+      image_created: "Image was successfully created."
+      image_insta_deleted: "Image was successfully deleted."
+    update_metadata:
+      errors:
+        captcha_unverified: "Could not update since the captcha was not completed."
+    related:
+      title: "Images related to Image #%{id}"
+    destroy:
+      success: "Image %{id} hidden"
+    change_hide_reason:
+      success: "Image deletion reason changed"
+    repair:
+      success: "Image was repaired successfully, you may have to wait for caches to expire"
+      failure: "Image was not repaired, ask a developer"
+    hard_destroy:
+      success: "Image was successfully purged of content"
+    delete_source_changes:
+      success: "Image sources have been sucessfully deleted"
+    feature:
+      success: "Image marked as featured image"
+    clear_hash:
+      success: "Image hash cleared successfully"
+    toggle_comments_lock:
+      lock: "Lock comments"
+      locked: "Comments locked"
+      unlock: "Unlock commenting"
+      unlocked: "Comments unlocked"
+    toggle_description_lock:
+      lock: "Lock description edits"
+      locked: "Description editing locked"
+      unlock: "Unlock description editing"
+      unlocked: "Description editing unlocked"
+    toggle_tags_lock:
+      lock: "Lock tagging"
+      locked: "Tag editing locked"
+      unlock: "Unlock tag editing"
+      unlocked: "Tag editing unlocked"
+    search:
+      exclude_deleted: "-D"
+      exclude_deleted_title: "No Deleted Uploads"
+      include_deleted: "+D"
+      include_deleted_title: "Include Deleted Uploads"
+      deleted_only: "DO"
+      deleted_only_title: "Only Deleted Uploads"
+    errors:
+      upload_disabled: "Sorry, image uploads are temporarily disabled. Please try again in a moment."
+      image_id_not_found: "Image with ID %{id} not found."
+      image_deleted: "This image has been deleted."
+      image_destroyed: "Image %{id} has been destroyed of content and cannot be recovered for this action."
+      unauthorized: "You must be logged in to view this page"
+      invalid_user: "Invalid user specified"
+      nonexistent_user: "Error: user %{user} does not exist."
+      blank_deletion_reason: "Deletion reason cannot be blank"
+      tags_min_limit_not_met: "Too few tags, there must be at least %{limit} tags."
+      tags_max_limit_not_met: "Too many tags. there must be at most %{limit} tags."
+      tags_include_bad_words: "At least one of the tags you entered is forbidden. Please check rule #2 and the <a href=\"/pages/tags\">tagging guidelines</a>."
+      tags_no_ratings_html: "Uh oh, you didn't include any rating tags. An image must have at least one rating tag. Please refer to the <a href=\"/pages/tags\">tagging guidelines</a>."
+      tags_safe_with_other_rating: "Safe cannot be used with any other rating."
+      tags_multiple_sexual_ratings: "Only one sexual rating can be used."
+      tags_multiple_dark_ratings: "Only one dark rating can be used."
+      tags_artist_dnp_html: "The artist %{artist} has a DNP listing with the %{dnp_type} restriction. <a href=\"/dnp/%{id}\">View listing</a>"
+      hash_duplicate_found_html: "This image has been uploaded before, sorry! It's image <a href=\"/%{id}\">#%{id}</a>."
+      hash_duplicate_found_hidden_html: "This image has been uploaded before and then deleted or merged by a member of site staff. Please <strong>do not</strong> try to re-upload it. This may result in your account getting banned. Original upload: <a href=\"/%{id}\">#%{id}</a>"
+      scraper_imgur_unsupported: "Imgur links are not supported due to the service incorrectly serving its images to us."
+      scraper_tumblr_post_type_unupported: "Tumblr %{type} posts are not supported."
+      scraper_tumblr_post_no_images: "This %{type} post does not seem to contain any images hosted by Tumblr."
+      scraper_tumblr_link_post_no_scrape: "This Tumblr link post does not point to a supported URL."
+      scraper_twitter_status_no_images: "This Twitter status doesn't have any images attached (GIFs are not supported)."
+      scraper_fetch_failed: "Unable to find a valid image at the URL you have provided."

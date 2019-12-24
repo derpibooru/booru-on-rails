@@ -1,0 +1,3 @@
+- content_for(:robots, true)
+= render partial: 'images/imagelist', locals: { images: @images, header: "Images tagged #{@tag.name}", info_row: tag_info, random_image_href: random_image_path }
+= render partial: 'search/form'

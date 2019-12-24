@@ -1,0 +1,48 @@
+- display_mod_tools = can?(:manage, @image) && (cookies['hidestaff'] != 'true'.freeze)
+- cache_unless(display_mod_tools, "image_tags_and_source_v8_#{image.id}_#{image.updated_at.to_i}_#{current_user ? 'nocaptcha' : 'captcha'}_#{!current_user.try(:fancy_tag_field_on_edit) ? 'fancy' : 'normal'}_#{@current_ban ? 'banned' : 'ok'}_#{can?(:update_metadata, image) ? 'updatable' : 'unupdatable'}_#{@error}", expires_in: 3600) do
+  .js-tagsauce id="image_tags_and_source_#{image.id.to_s}"
+    - if can?(:update_metadata, image) && !@current_ban
+      .js-imageform class=('hidden' unless image.errors.any?)
+        = render partial: 'layouts/errors', locals: { errors: image.errors }
+        - if !current_user
+          .block.block--fixed.block--warning
+            strong
+              em Hang on a sec...
+            br
+            ' Make sure you have read and understood our
+            => link_to 'tagging guidelines', '/pages/tags'
+            | before editing tags.
+        = form_with model: image, url: image_tags_path(image), method: :put, id: 'tags-form' do |f|
+          = f.hidden_field :old_tag_list, value: image.tag_list
+          .field
+            label for="image[tag_input]"
+              | Separate tags with commas. Use 'artist:name' tags to identify artists. Got questions? Check the
+              =<> link_to 'tag guidelines', '/pages/tags'
+              | or the
+              =< link_to 'spoiler guidelines', '/pages/spoilers'
+              | .
+            = render partial: 'tags/tag_editor', locals: { f: f, name: :tag_input, type: :edit, extra: { value: image.tag_list } }
+          - if !current_user && $flipper[:captcha].enabled?
+            = captcha_tags
+          ul.horizontal-list
+            li
+              .actions = f.submit 'Save tags', class: 'button', id: 'edit_save_button', autocomplete: 'off', data: { disable_with: raw('Saving&hellip;') }
+            li
+              button.button.js-tag-sauce-toggle data-click-toggle=".tagsauce, .js-imageform" data-click-focus=".js-taginput-plain:not(.hidden), .js-taginput-input" Cancel
+          = render partial: 'tags/quick_tag_table', locals: { target: '[name="image[tag_input]"]' }
+    - if !@error
+      .tagsauce
+        .block
+          - if can?(:update_metadata, image) && !@current_ban
+            a.button.js-tag-sauce-toggle#edit-tags data-click-toggle=".tagsauce, .js-imageform" data-click-focus=".js-taginput-plain:not(.hidden), .js-taginput-input" title='Edit tags' accessKey='t'
+              i.far.fa-edit>
+              | Tags:
+          - else
+              | Tags:
+          - if image.tag_changes.count > 0 || display_mod_tools
+            a.button.button--link.button--separate-left href="/images/#{@image.id}/tag_changes" title='Tag history'
+              i.fas.fa-history>
+              | History (
+              =image.tag_changes.count
+              | )
+        = render partial: 'tags/tag_list', locals: { tags: image.tags.display_order }

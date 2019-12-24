@@ -1,0 +1,67 @@
+- page_layout :medium
+- navigation_links = capture do
+  - if can? :manage, UserWhitelist
+    => link_to 'User whitelists', admin_user_whitelists_path
+    ' &bull;
+  => link_to 'User bans', admin_user_bans_path
+  ' &bull;
+  => link_to 'Site staff', admin_users_path(staff: 1)
+  - if can? :twofactor, User
+    ' &bull;
+    => link_to '2FA users', admin_users_path(twofactor: 1)
+- list = capture do
+  table.table
+    thead
+      tr
+        th Name
+        th Email
+        th Activated
+        th Role
+        th Created
+        th Options
+    tbody
+      - @users.each do |user|
+        tr
+          td
+            = link_to user.name, profile_path(user)
+            - if can?(:twofactor, User)
+              - if user.otp_required_for_login
+                span.banner__2fa.success
+                  | 2FA
+              - elsif user.staff?
+                span.banner__2fa.danger
+                  | 1FA :^)
+          td
+            - if can? :manage, User
+              = user.email
+            - else
+              | -
+          td
+            - if user.deleted_at
+              strong> Deactivated
+              = friendly_time user.deleted_at
+              - if user.deleted_by_user
+                '  by
+                = link_to user.deleted_by_user.name, profile_path(user.deleted_by_user)
+            - else
+              | Active
+          td
+            = user.role.humanize
+          td
+            = friendly_time user.created_at
+          td
+            - if can? :manage, User
+              => link_to t('edit'), edit_admin_user_path(user)
+              ' &bull;
+              - if user.deleted_at
+                => link_to 'Reactivate', admin_user_activation_path(user), data: { confirm: t('are_you_sure') }, method: :create
+              - else
+                => link_to 'Deactivate', admin_user_activation_path(user), data: { confirm: t('are_you_sure') }, method: :delete
+              ' &bull;
+            => link_to 'Ban', new_admin_user_ban_path(user_id: user.id)
+            ' &bull;
+            - if can? :manage, UserWhitelist
+              => link_to 'Add to whitelist', new_admin_user_whitelist_path(username: user.name)
+              ' &bull;
+            = link_to 'Add link', new_admin_user_link_path(user_id: user.id)
+= render partial: 'layouts/searchable_list', locals: { form_info: navigation_links, form_path: '', item_class: User, items: @users, new_item_path: new_admin_user_path, rendered_list: list }

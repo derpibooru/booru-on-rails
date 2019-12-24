@@ -1,0 +1,8 @@
+h1
+  ' Viewing full filter details for
+  = @filter.name
+
+= render partial: 'filters/filter_box'
+
+p = link_to 'Report filter to moderators', new_report_path(reportable_class: 'filter', reportable_id: @filter.id)
+p = link_to 'Back to the filters', '/filters'

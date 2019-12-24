@@ -1,0 +1,18 @@
+en:
+  comments:
+    create:
+      success: "Your comment has been posted."
+      error: "Your comment could not be posted, sorry!"
+    history:
+      title: "Comment history on %{target}"
+    edit:
+      title: "Editing comment on %{target}"
+    update:
+      success: "The comment has been edited successfully."
+      error: "Whoops, couldn't edit your comment! Something went wrong."
+    destroy:
+      content_destroyed: "Comment contents destroyed."
+      soft_removed: "Comment removed."
+    errors:
+      not_found: "Comment not found."
+      destroyed: "Comment was wiped and cannot be recovered for this action."

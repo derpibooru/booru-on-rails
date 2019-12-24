@@ -1,0 +1,175 @@
+- content_for(:robots, true)
+h1 Content Settings
+- current_user_for_settings = current_user || User.new
+= form_for current_user_for_settings, url: :settings, method: :put do |f|
+  - if current_user_for_settings.errors.any?
+    #error_explanation
+      h2 = "#{pluralize(current_user_for_settings.errors.count, 'error')} prevented your settings from being saved:"
+      ul
+      - current_user_for_settings.errors.full_messages.each do |msg|
+        li = msg
+
+  #js-setting-table.block
+    .block__header.block__header--js-tabbed
+      - if current_user
+        = link_to 'Watch List', '#', class: 'selected', data: { click_tab: 'watched' }
+        = link_to 'Display', '#', data: { click_tab: 'display' }
+        = link_to 'Comments', '#', data: { click_tab: 'comments' }
+        = link_to 'Notifications', '#', data: { click_tab: 'notifications' }
+        = link_to 'Uploading', '#', data: { click_tab: 'uploading' }
+        = link_to 'Local', '#', data: { click_tab: 'local' }
+      - else
+        = link_to 'Local', '#', class: 'selected', data: { click_tab: 'local' }
+        = link_to 'More settings…', '#', data: { click_tab: 'join-the-herd' }
+    - if current_user
+      .block__tab data-tab="watched"
+        h4 Tags
+        .field
+          = f.label :watched_tag_list, "Tags to 'watch' (any image tagged with one shows up in watched images list) - tags must exist"
+          = render partial: 'tags/tag_editor', locals: { f: f, name: :watched_tag_list, type: :edit }
+        h4 Watchlist queries and filtering
+        p
+          ' The following two areas are for search queries to control what other images show up in your watch list. Lines are ||'d together. See
+          => link_to 'the Syntax Guide', search_syntax_path
+          | for how to write queries.
+        .field
+          = f.label :watched_images_query_str, 'Watch list search string (images found by this search are added to your watched images list)'
+          = f.text_area :watched_images_query_str, class: 'input input--wide', autocapitalize: 'none'
+        .field
+          = f.label :watched_images_exclude_str, 'Watch list filter string (any images found by this search are removed from your watched images list)'
+          = f.text_area :watched_images_exclude_str, class: 'input input--wide', autocapitalize: 'none'
+        .field
+          => f.label :no_spoilered_in_watched, 'Hide images spoilered by filter in watchlist'
+          => f.check_box :no_spoilered_in_watched, class: 'checkbox'
+        h4 Other
+        p
+          | RSS feed link (for Google Reader, Thunderbird, etc.):
+          br
+          = url_field_tag :subscribe_url, images_watched_url(format: :rss, key: current_user_for_settings.authentication_token), class: 'input input--wide'
+          br
+          | Do not share this URL with anyone, it may allow an attacker to compromise your account.
+      .block__tab.hidden.flex.flex--maybe-wrap data-tab="display"
+        div
+          .field
+            => f.label :use_centered_layout
+            => f.check_box :use_centered_layout, class: 'checkbox'
+            .fieldlabel: i Align content to the center of the page - try this option out if you browse the site on a tablet or a fairly wide screen.
+          .field
+            => f.label :show_sidebar_and_watched_images
+            => f.check_box :show_sidebar_and_watched_images, class: 'checkbox'
+            .fieldlabel: i Show the sidebar and new watched images on the homepage (the default) or hide it.
+          .field
+            => f.label :hide_vote_counts
+            => f.check_box :hide_vote_counts, class: 'checkbox'
+            .fieldlabel: i Hide upvote and downvote counts on images, showing only the overall score
+          .field
+            => f.label :show_large_thumbnails
+            => f.check_box :show_large_thumbnails, class: 'checkbox'
+            .fieldlabel: i Show 250x250 pixel thumbnails (the default) or, for smaller screens, display 150x150 pixel thumbnails.
+          .field
+            => f.label :images_per_page
+            => f.number_field :images_per_page, min: Booru::CONFIG.settings[:min_images_per_page], max: Booru::CONFIG.settings[:max_images_per_page], step: 1, class: 'input'
+            .fieldlabel
+              i
+                | This is the number of images per page that are displayed on image listings and searches, up to a maximum of
+                =< Booru::CONFIG.settings[:max_images_per_page]
+                |. For 1080p monitors, try 21.
+          .field
+            => f.label :scale_large_images
+            => f.check_box :scale_large_images, class: 'checkbox'
+            .fieldlabel: i Scale large images down to fit your monitor (approximately) server-side before downloading. Disabling this will load full images immediately on image pages.
+          .field
+            => f.label :theme
+            => f.select :theme, options_for_select($themes.map { |t| [t.capitalize, t, { 'data-theme-path' => stylesheet_path("themes/#{t}.css") }] }, current_user_for_settings.theme), {}, class: 'input'
+            .fieldlabel: i Preview themes by selecting one from the dropdown. Saving sets the currently selected theme.
+          .field
+            label
+              | Clear recent filters list
+              input< type="checkbox" name="clear_recent_filters" class="checkbox"
+            .fieldlabel: i Checking this will clear the recent filters list in the header dropdown.
+      .block__tab.hidden data-tab="comments"
+        .field
+          => f.label :comments_newest_first, 'Comments - Newest First'
+          => f.check_box :comments_newest_first, class: 'checkbox'
+          .fieldlabel: i Show the newest comments first (enabled) or show the oldest comments at the top of the page.
+        .field
+          => f.label :comments_always_jump_to_last, 'Comments - Show Latest Page'
+          => f.check_box :comments_always_jump_to_last, class: 'checkbox'
+          .fieldlabel: i
+            | This setting takes effect when the previous is disabled. Always jump to the latest page (enabled) or show the first page if the oldest comments are shown at the top of the page.
+            br
+            | Posting will always direct you to the latest page so that you can see your comment in context.
+        .field
+          => f.label :comments_per_page
+          => f.number_field :comments_per_page, min: Booru::CONFIG.settings[:min_comments_per_page], max: Booru::CONFIG.settings[:max_comments_per_page], step: 1, class: 'input'
+          .fieldlabel
+            i
+              | Number of comments per page when pagination is enabled. The default is 20, and the maximum is
+              =< Booru::CONFIG.settings[:max_comments_per_page]
+              |.
+        .field
+          => f.label :messages_newest_first, 'Messages - Newest First'
+          => f.check_box :messages_newest_first, class: 'checkbox'
+          .fieldlabel: i Show the newest messages first (enabled) or show the oldest messages at the top of a conversation. Enabling this makes it feel more like a top-posted email quote chain.
+      .block__tab.hidden data-tab="notifications"
+        .field
+          => f.label :watch_on_reply, 'Subscribe on Reply'
+          => f.check_box :watch_on_reply, class: 'checkbox'
+          .fieldlabel: i Subscribe on Reply means you'll be subscribed things (images or topics) automatically as soon as you post a comment or reply, keeping you in the conversation.
+        .field
+          => f.label :watch_on_upload, 'Subscribe on Upload'
+          => f.check_box :watch_on_upload, class: 'checkbox'
+          .fieldlabel: i Subscribe on Upload means you'll be subscribed to images automatically as soon as you upload, to help you keep track of comments.
+        .field
+          => f.label :watch_on_new_topic, 'Subscribe on New Threads'
+          => f.check_box :watch_on_new_topic, class: 'checkbox'
+          .fieldlabel: i Subscribe on New Threads means you'll be subscribed to threads automatically as soon as you post, to help you keep track of replies.
+      .block__tab.hidden data-tab="uploading"
+        .field
+          => f.label :fancy_tag_field_on_upload, 'Fancy tags - uploads'
+          => f.check_box :fancy_tag_field_on_upload, class: 'checkbox'
+        .field
+          => f.label :fancy_tag_field_on_edit, 'Fancy tags - edits'
+          => f.check_box :fancy_tag_field_on_edit, class: 'checkbox'
+          .fieldlabel: i The fancy tag editor gives you autosuggestions and visual representations of the tags, but is sometimes not desired - for instance when dealing with batch uploads where you might want to copy-paste tags. You can choose which type of editor to use by default here.
+        .field
+          => f.label :anonymous_by_default
+          => f.check_box :anonymous_by_default, class: 'checkbox'
+          .fieldlabel: i Check this box to post images and comments as anonymous by default, even if logged in.
+    .block__tab class=(current_user ? 'hidden' : nil) data-tab="local"
+      .block.block--fixed.block--warning Settings on this tab are saved in the current browser. They are independent of whether you are logged in or not.
+      .field
+        => label_tag :serve_hidpi, 'Serve HiDPI thumbnails'
+        => check_box_tag :serve_hidpi
+        .fieldlabel: i Use high quality thumbnails on displays with a high pixel density. Requires more data than regular thumbnails.
+      .field
+        => label_tag :serve_webm, 'Serve WebM'
+        => check_box_tag :serve_webm
+        .fieldlabel: i Serve WebM/MP4 versions of GIF images when available. Good for lower-bandwidth connections, but the video versions may have missing start/end frames, and do not support transparency.
+      .field
+        => label_tag :webm, 'Use video thumbnails'
+        => check_box_tag :webm
+        .fieldlabel: i Use video thumbnails for WebM videos. Does not apply to GIF images.
+      .field
+        => label_tag :hide_uploader
+        => check_box_tag :hide_uploader
+        .fieldlabel: i Hide the uploader and date posted information on image pages.
+      .field
+        => label_tag :chan_nsfw, 'Show NSFW channels'
+        => check_box_tag :chan_nsfw
+        .fieldlabel: i Show streams marked as NSFW on the channels page.
+      - if current_user_for_settings.staff?
+        .field
+          => label_tag :hide_staff_tools, 'Hide Staff Tools'
+          => check_box_tag :hide_staff_tools
+          .fieldlabel: i Hide most of the staff tools (e.g. user IP's, FP's, admin bar, etc) while this option is checked. Useful when browsing in public.
+    - if !current_user
+      .block__tab.hidden data-tab="join-the-herd"
+        p
+          | Consider
+          =< link_to 'creating an account!', new_user_registration_path
+          br
+          | You will be able to customize the number of images and comments you get on a single page, as well as change the appearance of the site with custom themes.
+    br
+    = f.submit 'Save My Settings', class: 'button'
+    br

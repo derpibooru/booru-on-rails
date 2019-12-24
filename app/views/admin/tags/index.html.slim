@@ -1,0 +1,29 @@
+- @tags = [] unless @query # do not show all tags without a search query; it is expensive resource-wise
+- list = capture do
+  table.table
+    thead
+      tr
+        th Tag
+        th Image
+        th Category
+        th Options
+    tbody
+      - @tags.each do |tag|
+        tr
+          td
+            => link_to tag.name, tag_path(tag)
+            | (
+            = tag.images_count
+            | )
+          td
+            - if tag.spoiler_image_uri.present?
+              .image-constrained.tag-image--constrained
+                = image_tag tag.spoiler_image_uri, alt: 'Spoiler image'
+          td
+            = Tag.category_labels[tag.category]
+          td
+            = link_to t('edit'), edit_admin_tag_path(tag)
+            - if can? :manage, Tag
+              '  &bull;
+              = link_to t('destroy'), admin_tag_path(tag), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { form_info: 'An empty query shows all tags (this may take a while to load)', form_path: admin_tags_path, item_class: Tag, items: @tags, new_item_path: new_admin_tag_path, rendered_list: list }

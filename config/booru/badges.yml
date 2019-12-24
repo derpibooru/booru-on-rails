@@ -1,0 +1,17 @@
+:monthly:
+  400: 14   # this month's on me
+  100: 23   # platinum
+  50:  12   # gold
+  20:  18   # silver
+  5:   17   # bronze
+  0:   null
+
+:all_time:
+  500: 22   # heart
+  350: 20   # diamond
+  200: 19   # sapphire
+  125: 24   # ruby
+  75:  21   # emerald
+  0:   null
+
+:artist: 27

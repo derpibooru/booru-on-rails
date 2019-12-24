@@ -1,0 +1,55 @@
+.filter
+  .filter-options
+    ul
+      li
+        ' Used by
+        => number_with_delimiter @filter.user_count
+        ' #{'person'.pluralize(@filter.user_count)}
+      li
+        ' Spoilers
+        => number_with_delimiter @filter.spoilered_tag_ids.size
+        ' #{'tag'.pluralize(@filter.spoilered_tag_ids.size)} and hides
+        => number_with_delimiter @filter.hidden_tag_ids.size
+        = 'tag'.pluralize(@filter.hidden_tag_ids.size)
+      / fixme: button_to
+      - if @filter && @filter == @current_filter
+        li
+          strong Your current filter
+      - else
+        li = link_to 'Use this filter', filters_current_path(id: @filter.id), method: :patch
+      - if can? :edit, @filter
+        li = link_to 'Edit this filter', edit_filter_path(@filter)
+      - elsif can? :create, Filter
+        li = link_to 'Copy and Customize this filter', new_filter_path(based_on_filter_id: @filter.id)
+      - if can? :delete, @filter
+        li = link_to 'Destroy this filter', filter_path(@filter), data: { confirm: t('are_you_sure') }, method: :delete
+  - if @filter.user
+    p.filter-maintainer
+      ' This filter is maintained by
+      = link_to @filter.user.name, profile_path(@filter.user)
+      ' .
+      - if @filter.public?
+        em This maintainer can change the filter without your permission if you use this shared filter
+  - if @filter.description.present?
+    p.filter-description = @filter.description
+  - spoilered_tags = @filter.spoilered_tags.sort_by(&:name)
+  - hidden_tags = @filter.hidden_tags.sort_by(&:name)
+  - if spoilered_tags.empty? && hidden_tags.empty?
+    p This filter doesn't hide or spoiler any tags.
+  - else
+    - if !spoilered_tags.empty? || @filter.spoilered_complex_str.present?
+      h5 This filter spoilers...
+      = render partial: 'tags/tag_list', locals: { tags: spoilered_tags.to_a }
+      - if @filter.spoilered_complex_str.present?
+        ' Complex filter:
+        code.spoiler-filter-code = @filter.normalized_spoilered_complex_str
+    - else
+      p This filter doesn't spoiler any tags.
+    - if !hidden_tags.empty? || @filter.hidden_complex_str.present?
+      h5 This filter hides...
+      = render partial: 'tags/tag_list', locals: { tags: hidden_tags.to_a }
+      - if @filter.hidden_complex_str.present?
+        ' Complex filter:
+        code.spoiler-filter-code = @filter.normalized_hidden_complex_str
+    - else
+      p This filter doesn't hide any tags.

@@ -1,0 +1,19 @@
+- @user.awards.includes(:badge).priority_first.each do |award|
+  - badge = award.badge
+  - label = (award.label || '-')
+  .block__content.flex.flex--centered.flex--center-distributed.alternating-color.no-overflow title=label
+    .flex__grow.center
+      .badge = image_tag badge.uploaded_image.url, alt: label, size: '32'
+      br
+        = award.badge_name.presence || badge.title
+      - if can?(:read, BadgeAward)
+        = (award.reason || '-')
+    .flex__grow.center
+      = (award.awarded_on ? friendly_time(award.awarded_on) : 'Some time ago')
+      - if can?(:manage, BadgeAward)
+        span<> title=award.awarded_by&.name.presence = (award.awarded_by ? user_abbrv(award.awarded_by) : '(Auto)')
+    - if can?(:manage, BadgeAward)
+      .flex__grow.center
+        a href=profile_badge_award_path(@user, award) data-method="delete" Remove
+        br
+        a href=edit_profile_badge_award_path(@user, award) Edit

@@ -1,0 +1,35 @@
+h1 = "#{@ip}'s IP profile"
+ul
+  li = link_to 'View images this IP has uploaded', search_path(q: "ip:#{@ip}", del: 1)
+  li = link_to 'View comments this IP has posted', comments_path(cq: "ip:#{@ip}", del: 1)
+  li = link_to 'View posts this IP has made', posts_path(ip: @ip, del: 1)
+= render partial: 'bans/ban_list', locals: { bans: @bans }
+
+h2 Administration Options
+ul
+  li = link_to 'View tag changes', "/ip_profiles/#{@ip}/tag_changes"
+  li = link_to 'View source URL history', "/ip_profiles/#{@ip}/source_changes"
+  li = link_to 'View reports this IP has made', admin_reports_path(rq: "ip:#{@ip}")
+  li = link_to 'View IP ban history', admin_subnet_bans_path(q: @ip)
+  li = link_to 'Ban this sucker', new_admin_subnet_ban_path(ip: @ip)
+
+h4 Observed users
+table.table
+  thead
+    tr
+      th Username
+      th Account Used
+      th Last Seen
+      th Created At
+  tbody
+    - @user_ips.each do |uip|
+      tr
+        td
+          =<> link_to uip.user.name, profile_path(uip.user)
+        td
+          =<> uip.uses
+          | times
+        td
+          =<> friendly_time uip.updated_at
+        td
+          =<>friendly_time uip.user.created_at

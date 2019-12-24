@@ -1,0 +1,55 @@
+- page_layout :medium
+
+h1 = @title
+.column-layout
+  .column-layout__left
+    .block
+      .block__content
+        h3 Search
+        = form_tag posts_path, class: 'hform', method: :get, enforce_utf8: false do
+          .field = label_tag :author, 'Author'
+          .field = text_field_tag :author, params[:author], class: 'input hform__text', placeholder: 'Author (* is wildcard)'
+          - if can? :manage, Post
+            .field = label_tag :ip, 'IP address'
+            .field = text_field_tag :ip, params[:ip], class: 'input hform__text', placeholder: '192.168.0.1'
+            .field = label_tag :fingerprint, 'Fingerprint'
+            .field = text_field_tag :fingerprint, params[:fingerprint], class: 'input hform__text'
+
+          .field = label_tag :subject, 'Topic title'
+          .field = text_field_tag :subject, params[:subject], class: 'input hform__text', placeholder: 'Topic title'
+          .field
+            => label_tag :topics_only, 'Topic openers only?'
+            =< check_box_tag :topics_only, '1', params[:topics_only], class: 'checkbox'
+          .field
+          .field = label_tag :forum_id, 'Forum'
+          .field
+            - forums = Forum.get_user_facing_list current_user
+            = select_tag :forum_id, options_from_collection_for_select(forums, :id, :name, params[:forum_id]), class: 'input hform__text', include_blank: true
+          .field = label_tag :body, 'Post body'
+          .field = text_area_tag :body, params[:body], class: 'input input--wide', placeholder: 'Body'
+          .field = label_tag :sort_by
+          .field
+            =< select_tag :sf, options_for_select({ 'Creation Date' => 'created_at', 'Relevance' => 'relevance' }, params[:sf]), class: 'input'
+            =< select_tag :sd, options_for_select({ 'Descending' => 'desc', 'Ascending' => 'asc' }, params[:sd]), class: 'input'
+          - if can? :manage, Post
+            .field.js-staff-action
+              => radio_button_tag :del, '', params[:del].blank?, id: :'post-search-no-deleted'
+              => label_tag :'post-search-no-deleted', 'No Deleted'
+              => radio_button_tag :del, '1', params[:del].present? && params[:deleted] != 'only', id: :'post-search-include-deleted'
+              => label_tag :'post-search-include-deleted', 'Include Deleted'
+              => radio_button_tag :del, 'only', params[:del] == :only, id: :'post-search-only-deleted'
+              => label_tag :'post-search-only-deleted', 'Only Deleted'
+          .field
+          = submit_tag 'Search', class: 'button button--state-primary'
+  .column-layout__main
+    - pagination = paginate @posts
+    .block
+      .block__header
+        = pagination
+
+    =<> render partial: 'topics/posts/post_list', locals: { forum: nil }
+
+    .block
+      .block__header.block__header--light
+        = pagination
+        span.block__header__title = pagination_info(@posts)

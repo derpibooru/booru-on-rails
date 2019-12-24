@@ -1,0 +1,20 @@
+- Differ.format = :html
+- page_layout :wide
+
+h1
+  ' Revision history for
+  = link_to @static_page.title, @static_page
+
+table.table
+  thead
+    tr
+      th User
+      th Date
+      th Body
+
+  tbody
+    - @versions.each do |new_version, old_version|
+      tr
+        td = link_to new_version.user.name, profile_path(new_version.user)
+        td = friendly_time(new_version.created_at)
+        td.static-page__diff == Differ.diff_by_line(h(new_version.body.gsub("\r", '')), h(old_version&.body&.gsub("\r", '')))

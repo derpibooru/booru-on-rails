@@ -1,0 +1,3 @@
+.block__content.js-imagelist-info.flex class="#{params[:page] && params[:page].to_i > 1 ? 'hidden' : ''}"
+  .flex__grow
+    = render partial: 'tags/tag_list', locals: { tags: @ignoredtaglist }

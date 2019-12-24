@@ -1,0 +1,11 @@
+/ partial, accepts :info, :path, :q (default :q), :text (default 'Search query')
+- text = 'Search query' unless local_assigns[:text]
+- q = :q unless local_assigns[:q]
+= form_tag path, class: 'hform', method: :get, enforce_utf8: false do
+  .field
+    = text_field_tag q, params[q], class: 'hform__text input', placeholder: text
+    = submit_tag 'Search', class: 'button hform__button'
+  - if local_assigns[:info]
+    = info
+    br
+    br

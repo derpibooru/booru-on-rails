@@ -1,0 +1,36 @@
+- if params[:q].present?
+  - if @images.present?
+    = render partial: 'images/imagelist', locals: { images: @images, header: @title, info_row: tag_info, random_image_href: random_image_path }
+
+  - elsif @search_failed
+    h2 Resu- uhh...
+    p
+      strong> Okay, hold up.
+      ' We couldn't make heads or tails of whatever it is you just searched for.
+    p
+      ' You searched for
+      code = params[:q]
+      ' , which is all well and good but perhaps it doesn't make total sense to
+      ' our search engine. A classic problem is imbalanced parentheses. That is, have
+      ' you provided a
+      code> )
+      ' for every
+      code = '('
+      ' ? Did you try surrounding terms in quotes?
+    p
+      ' Twilight Meditation:
+      strong
+        code = @search_failed
+  - else
+    h2 Results
+    p
+      ' We couldn't find any images for you. None at all. Nope. We did try,
+      ' though! For the most part. Have a look below and see if you can improve
+      ' your search.
+    p
+      strong> Remember, we won't show you anything tagged with stuff you've got hidden!
+      ' Head to the
+      => link_to 'filters', filters_path
+      | page to change your tag hiding preferences.
+
+= render partial: 'search/form'

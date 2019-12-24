@@ -1,0 +1,72 @@
+h2 DNP Listing for Tag "#{ @dnp_entry.tag.name }"
+.block
+  .block__header
+    span.block__header__title DNP Information
+    = link_to 'Back to DNP List', admin_dnp_entries_path
+  .block__content
+    table.table
+      tbody
+        tr
+          td Tag:
+          td
+            = render partial: 'tags/tag', locals: { tag: @dnp_entry.tag }
+        tr
+          td Requesting User:
+          td = link_to @dnp_entry.requesting_user.name, profile_path(@dnp_entry.requesting_user)
+        tr
+          td Type:
+          td = @dnp_entry.dnp_type
+        tr
+          td Conditions:
+          td = render_textile(@dnp_entry.conditions)
+        tr
+          td State:
+          td
+            - state_text = @dnp_entry.aasm_state == 'acknowledged' ? 'Claimed (Rescinded)' : @dnp_entry.aasm_state
+            => state_text.capitalize
+            - if @dnp_entry.modifying_user.present?
+              ' by
+              = link_to @dnp_entry.modifying_user.name, profile_path(@dnp_entry.modifying_user)
+        tr
+          td Reason:
+          td = render_textile(@dnp_entry.reason)
+        tr
+          td Reason hidden:
+          td = @dnp_entry.hide_reason
+        tr
+          td Instructions:
+          td = render_textile(@dnp_entry.instructions)
+        tr
+          td Feedback:
+          td = @dnp_entry.feedback
+        tr
+          td Created:
+          td = friendly_time(@dnp_entry.created_at)
+        tr
+          td Updated:
+          td = friendly_time(@dnp_entry.updated_at)
+        tr
+          td Options:
+          td
+            => link_to 'Send PM', new_conversation_path(recipient: @dnp_entry.requesting_user.name)
+            - if @dnp_entry.aasm_state != 'closed'
+              ' &bull;
+              => link_to 'Edit', edit_admin_dnp_entry_path(@dnp_entry)
+            - if %w[requested claimed].include? @dnp_entry.aasm_state
+              ' &bull;
+              => link_to 'Claim', admin_dnp_entry_transition_path(@dnp_entry, do: 'claim'), method: :post, data: { confirm: t('dnp.confirm') }
+              ' &bull;
+              => link_to 'Approve', admin_dnp_entry_transition_path(@dnp_entry, do: 'list'), method: :post, data: { confirm: t('dnp.confirm') }
+              ' &bull;
+              = link_to 'Close', admin_dnp_entry_transition_path(@dnp_entry, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }
+            - elsif %w[listed].include? @dnp_entry.aasm_state
+              ' &bull;
+              => link_to 'Rescind', admin_dnp_entry_transition_path(@dnp_entry, do: 'rescind'), method: :post, data: { confirm: t('dnp.confirm') }
+              ' &bull;
+              = link_to 'Close', admin_dnp_entry_transition_path(@dnp_entry, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }
+            - elsif %w[rescinded acknowledged].include? @dnp_entry.aasm_state
+              ' &bull;
+              => link_to 'Claim', admin_dnp_entry_transition_path(@dnp_entry, do: 'acknowledge'), method: :post, data: { confirm: t('dnp.confirm') }
+              ' &bull;
+              = link_to 'Close', admin_dnp_entry_transition_path(@dnp_entry, do: 'close'), method: :post, data: { confirm: t('dnp.confirm') }
+= render partial: 'admin/mod_notes/table', locals: { notable: @dnp_entry }

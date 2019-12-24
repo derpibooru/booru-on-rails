@@ -1,0 +1,24 @@
+- if !@current_ban
+  a href="/reports/new?reportable_class=image&reportable_id=#{@image.id}"
+    button.button.button--link
+      i.fa.fa-exclamation-triangle>
+      | General reporting
+  .report-duplicate
+    - checked = @dupe_reports.any? { |dr| dr.state == 'open' }
+    input.toggle-box id="image-dedupe" type="checkbox" checked=checked
+    label for="image-dedupe" Updating/merging
+    .toggle-box-container
+      .toggle-box-container__content
+        - if current_user
+          == render partial: 'duplicate_reports/form', locals: { image: @image }
+        - else
+          p
+            ' You must
+            a> href="/users/sign_in" log in
+            | to report duplicate images.
+        h4 Existing duplicate reports
+        == render partial: 'duplicate_reports/list', locals: { duplicate_reports: @dupe_reports.select { |dr| dr.duplicate_of_image == @image } }
+        == render partial: 'duplicate_reports/list', locals: { duplicate_reports: @dupe_reports.select { |dr| dr.image == @image } }
+
+- else
+  | Cannot report while banned

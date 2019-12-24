@@ -1,0 +1,38 @@
+h1 Reverse Search
+= form_tag '/search/reverse', multipart: true do
+  p Basic image similarity search. Finds uploaded images similar to the one provided based on simple intensities and uses the first frame of GIFs; very low contrast images (such as sketches) will produce poor results and, regardless of contrast, results may include seemingly random images that look very different.
+  = render partial: 'layouts/image_upload', locals: { form: nil, field: :image }
+  h4 Optional settings
+  .field
+    = label_tag :fuzziness, 'Match fuzziness (suggested values: between 0.2 and 0.5)'
+    br
+    = number_field_tag :fuzziness, '0.25', min: 0, max: 1, step: 0.01, class: 'input'
+  .field
+    = submit_tag 'Reverse Search', class: 'button'
+- if @matches.present?
+  h2 Results
+  table
+    tr
+      th &nbsp;
+      th Image
+      th &nbsp;
+    - @matches.each do |di|
+      tr
+        th
+          h3 = link_to "##{di.id}", short_image_path(di)
+          p
+            - if di.source_url.present?
+              span class='source_url'
+                = link_to 'Source', di.source_url, 'xmlns:dc' => 'http://purl.org/dc/elements/1.1/', rel: 'dc:source'
+            - else
+              | Unknown Source
+        th
+          = render partial: 'images/image_container', locals: { image: di, size: :thumb }
+        td
+          h3 = "#{di.image_width}x#{di.image_height} - #{di.image_size / 1024} kB"
+          = render partial: 'tags/tag_list', locals: { tags: di.tags.sort_by(&:name) }
+
+- elsif request.post?
+  h2 Results
+  p
+    | We couldn't find any images matching this in our image database.

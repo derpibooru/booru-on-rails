@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# Just in case
+test -s /usr/local/share/chruby/chruby.sh && source /usr/local/share/chruby/chruby.sh
+test -s /usr/local/share/chruby/auto.sh && source /usr/local/share/chruby/auto.sh
+
+# Set ruby version dynamically, proofs for runtime upgrades.
+RUBY_VERSION=`git cat-file blob HEAD:.ruby-version`
+chruby $RUBY_VERSION
+
+# Set rails environment
+export RAILS_ENV=production
+
+read oldrev newrev ref
+echo "Updating $oldrev -> $newrev ($ref)"
+
+# Clear variable set to '.' so git commands don't complain
+unset GIT_DIR
+
+die() {
+    echo "$*" 1>&2
+    exit 1
+}
+
+if git diff --name-only $oldrev $newrev | grep "^Gemfile"; then
+  echo "Running bundler"
+  bundle install --quiet --without development test || die "bundler failed to update"
+fi
+
+# Run migrations
+if git diff --name-only $oldrev $newrev | grep "^db/"; then
+  echo "Running database migrations"
+  bundle exec rake db:migrate || die "db:migrate failed"
+fi
+
+# Reset assets
+if git diff --name-only $oldrev $newrev | grep "^app/assets/"; then
+  echo "Compiling assets"
+  bundle exec rake assets:precompile || die "assets compile failed"
+  rsync -a --no-links -P --exclude "uploads/tmp" /home/derpibooru/derpibooru/public/ /home/derpibooru/shared/public/system/images/public/ || die "assets rsync failed"
+fi
+
+# Restart puma
+kill -USR2 `cat ~/derpibooru/tmp/pids/unicorn.pid`
+
+# Restart background workers
+bundle exec eye quit --stop_all
+bundle exec eye load /home/derpibooru/derpibooru/config/derpibooru.eye

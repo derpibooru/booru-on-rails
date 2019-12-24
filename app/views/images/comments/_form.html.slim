@@ -1,0 +1,20 @@
+- edit = comment.persisted?
+= form_for [image, comment], remote: !edit, html: { id: 'js-comment-form' } do |f|
+  = render partial: 'layouts/errors', locals: { errors: comment.errors }
+  - edit_area = capture do
+    = render partial: 'layouts/textile_toolbar'
+    = f.text_area :body, class: 'input input--wide input--text js-preview-input js-toolbar-input', placeholder: 'Please read the site rules before posting and use [spoiler][/spoiler] for above-rating stuff.', required: true
+  - title = edit ? 'Edit' : 'Write'
+  - actions = capture do
+    - if edit
+      .field = f.text_field :edit_reason, class: 'input input--wide', placeholder: 'Reason for edit'
+      = f.submit 'Edit', class: 'button', autocomplete: 'off', data: { disable_with: 'Updating...' }
+    - else
+      = f.button class: 'button', autocomplete: 'off', data: { disable_with: 'Posting...' } do
+        i.fa.fa-comment>
+        | Post
+      - if current_user
+        = f.check_box :anonymous, checked: current_user.anonymous_by_default, class: 'checkbox preview-anonymous spacing-left'
+        =< f.label :anonymous
+    = f.hidden_field :fuck_ie, value: 'fuck_ie'
+  = render partial: 'communications/communication_edit', locals: { title: title, edit_area: edit_area, actions: actions }

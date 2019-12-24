@@ -1,0 +1,45 @@
+- if !@image.destroyed_content
+  - if can? :undelete, @image
+    = form_tag image_hide_path(@image.id), method: :delete do
+      .field
+        = submit_tag 'Restore post', class: 'button button--state-success button--full-width'
+- if @image.duplicate_id
+  .walloftext
+    .block.block--fixed.block--warning
+      h1 This image has been merged into another image
+      p
+        ' This image was merged into image
+        => link_to "##{@image.duplicate_id}", "/#{@image.duplicate_id}"
+        | because it was determined to be a duplicate of that image.
+
+  - if can? :reject, DuplicateReport
+    hr
+    p = link_to 'Restore Post', image_hide_path(@image), method: :delete
+- else
+  .walloftext
+    .block.block--fixed.block--warning
+      h1 This image has been deleted
+      p
+        ' Reason:
+        strong = @image.deletion_reason || 'Unknown (likely deleted in error). Please contact a moderator.'
+      - if can? :undelete, @image
+        p
+          strong> Spoilers!
+          ' Done by:
+          strong = @image.deleted_by&.name || 'System'
+    p
+      ' If you originally uploaded the file previously located here, please don't re-upload it -
+      => link_to 'contact us', '/pages/contact'
+      | if you feel this was in error and we'll talk! We're only human, and mistakes happen.
+    p
+      ' Here's the
+      => link_to 'tagging guidelines', '/pages/tags'
+      ' and
+      = link_to 'rules of the site', '/pages/rules'
+      | . Other useful links can be found at the bottom of the page.
+
+- if @image.can_see_when_hidden?(current_user)
+  = render template: 'images/show', locals: { image: @image }
+- else
+  p Tags:
+  = render partial: 'tags/tag_list', locals: { tags: @image.tags.display_order }

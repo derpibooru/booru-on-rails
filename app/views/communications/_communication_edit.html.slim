@@ -1,0 +1,23 @@
+/ usage: define communication editing area with +edit_area+ (make sure the element has 'js-preview-input' class),
+  define form actions ('Post'/'Edit'/'Submit') with +actions+, pass edit tab name with +title+.
+  use captured blocks to define multiple elements. example:
+  - edit_area = text_area_tag(name, content, { class: 'input input--wide input--text js-preview-input' })
+  - actions = capture do
+    .field
+      = submit_tag 'Post'
+ = render partial: 'communications/communication_edit', locals: { title: 'Leave a Comment', edit_area: edit_area, actions: actions }
+.block
+  .block__header.block__header--js-tabbed
+    =link_to '#', class: 'selected', data: { click_tab: 'write' } do
+      i.fa.fa-pencil-alt>
+      = title
+    =link_to '#', data: { click_tab: 'preview' } do
+      i.fa.fa-eye>
+      | Preview
+  .block__tab.communication-edit__tab.selected data-tab="write"
+    = render partial: 'layouts/textile_help'
+    = edit_area
+  .block__tab.communication-edit__tab.hidden data-tab="preview"
+    | [Loading preview...]
+  .block__content.communication-edit__actions
+    = actions

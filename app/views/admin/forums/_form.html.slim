@@ -1,0 +1,15 @@
+= form_for [:admin, @forum] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @forum.errors }
+  .field
+    => f.label :name, 'Name:'
+    = f.text_field :name, class: 'input input--wide'
+  .field
+    => f.label :short_name, 'Slug:'
+    = f.text_field :short_name, class: 'input input--wide'
+  .field
+    => f.label :description, 'Description:'
+    = f.text_area :description, class: 'input input--wide'
+  .field
+    => f.label :access_level, 'Access level:'
+    = f.select :access_level, options_for_select({ Normal: 'normal', Assistant: 'assistant', Moderator: 'staff' }, @forum.access_level), {}, class: 'input'
+  = f.submit 'Save Forum', class: 'button'

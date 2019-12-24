@@ -1,0 +1,3 @@
+= render partial: 'images/image_container', locals: { image: reportable.image, size: :thumb_tiny }
+a href=short_image_path(reportable.image, anchor: "comment_#{reportable.id}")
+  = text

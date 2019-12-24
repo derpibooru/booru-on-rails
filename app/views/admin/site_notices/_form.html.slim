@@ -1,0 +1,29 @@
+= form_for [:admin, @site_notice] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @site_notice.errors }
+  .field
+    => f.label :title, 'Title (the bold bit) for the site notice; keep this short:'
+    = f.text_field :title, class: 'input input--wide', placeholder: 'Title', required: true
+  .field
+    => f.label :text, 'Main body of the site notice:'
+    = f.text_field :text, class: 'input input--wide', placeholder: 'Text', required: true
+  h3
+    ' Link
+    small (optional; leave these two fields blank for no link)
+  .field
+    => f.label :link_text, 'Text which will contain the link:'
+    = f.text_field :link_text, class: 'input input--wide', placeholder: 'Link text'
+  .field
+    => f.label :link, 'Link which the site notice should take users to:'
+    = f.text_field :link, class: 'input input--wide', placeholder: 'Link'
+  h3 Run Time
+  .field
+    => f.label :start, 'Start time for the site notice (usually "now"):'
+    = f.text_field :start, class: 'input input--wide', required: true
+  .field
+    => f.label :finish, 'Finish time for the site notice (e.g. "2 weeks from now"):'
+    = f.text_field :finish, class: 'input input--wide', required: true
+  h3 Enable
+  .field
+    => f.check_box :live, checked: @site_notice.new_record? || @site_notice.live, class: 'checkbox'
+    = f.label :live, 'Live'
+  = f.submit 'Save Site Notice', class: 'button'

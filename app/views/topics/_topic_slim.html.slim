@@ -1,0 +1,11 @@
+- topic = topic_slim
+.block__content.alternating-color
+  - if topic.sticky
+    i.fa.fa-thumbtack>
+  - if topic.last_post
+    span.hyphenate-breaks
+      => link_to_author(topic.last_post, false)
+    => link_to 'replied to', short_topic_post_path(topic.forum, topic, topic.last_post, anchor: "post_#{topic.last_post.id}")
+  =<> link_to topic.title, short_topic_path(topic.forum, topic)
+  | in
+  =< link_to topic.forum.name, short_forum_path(topic.forum)

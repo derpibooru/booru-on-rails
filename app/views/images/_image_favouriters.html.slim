@@ -1,0 +1,21 @@
+h5 Favorited by #{pluralize(@image.faves_count, 'user')}
+- @image.faves.sort_by { |f| f.user.name }.each do |f|
+  = link_to f.user.name, profile_path(f.user), class: 'interaction-user-list-item'
+
+- if can?(:manage, @image) && !@image.hidden_from_users && (cookies['hidestaff'] != 'true'.freeze)
+  h5 Upvoted by #{pluralize(@image.upvotes_count, 'user')}
+  - @image.upvotes.each do |u|
+    span.interaction-user-list-item
+      = link_to u.user.name, profile_path(u.user)
+      = link_to '(x)', image_vote_path(@image, u.user.id), method: :delete
+
+  h5 Downvoted by #{pluralize(@image.downvotes_count, 'user')}
+  - @image.downvotes.each do |d|
+    span.interaction-user-list-item
+      = link_to d.user.name, profile_path(d.user)
+      = link_to '(x)', image_vote_path(@image, d.user.id), method: :delete
+
+  h5 Hidden by #{pluralize(@image.hides_count, 'user')}
+  - @image.hides.each do |h|
+    span.interaction-user-list-item
+      = link_to h.user.name, profile_path(h.user)

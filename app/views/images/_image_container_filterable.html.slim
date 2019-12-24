@@ -1,0 +1,44 @@
+/ usage:
+  embedded thumbnails { image: image, size: :medium (or :small, :thumb, etc.) }
+  full image { image: image, size: :full }
+- if image && image.visible_to?(current_user)
+  ruby:
+    full_view = size == :full
+    tagblocked_size = full_view ? '250' : '150'
+    see_hidden = image.hidden_from_users && image.can_see_when_hidden?(current_user)
+
+  .image-show-container data=image_container_data(image)
+    .block.block--fixed.block--warning.block--no-margin.image-filtered.hidden class=('layout--narrow' if full_view)
+      strong = link_to 'This image is blocked by your current filter - click here to display it anyway', '#', data: { click_unfilter: image.id.to_s }
+      p = image_tag '/tagblocked.svg', size: tagblocked_size, data: { click_unfilter: image.id.to_s }
+      span.filter-explanation
+      =< link_to 'your current filter', '/filters/current', class: 'filter-link'
+      br
+      - if full_view
+        strong This warning may be hiding NSFW (18+) content. Your jurisdiction/age may mean viewing this content is illegal.
+        br
+        | You can click above to reveal the image just this once, or change/edit your filter to allow this tag at all times.
+      - else
+        | Image tags:
+        strong =< image.tag_list
+    - if full_view
+      #image_target.hidden.image-show data-scaled=(current_user && !current_user.scale_large_images ? 'false' : 'true') data-uris=image.image.view_urls(hidden: see_hidden).to_json data-width=image.image_width data-height=image.image_height
+        - if image.image_mime_type == 'video/webm'
+          video[controls] = image_tag 'loading_image.png'
+        - else
+          picture = image_tag 'loading_image.png'
+    - else
+      .image-show.hidden
+        a href=short_image_path(image)
+          span.imgspoiler
+            - hover_text = t('images.thumbs.hover', width: image.image_width, height: image.image_height, tags: image.tag_list)
+            - if image.image_mime_type == 'video/webm'
+              video data-image-id=image.id alt=hover_text title=hover_text autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"
+                source src=image.image.url(size, hidden: see_hidden) type="video/webm"
+                source src=image.image.url(size, hidden: see_hidden).gsub(/webm\z/, 'mp4') type="video/mp4"
+            - else
+              picture[data-image-id=image.id alt=hover_text title=hover_text]: img src=image.image.url(size, hidden: see_hidden)
+- else
+  .block.block--fixed.block--warning
+    strong> Image not found or deleted
+    p The image embedded here was not found or has been deleted since it was embedded here.

@@ -1,0 +1,52 @@
+.hide-mobile
+  .dropdown.header__dropdown
+    a.header__link href="/images"
+      | Images
+      span data-click-preventdefault="true"
+        i.fa.fa-caret-down<
+    .dropdown__content
+      a.header__link href=search_path(q: '*'.freeze, random_image: 'y'.freeze)
+        | Random
+  .dropdown.header__dropdown
+    a.header__link href="/activity"
+      | Activity
+      span data-click-preventdefault="true"
+        i.fa.fa-caret-down<
+    .dropdown__content
+      a.header__link href="/lists"
+        | Rankings
+      a.header__link href="/lists/recent_comments"
+        | Comments
+  .dropdown.header__dropdown
+    a.header__link href="/forums"
+      | Forums
+      span data-click-preventdefault="true"
+        i.fa.fa-caret-down<
+    .dropdown__content
+      - cache_if(current_user.nil? || current_user.role == 'user'.freeze, expires_in: 1.day) do
+        - Forum.get_user_facing_list(current_user).each do |f|
+          a.header__link href=short_forum_path(f) = f.name
+      a.header__link href='/posts'
+        i.fa.fa-fw.fa-search>
+        | Post Search
+  .dropdown.header__dropdown
+    a.header__link href="/tags"
+      | Tags
+      span data-click-preventdefault="true"
+        i.fa.fa-caret-down<
+    .dropdown__content
+      a.header__link href="/tags/ratings"
+        | Ratings
+      a.header__link href="/pages/tags"
+        | Guidelines
+      a.header__link href="/tags/aliases"
+        | Aliased
+  - cache 'livestream-button'.freeze, expires_in: 60 do
+    a.header__link href='/channels'
+      ' Live
+      span.header__counter
+        = Channel.where(is_live: true).count.to_s
+  a.header__link href='/galleries'
+    | Galleries
+  a.header__link href='/commissions'
+    | Commissions

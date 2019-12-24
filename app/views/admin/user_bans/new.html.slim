@@ -1,0 +1,10 @@
+h1 New User Ban
+= render partial: 'form'
+br
+= link_to 'Back', admin_users_path, class: 'button button--link'
+
+- if @user
+  h4
+    | Mod Notes for
+    =< @user.name
+  = render partial: 'admin/mod_notes/table', locals: { notable: @user }

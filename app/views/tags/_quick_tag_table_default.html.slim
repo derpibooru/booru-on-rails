@@ -1,0 +1,8 @@
+- models = Tag.where(name: data.values.flatten).includes(:implied_tags).index_by(&:name)
+- data.each do |heading, tags|
+  div
+    strong = heading
+    br/
+    - tags.each do |tag_name|
+      = print_tag_link models[tag_name], tag_name
+      br/

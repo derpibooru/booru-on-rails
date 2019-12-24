@@ -1,0 +1,103 @@
+= form_for [:admin, @user] do |f|
+  = render partial: 'layouts/errors', locals: { errors: @user.errors }
+  .block
+    .block__header
+      span.block__header__title Essential user details
+    label.table-list__label
+      .table-list__label__text Name:
+      .table-list__label__input = f.text_field :name, class: 'input'
+    label.table-list__label
+      .table-list__label__text Email:
+      .table-list__label__input = f.text_field :email, class: 'input'
+    - if @user.role.present? && can?(:manage, Role)
+      label.table-list__label
+        .table-list__label__text Role:
+        .table-list__label__input = f.select :role, options_for_select(User::ROLES.map { |r| [r.humanize, r] }, @user.role), {}, class: 'input'
+      label.table-list__label
+        .table-list__label__text Secondary banner:
+        .table-list__label__input = f.select :secondary_role, options_for_select(User::SECONDARY_ROLES.map, @user.secondary_role), { include_blank: '-' }, class: 'input'
+      label.table-list__label
+        .table-list__label__text Hide staff banner:
+        .table-list__label__input = f.check_box :hide_default_role, class: 'checkbox'
+    label.table-list__label
+      .table-list__label__text Personal title:
+      .table-list__label__input = f.text_field :personal_title, class: 'input'
+    .table-list__label
+      .table-list__label__text Avatar:
+      .table-list__label__input
+        .field
+          => f.label :uploaded_avatar, 'Upload image:'
+          = f.file_field :uploaded_avatar, class: 'input'
+        - if @user.avatar.present?
+          .field
+            => f.check_box :remove_avatar, class: 'checkbox'
+            = f.label :remove_avatar, 'Remove avatar'
+  .block
+    .block__header
+      span.block__header__title General user flags
+    label.table-list__label
+      .table-list__label__text Hide ads:
+      .table-list__label__input = f.check_box :hide_advertisements, class: 'checkbox'
+    label.table-list__label
+      .table-list__label__text Disallow creating polls in forum topics:
+      .table-list__label__input = check_box_tag :abuses_polls, nil, @user.has_role?(:abuses, Poll), class: 'checkbox'
+    label.table-list__label
+      .table-list__label__text Disallow voting on polls:
+      .table-list__label__input = check_box_tag :abuses_poll_votes, nil, @user.has_role?(:abuses, PollVote), class: 'checkbox'
+    - if can? :manage, Role
+      label.table-list__label
+        .table-list__label__text Add tags in batches:
+        .table-list__label__input = check_box_tag :batch_tag, nil, @user.has_role?(:batch_update, Tag), class: 'checkbox'
+  - if can? :manage, Role
+    .block
+      .block__header.warning
+        span.block__header__title Special roles for assistants
+      .table-list__label
+        .table-list__label__text Manage images:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :image_mod, granted: @user.has_role?(:moderator, Image) }
+      .table-list__label
+        .table-list__label__text Manage duplicates:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :dupe_mod, granted: @user.has_role?(:moderator, DuplicateReport) }
+      .table-list__label
+        .table-list__label__text Manage comments:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :comment_mod, granted: @user.has_role?(:moderator, Comment) }
+      .table-list__label
+        .table-list__label__text Manage tags details:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :tag_mod, granted: @user.has_role?(:moderator, Tag) }
+      .table-list__label
+        .table-list__label__text Manage user links:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :link_mod, granted: @user.has_role?(:moderator, UserLink) }
+      .table-list__label
+        .table-list__label__text Moderate forums:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :forum_mod, granted: @user.has_role?(:moderator, Topic) }
+    .block
+      .block__header.danger
+        span.block__header__title Special roles for moderators
+      .table-list__label
+        .table-list__label__text Manage users and wipe votes:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :user_edit, granted: @user.has_role?(:moderator, User) }
+      .table-list__label
+        .table-list__label__text Manage permissions:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :can_roles, granted: @user.has_role?(:admin, Role) }
+      .table-list__label
+        .table-list__label__text Manage tags, access Sidekiq:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :tag_admin, granted: @user.has_role?(:admin, Tag) }
+      .table-list__label
+        .table-list__label__text Manage system flags (flipper):
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :flipper, granted: @user.has_role?(:flipper) }
+      .table-list__label
+        .table-list__label__text Manage site notices:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :can_notice, granted: @user.has_role?(:admin, SiteNotice) }
+      .table-list__label
+        .table-list__label__text Manage badges:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :can_badges, granted: @user.has_role?(:admin, Badge) }
+      .table-list__label
+        .table-list__label__text Manage FP bans:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :ban_competent, granted: @user.has_role?(:ban_competent) }
+      .table-list__label
+        .table-list__label__text View 2FA details:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :twofactor, granted: @user.has_role?(:twofactor) }
+      .table-list__label
+        .table-list__label__text Manage ads:
+        .table-list__label__input = render partial: 'role_selector', locals: { permission: :can_advert, granted: @user.has_role?(:admin, Advert) }
+  = f.submit 'Save User', class: 'button'

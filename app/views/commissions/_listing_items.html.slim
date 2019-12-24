@@ -1,0 +1,47 @@
+.block
+  .block__header
+    span.block__header__title Available Items and Prices
+    - if can? :edit, @user.commission
+      = link_to 'Add an item', new_commission_item_path(@user.commission)
+  .block__content
+    - if @user.commission.commission_items.blank?
+      - if @user == current_user
+        p You have not added any items to your commissions sheet yet.
+        p Your listing will not appear in search results until you list at least one item.
+      - else
+        p This artist has not added any items yet. Please check back later.
+    - else
+      table.table
+        thead
+          tr
+            th Example
+            th Description
+            th Base Price
+            th Add-Ons
+            - if can? :edit, @user.commission
+              th Options
+        tbody
+          - @user.commission.commission_items.order(base_price: :asc).each do |item|
+            tr
+              td
+                - if item.example_image_id.present?
+                  = render partial: 'images/image_container', locals: { image: item.example_image, size: :thumb_small }
+                - else
+                  | (No example)
+              td
+                strong
+                  =item.item_type
+                br
+                br
+                = render_textile(item.description)
+              td
+                | $
+                = format('%.2f', item.base_price)
+              td
+                =  render_textile(item.add_ons)
+              - if can? :edit, @user.commission
+                td
+                  = link_to 'Edit Item', edit_commission_item_path(@user.commission, item)
+                  br
+                  br
+                  = link_to 'Delete Item', commission_item_path(@user.commission, item), data: { confirm: t('are_you_sure') }, method: :delete

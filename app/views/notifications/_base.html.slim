@@ -1,0 +1,13 @@
+- if notification.actor
+  .block.block--fixed.flex class="js-notification-id-#{notification.id}"
+    - if notification.actor_type == 'Image' && notification.actor.id
+      .flex.flex--centered.flex__fixed.thumb-tiny-container.spacing-right = render partial: 'images/image_container', locals: { image: notification.actor, size: :thumb_tiny }
+    .flex.flex--centered.flex__grow
+      div
+        = render partial: "notifications/#{notification.actor_type.downcase}", locals: { notification: notification }
+        =< friendly_time notification.updated_at
+    .flex.flex--centered.flex--no-wrap
+      a.button.button--separate-right title="Delete" data-click-markread=notification.id
+        i.fa.fa-trash
+      a.button title="Unsubscribe" data-subscription-id=notification.actor_id data-subscription-type=notification.actor_type data-click-togglesubscription="unwatch" data-click-hide=".js-notification-id-#{notification.id}"
+        .fa.fa-bell-slash

@@ -1,0 +1,7 @@
+test:
+  adapter: postgresql
+  encoding: unicode
+  host: postgres
+  pool: 3
+  database: derpibooru_test
+  username: derpibooru

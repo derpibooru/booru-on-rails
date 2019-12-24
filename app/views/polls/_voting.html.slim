@@ -1,0 +1,32 @@
+- if can? :manage, Poll
+  #poll-actions
+    .block__header.block__header--js-tabbed
+      a href="#" data-click-tab="voting" class="selected"
+        - if poll.multiple_choice
+          i.fa.fa-check-square>
+        - else
+          i.fa.fa-check-circle>
+        | Voting
+      a href="#" data-click-tab="voters" data-load-tab=forum_topic_poll_voters_path(poll.topic.forum, poll.topic)
+        i.fa.fa-id-card>
+        | List voters
+      a href="#" data-click-tab="administration"
+        i.fa.fa-toolbox>
+        | Administrate
+    .block__tab data-tab="voting"
+      = voting
+    .block__tab.hidden data-tab="voters"
+      p Loading...
+    .block__tab.hidden data-tab="administration"
+      .field
+        a.button.button--state-warning.js-staff-action> href=edit_admin_poll_path(poll)
+          i.fa.fa-edit>
+          | Edit
+      - if !poll.hidden_from_users
+        = form_tag admin_poll_path(poll), method: :delete, id: 'delete-poll-form' do
+          = label_tag :deletion_reason, 'Deletion reason (cannot be empty)', required: true
+          .field.field--inline
+            = text_field_tag :deletion_reason, '', class: 'input input--wide', placeholder: 'Rule violation', required: true
+            = submit_tag 'Delete', class: 'button button--state-danger button--separate-left'
+- else
+  = voting

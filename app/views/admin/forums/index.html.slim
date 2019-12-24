@@ -1,0 +1,33 @@
+h1 Forums
+.block
+  .block__header
+    = icon_link 'New Forum', 'fa fa-plus', new_admin_forum_path
+  .block__content
+    - if @forums.blank?
+      p We couldn't find any forums for you, sorry!
+    - else
+      table.table
+        thead
+          tr
+            th Name
+            th Short Name
+            th Topic Count
+            th Post Count
+            th Options
+        tbody
+          - @forums.each do |forum|
+            tr
+              td
+                = link_to forum.name, forum_path(forum)
+              td
+                = forum.short_name
+              td
+                = forum.topic_count
+              td
+                = forum.post_count
+              td
+                => link_to t('show'), admin_forum_path(forum)
+                ' &bull;
+                => link_to t('edit'), edit_admin_forum_path(forum)
+                ' &bull;
+                = link_to t('destroy'), admin_forum_path(forum), data: { confirm: t('are_you_sure') }, method: :delete

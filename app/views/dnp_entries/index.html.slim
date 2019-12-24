@@ -1,0 +1,74 @@
+- page_layout :medium
+h2 The Do-Not-Post (DNP) List
+
+/ Information block
+h3 Information
+.block
+  .block__header
+    span.block__header__title About
+  .block__content
+    p This is a list of artists who have asked us to place a restriction on the uploading of their artwork. These restructions can include anything from requesting that no edits of their work be allowed, to requesting that no uploads be allowed unless uploaded by the artists themselves.
+    p We ask that you please respect the wishes of artists in regards to their artworks, and check the list before uploading. Note that just because an artist is not listed may not mean that their artwork is ok to post, especially if they have a note at their "source" that they do not wish for their artwork to be reposted.
+br
+
+/ Manage listings
+.block
+  .block__header
+    span.block__header__title Manage My Listings
+  .block__content
+    -if current_user && current_user.can?(:create, DnpEntry)
+      = link_to 'Create an entry', new_dnp_entry_path
+      br
+      = link_to 'My Listings', dnp_entries_path(show: 'mine')
+    -elsif current_user
+      ' You must have a verified user link to create and manage DNP entries.
+      = link_to 'Request a user link', new_user_link_path
+      | .
+    -else
+      | You must be logged in and have a verified user link to create and manage DNP entries.
+
+/ The actual DNP list
+h3 The List
+.block
+  - pagination = paginate @dnp_entries
+  .block__header
+    span.block__header__title The DNP List
+    = pagination
+  .block__content
+    - if @dnp_entries.blank?
+      | No results found for your query
+    - else
+      table.table
+        thead
+          tr
+            th Tag
+            th Restriction
+            th Conditions
+            - if @status_column
+              th Status
+              th Created
+            th Options
+        tbody
+          - @dnp_entries.each do |entry|
+            tr
+              td
+                = render partial: 'tags/tag', locals: { tag: entry.tag }
+              td
+                = entry.dnp_type
+              td
+                = entry.conditions.present? ? render_textile(entry.conditions) : '-'
+              - if @status_column
+                td
+                  = entry.aasm_state.capitalize
+                td
+                  = friendly_time(entry.created_at)
+              td
+                = link_to 'More Info', entry
+                - if can?(:edit, entry)
+                  br
+                  = link_to 'Edit', edit_admin_dnp_entry_path(entry)
+                - if can?(:rescind, entry) && entry.rescindable?
+                  br
+                  = link_to 'Rescind', dnp_entry_rescind_path(entry), method: :post, data: { confirm: t('dnp.confirm_rescind') }
+  .block__header
+    = pagination

@@ -1,0 +1,69 @@
+- tag = @ignoredtaglist[0]
+.block__content.js-imagelist-info.flex class="#{params[:page] && params[:page].to_i > 1 ? 'hidden' : ''}"
+  .flex__fixed.tag-info__image.thumb-tiny-container.spacing-right
+    - if tag.spoiler_image_uri
+      img src=tag.spoiler_image_uri alt="spoiler image"
+    - else
+      | no spoiler image
+  .flex__grow
+    = render partial: 'tags/tag', locals: { tag: tag }
+    = link_to 'Tag changes', tag_tag_changes_path(tag), class: 'detail-link'
+    - if can? :update, Tag
+      = link_to 'Edit details', edit_admin_tag_path(tag), class: 'detail-link'
+      - if can? :mod_read, TagChange
+        = link_to 'Tag usage', tag_usage_path(tag), class: 'detail-link'
+    - if (can? :manage, DnpEntry) && tag.namespace == 'artist'
+      = link_to 'Create DNP Entry', new_admin_dnp_entry_path(tag_id: tag.id)
+    - cache_unless_can(:update, Tag, cache_string, expires_in: 1.hour) do
+      - if tag.short_description.present?
+        br
+        strong Short description:
+        =< tag.short_description
+      - if tag.mod_notes.present? && (can? :update, Tag)
+        br
+        strong.comment_deleted Mod notes:
+        =< tag.mod_notes
+      - if aliased_tags.present?
+        br
+        strong Aliases:
+        =< aliased_tags
+      - if implied_tags.present?
+        br
+        strong Implies:
+        =< implied_tags
+        br
+      - if associated_links.present? || implied_by_tags.present? || tag.description.present?
+        br
+        = link_to 'Toggle detailed information', '#', data: { click_toggle: '.tag-info__more' }
+        .tag-info__more
+          hr
+          - if associated_links.present?
+            strong Associated links:
+            =< associated_links
+            br
+          - if associated_users.present?
+            strong Associated users:
+            =< associated_users
+            br
+          - if implied_by_tags.present?
+            input.toggle-box id="implied_by" type="checkbox" checked=false
+            label for="implied_by" Implied by (warning: unfiltered)
+            .toggle-box-container
+              .toggle-box-container__content
+                =< implied_by_tags
+            br
+          - if tag.description.present?
+            strong Detailed description:
+            br
+            = render_textile tag.description, true
+      - if @dnp_entries.present?
+        hr
+        strong.comment_deleted This artist is on the Do-Not-Post List with the following restrictions:
+        - @dnp_entries.each do |dnp|
+          br
+          ' &bull;
+          strong => dnp.dnp_type
+          => render_textile(dnp.conditions) if dnp.conditions.present?
+          | (
+          = link_to 'more info', dnp_entry_path(dnp)
+          | )

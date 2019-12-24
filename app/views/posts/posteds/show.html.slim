@@ -1,0 +1,11 @@
+h1 = @title
+- pagination = paginate @posts if @posts && (@posts.first || @posts.size > 1)
+- if pagination.present?
+  .block: .block__header = pagination
+
+= render partial: 'topics/posts/post_list', locals: { forum: nil }
+
+.block
+  .block__header.block__header--light
+    = pagination.presence
+    span.block__header__title = pagination_info(@posts)

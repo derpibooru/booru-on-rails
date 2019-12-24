@@ -1,0 +1,10 @@
+div
+  p
+    - if can? :update, @image
+      a.button#edit-description href="#" data-click-focus="#description" data-click-hide=".image-description" data-click-show="#description-form" title="Edit description" accessKey='d'
+        i.far.fa-edit>
+        | Description:
+    - else
+      | Description:
+  .image-description__text
+    = render_textile(@image.description, true)

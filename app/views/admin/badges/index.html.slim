@@ -1,0 +1,22 @@
+- list = capture do
+  table.table
+    thead
+      tr
+        th Badge
+        th Image
+        th Options
+    tbody
+      - @badges.each do |badge|
+        tr
+          td
+            = badge.title
+          td
+            = image_tag badge.uploaded_image.url, size: '32'
+          td
+            = link_to 'Users', admin_badge_users_path(badge)
+            - if can? :manage, Badge
+              '  &bull;
+              => link_to 'Edit', edit_admin_badge_path(badge)
+              ' &bull;
+              = link_to 'Destroy', admin_badge_path(badge), data: { confirm: t('are_you_sure') }, method: :delete
+= render partial: 'layouts/searchable_list', locals: { item_class: Badge, items: @badges, new_item_path: can?(:manage, Badge) ? new_admin_badge_path : nil, rendered_list: list }

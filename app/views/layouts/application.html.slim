@@ -1,0 +1,19 @@
+ruby:
+  theme = current_user&.theme || 'default'.freeze
+  signed_in = user_signed_in? ? 'true'.freeze : 'false'.freeze
+  container_class = current_user&.use_centered_layout ? 'layout--center-aligned'.freeze : nil
+  content_class = content_for(:page_layout_class) || @page_layout_class || 'layout--narrow'.freeze
+
+doctype html
+html prefix='dc: http://purl.org/dc/elements/1.1/' lang='en'
+  head
+    include _head.html
+  body data-theme=theme data-signed-in=signed_in
+    include _burger.html
+    #container class=container_class
+      include _header.html
+      include _flash_warnings.html
+      main#content class=content_class
+        = yield
+      include _footer.html
+    .js-datastore data=js_datastore

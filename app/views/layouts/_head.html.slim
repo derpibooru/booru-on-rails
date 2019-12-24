@@ -1,0 +1,40 @@
+meta charset='utf-8'
+meta name='viewport' content="width=#{request.user_agent =~ /Mobile|webOS/ ? 'device-width' : '1024'}, initial-scale=1"
+
+title
+  - if @title
+    => @title
+    ' -
+    = t('booru.name')
+  - else
+    = t('booru.name')
+
+- current_theme = user_signed_in? ? current_user.theme : 'default'.freeze
+= stylesheet_link_tag "themes/#{current_theme}", media: :all
+= javascript_include_tag 'application'.freeze, async: true
+= favicon_link_tag '/favicon.ico'.freeze, rel: 'icon'.freeze, type: 'image/x-icon'.freeze
+= favicon_link_tag '/favicon.svg'.freeze, rel: 'icon'.freeze, type: 'image/svg+xml'.freeze
+= csrf_meta_tags
+
+meta name='generator' content='booru-on-rails'
+meta name='theme-color' content='#618fc3'
+meta name='format-detection' content='telephone=no'
+- unless content_for(:robots)
+  meta name='robots' content='noindex, nofollow'
+
+- if @image && @image.persisted?
+  - thumb_url = "https:#{@image.image.url(:medium)}"
+  - image_url = short_image_url(@image)
+  meta name='description' content="MLP:FIM Imageboard - Image ##{@image.id} - #{@image.tag_list}"
+  meta name='keywords' content=@image.tag_list
+  link rel='image_src' href=thumb_url
+  meta property='og:image' content=thumb_url
+  - @image.tag_list.split(',').map(&:strip).select { |t| t.start_with?('artist:') }.each do |artist|
+    meta property='dc:creator' content=artist.gsub(/\Aartist:/, '')
+  - if @image.source_url.present?
+    link rel='foaf:primaryTopic' href=@image.source_url
+  link rel='alternate' type='application/json+oembed' href=oembed_url(format: :json, url: image_url) title='oEmbed JSON Profile'
+  link rel='alternate' type='application/xml+oembed' href=oembed_url(format: :xml, url: image_url) title='oEmbed XML Profile'
+  link rel='shortlink' href=image_url
+- else
+  meta name='description' content=t('booru.meta_description')
